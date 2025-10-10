@@ -10,13 +10,7 @@ import {
   useFundWallet,
   useSolanaFundingPlugin
 } from '@privy-io/react-auth/solana'
-import {
-  Connection,
-  LAMPORTS_PER_SOL,
-  PublicKey,
-  SystemProgram,
-  Transaction
-} from '@solana/web3.js'
+import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 import bs58 from 'bs58'
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
@@ -141,6 +135,77 @@ const normaliseSignature = (value) => {
 
   if (typeof value === 'object' && value.signature) {
     return normaliseSignature(value.signature)
+  }
+
+  return null
+}
+
+const extractSolAmountFromFundingResult = (result) => {
+  if (!result) {
+    return null
+  }
+
+  const normalizeNumeric = (value) => {
+    if (typeof value === 'number') {
+      return Number.isFinite(value) ? value : null
+    }
+
+    if (typeof value === 'string') {
+      const parsed = parseFloat(value)
+      return Number.isFinite(parsed) ? parsed : null
+    }
+
+    return null
+  }
+
+  if (typeof result === 'number' || typeof result === 'string') {
+    return normalizeNumeric(result)
+  }
+
+  if (Array.isArray(result)) {
+    const [first] = result
+    return extractSolAmountFromFundingResult(first)
+  }
+
+  if (typeof result === 'object') {
+    if (result.amount !== undefined) {
+      const direct = normalizeNumeric(result.amount)
+      if (direct !== null) {
+        return direct
+      }
+
+      if (typeof result.amount === 'object') {
+        const nestedAmount =
+          normalizeNumeric(result.amount.amount ?? result.amount.value ?? result.amount.sol)
+
+        if (nestedAmount !== null) {
+          return nestedAmount
+        }
+
+        if (typeof result.amount.lamports === 'number') {
+          return result.amount.lamports / LAMPORTS_PER_SOL
+        }
+      }
+    }
+
+    if (typeof result.lamports === 'number' && Number.isFinite(result.lamports)) {
+      return result.lamports / LAMPORTS_PER_SOL
+    }
+
+    if (result.fundingAmount !== undefined) {
+      return normalizeNumeric(result.fundingAmount)
+    }
+
+    if (result.depositAmount !== undefined) {
+      return normalizeNumeric(result.depositAmount)
+    }
+
+    if (result.transaction?.amount) {
+      const txAmount = normalizeNumeric(result.transaction.amount)
+      if (txAmount !== null) {
+        return txAmount
+      }
+    }
   }
 
   return null
@@ -437,212 +502,7 @@ export default function TurfLootTactical() {
     [resolveEmbeddedWalletFromHook]
   )
 
-  const getPreferredSolanaRpcEndpoints = useCallback(() => {
-    return [
-      process.env.NEXT_PUBLIC_SOLANA_PRIVATE_RPC,
-      process.env.NEXT_PUBLIC_SOLANA_HELIUS_RPC,
-      process.env.NEXT_PUBLIC_SOLANA_RPC_PRIVATE,
-      process.env.NEXT_PUBLIC_SOLANA_RPC_HELIUS,
-      process.env.NEXT_PUBLIC_HELIUS_RPC,
-      'https://api.mainnet-beta.solana.com',
-      'https://rpc.ankr.com/solana'
-    ].filter(Boolean)
-  }, [])
 
-  const transferDepositToPlatform = useCallback(
-    async ({ depositAmount, feeAmount = 0, userWalletAddress }) => {
-      try {
-        const normalizedUserWallet = normalizeAddress(userWalletAddress)
-
-        if (!authenticated || !privyUser || !normalizedUserWallet) {
-          console.log('⚠️ Skipping deposit transfer - missing authentication or wallet information')
-          return null
-        }
-
-        const platformWalletAddress = normalizeAddress(
-          process.env.NEXT_PUBLIC_PLATFORM_SOLANA_WALLET ||
-          process.env.NEXT_PUBLIC_SITE_FEE_WALLET ||
-          'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG'
-        )
-
-        if (!platformWalletAddress) {
-          console.error('❌ No platform Solana wallet configured for deposit transfer')
-          return null
-        }
-
-        if (platformWalletAddress === normalizedUserWallet) {
-          console.log('ℹ️ Platform wallet matches user wallet - nothing to transfer')
-          return null
-        }
-
-        const depositLamports = Math.max(0, Math.floor(depositAmount * LAMPORTS_PER_SOL))
-        const requestedFeeLamports = Math.max(0, Math.floor(feeAmount * LAMPORTS_PER_SOL))
-
-        if (depositLamports === 0 && requestedFeeLamports === 0) {
-          console.log('⚠️ Deposit amount too small to transfer to platform wallet')
-          return null
-        }
-
-        if (depositLamports < 5_000 && requestedFeeLamports === 0) {
-          console.log('⚠️ Deposit below minimum lamports threshold for transfer')
-          return null
-        }
-
-        const embeddedWalletAccount = privyUser?.linkedAccounts?.find(
-          account => account.type === 'wallet' && account.chainType === 'solana'
-        )
-
-        const expectedWalletAddress = normalizeAddress(
-          embeddedWalletAccount?.address ||
-          privyUser?.wallet?.address ||
-          normalizedUserWallet
-        )
-
-        let signingWallet = resolveEmbeddedWalletFromHook(expectedWalletAddress)
-
-        if (!signingWallet) {
-          signingWallet = await waitForEmbeddedWalletFromHook(expectedWalletAddress)
-        }
-
-        if (!signingWallet) {
-          console.error('❌ Unable to resolve embedded wallet for deposit transfer')
-          return null
-        }
-
-        const rpcEndpoints = getPreferredSolanaRpcEndpoints()
-        let connection = null
-        let rpcEndpointUsed = null
-
-        for (const endpoint of rpcEndpoints) {
-          try {
-            const testConnection = new Connection(endpoint, 'confirmed')
-            await testConnection.getLatestBlockhash()
-            connection = testConnection
-            rpcEndpointUsed = endpoint
-            break
-          } catch (rpcError) {
-            console.warn(`⚠️ Unable to use RPC endpoint ${endpoint}:`, rpcError?.message || rpcError)
-          }
-        }
-
-        if (!connection || !rpcEndpointUsed) {
-          console.error('❌ No Solana RPC endpoint available for deposit transfer')
-          return null
-        }
-
-        const feeWalletConfigured = normalizeAddress(process.env.NEXT_PUBLIC_SITE_FEE_WALLET)
-        let lamportsForFee = Math.min(requestedFeeLamports, depositLamports)
-        let lamportsForPlatform = depositLamports - lamportsForFee
-
-        const feeWalletAddress = feeWalletConfigured && feeWalletConfigured !== platformWalletAddress
-          ? feeWalletConfigured
-          : platformWalletAddress
-
-        if (feeWalletAddress === platformWalletAddress) {
-          lamportsForPlatform += lamportsForFee
-          lamportsForFee = 0
-        }
-
-        if (lamportsForPlatform <= 0 && lamportsForFee <= 0) {
-          console.log('⚠️ Nothing to transfer after fee calculations')
-          return null
-        }
-
-        const fromPublicKey = new PublicKey(normalizedUserWallet)
-        const transaction = new Transaction()
-
-        if (lamportsForPlatform > 0) {
-          transaction.add(SystemProgram.transfer({
-            fromPubkey: fromPublicKey,
-            toPubkey: new PublicKey(platformWalletAddress),
-            lamports: lamportsForPlatform
-          }))
-        }
-
-        if (lamportsForFee > 0) {
-          transaction.add(SystemProgram.transfer({
-            fromPubkey: fromPublicKey,
-            toPubkey: new PublicKey(feeWalletAddress),
-            lamports: lamportsForFee
-          }))
-        }
-
-        const latestBlockhash = await connection.getLatestBlockhash()
-        transaction.recentBlockhash = latestBlockhash.blockhash
-        transaction.lastValidBlockHeight = latestBlockhash.lastValidBlockHeight
-        transaction.feePayer = fromPublicKey
-
-        const serializedTransaction = transaction.serialize({ requireAllSignatures: false })
-
-        console.log('🔐 Preparing deposit transfer submission...', {
-          walletSupportsDirect: typeof signingWallet.signAndSendTransaction === 'function',
-          hookAvailable: typeof signAndSendTransaction === 'function',
-          rpcEndpointUsed,
-          chain: SOLANA_CHAIN
-        })
-
-        const response = await submitPrivyTransaction({
-          signingWallet,
-          signAndSendTransactionHook: signAndSendTransaction,
-          transaction: serializedTransaction,
-          chain: SOLANA_CHAIN,
-          options: {
-            commitment: 'confirmed',
-            uiOptions: {
-              showWalletUIs: false,
-              isCancellable: false,
-              description: 'Transferring TurfLoot deposit to arena pool'
-            }
-          }
-        })
-
-        const signature = normaliseSignature(response?.signature ?? response)
-
-        if (!signature) {
-          throw new Error('Privy did not return a transaction signature for deposit transfer')
-        }
-
-        console.log('✅ Deposit transfer submitted to Solana:', {
-          signature,
-          rpcEndpoint: rpcEndpointUsed,
-          lamportsForPlatform,
-          lamportsForFee
-        })
-
-        try {
-          await connection.confirmTransaction({
-            signature,
-            blockhash: latestBlockhash.blockhash,
-            lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
-          }, 'confirmed')
-          console.log('✅ Deposit transfer confirmed on Solana network')
-        } catch (confirmationError) {
-          console.warn('⚠️ Deposit transfer confirmation issue:', confirmationError)
-        }
-
-        return {
-          signature,
-          rpcEndpoint: rpcEndpointUsed,
-          platformWallet: platformWalletAddress,
-          feeWallet: feeWalletAddress,
-          lamportsForPlatform,
-          lamportsForFee
-        }
-      } catch (error) {
-        console.error('❌ Failed to transfer deposit to platform wallet:', error)
-        return null
-      }
-    },
-    [
-      SOLANA_CHAIN,
-      authenticated,
-      getPreferredSolanaRpcEndpoints,
-      privyUser,
-      resolveEmbeddedWalletFromHook,
-      signAndSendTransaction,
-      waitForEmbeddedWalletFromHook
-    ]
-  )
 
   // 🚀 Privy 3.0 + Helius: Room entry fee deduction (embedded wallet using Solana provider)
   const deductRoomFees = async (entryFee, userWalletAddress) => {
@@ -867,243 +727,6 @@ export default function TurfLootTactical() {
     
     console.log(`✅ Sufficient funds for ${actionName}: $${currentBalance.toFixed(3)} >= $${costs.totalCost.toFixed(3)}`)
     return true
-  }
-  const processFeeTransaction = async (depositAmount, userWalletAddress) => {
-    if (isProcessingFee) {
-      console.log('⚠️ Fee processing already in progress')
-      return false
-    }
-    
-    setIsProcessingFee(true)
-    
-    try {
-      const feePercentage = parseFloat(process.env.NEXT_PUBLIC_DEPOSIT_FEE_PERCENTAGE) || 10
-      const feeAmount = depositAmount * (feePercentage / 100)
-      const siteWallet = process.env.NEXT_PUBLIC_SITE_FEE_WALLET
-      
-      console.log(`💰 Processing ${feePercentage}% deposit fee:`, {
-        depositAmount: depositAmount.toFixed(4),
-        feeAmount: feeAmount.toFixed(4),
-        siteWallet,
-        userWallet: userWalletAddress
-      })
-      
-      // Check if we have enough balance for the fee (user needs to have deposited)
-      if (depositAmount < feeAmount) {
-        console.log('⚠️ Deposit amount too small for fee processing')
-        return false
-      }
-      
-      // Get the user's wallet from Privy to send the transaction
-      if (!privyUser || !authenticated) {
-        console.log('❌ User not authenticated for fee processing')
-        return false
-      }
-      
-      // Show user notification about fee processing
-      console.log(`🏦 Collecting ${feePercentage}% deposit fee (${feeAmount.toFixed(4)} SOL) for site operations`)
-      
-      const feeTransactionData = {
-        from: userWalletAddress,
-        to: siteWallet,
-        amount: feeAmount,
-        depositAmount: depositAmount,
-        feePercentage: feePercentage,
-        timestamp: new Date().toISOString(),
-        status: 'pending'
-      }
-
-      console.log('📄 Fee transaction prepared:', feeTransactionData)
-
-      const transferResult = await transferDepositToPlatform({
-        depositAmount,
-        feeAmount,
-        userWalletAddress
-      })
-
-      if (transferResult) {
-        feeTransactionData.status = 'completed'
-        feeTransactionData.signature = transferResult.signature
-        feeTransactionData.rpcEndpoint = transferResult.rpcEndpoint
-        feeTransactionData.platformWallet = transferResult.platformWallet
-        feeTransactionData.feeWallet = transferResult.feeWallet
-        feeTransactionData.lamportsForPlatform = transferResult.lamportsForPlatform
-        feeTransactionData.lamportsForFee = transferResult.lamportsForFee
-        console.log('✅ Deposit moved to platform wallet:', transferResult)
-      } else {
-        console.warn('⚠️ Deposit transfer to platform wallet did not complete. Funds remain in embedded wallet.')
-      }
-
-      const feeKey = `fee_transaction_${Date.now()}`
-      localStorage.setItem(feeKey, JSON.stringify(feeTransactionData))
-
-      if (!transferResult) {
-        return false
-      }
-
-      console.log('✅ Fee processing completed and recorded')
-
-      const netBalance = Math.max(depositAmount - feeAmount, 0)
-      const usdBalance = (netBalance * 150).toFixed(2)
-
-      setWalletBalance({
-        sol: netBalance.toFixed(4),
-        usd: usdBalance,
-        loading: false
-      })
-
-      const feeMessage = `Deposit successful! ${feePercentage}% fee (${feeAmount.toFixed(4)} SOL) collected for site operations. Net balance: ${netBalance.toFixed(4)} SOL`
-      console.log('💡', feeMessage)
-
-      // Trigger a fresh balance fetch so UI reflects on-chain transfer
-      await fetchWalletBalance(userWalletAddress)
-
-      return true
-      
-    } catch (error) {
-      console.error('❌ Error processing deposit fee:', error)
-      return false
-    } finally {
-      setIsProcessingFee(false)
-    }
-  }
-  
-  // DEPOSIT DETECTION SYSTEM
-  const detectDepositAndProcessFee = async (newBalance, walletAddress) => {
-    if (previousBalance === 0) {
-      // First balance check, just store the balance
-      setPreviousBalance(newBalance)
-      return
-    }
-    
-    if (newBalance > previousBalance) {
-      const depositAmount = newBalance - previousBalance
-      console.log(`💸 DEPOSIT DETECTED! Amount: ${depositAmount.toFixed(4)} SOL`)
-      console.log(`📊 Balance change: ${previousBalance.toFixed(4)} → ${newBalance.toFixed(4)} SOL`)
-      
-      // Only process fee for deposits above a minimum threshold (e.g., 0.001 SOL)
-      if (depositAmount >= 0.001) {
-        console.log('🎯 Processing deposit fee...')
-        await processFeeTransaction(depositAmount, walletAddress)
-      } else {
-        console.log('⚠️ Deposit too small for fee processing (< 0.001 SOL)')
-      }
-    }
-    
-    // Update previous balance for next comparison
-    setPreviousBalance(newBalance)
-  }
-  // STEP 2: Fetch the on-chain balance (with deposit detection and fee processing)
-  const checkSolanaBalance = async (walletAddress) => {
-    if (!walletAddress) {
-      console.log('⚠️ No wallet address provided for balance check')
-      return 0
-    }
-    
-    console.log('🔍 Checking Solana balance for:', walletAddress)
-    
-    // OPTION 1: Try private RPC provider first (Helius, Triton, etc.)
-    const privateRpcEndpoint =
-      process.env.NEXT_PUBLIC_SOLANA_PRIVATE_RPC ||
-      process.env.NEXT_PUBLIC_SOLANA_HELIUS_RPC ||
-      process.env.NEXT_PUBLIC_SOLANA_RPC_PRIVATE ||
-      process.env.NEXT_PUBLIC_SOLANA_RPC_HELIUS ||
-      process.env.NEXT_PUBLIC_HELIUS_RPC
-
-        if (privateRpcEndpoint) {
-          try {
-            console.log('🚀 Using private Solana RPC for real-time balance')
-
-            const response = await fetch(privateRpcEndpoint, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-              },
-              body: JSON.stringify({
-                jsonrpc: '2.0',
-                id: 1,
-                method: 'getBalance',
-                params: [walletAddress]
-              }),
-              signal: AbortSignal.timeout(5000)
-            })
-
-            if (response.ok) {
-              const data = await response.json()
-              if (data.result?.value !== undefined) {
-                const solBalance = data.result.value / 1000000000
-                console.log(`✅ Real balance from private RPC:`, solBalance, 'SOL')
-
-                // DEPOSIT DETECTION: Check for balance increases
-                await detectDepositAndProcessFee(solBalance, walletAddress)
-
-                return solBalance
-              }
-            } else {
-              console.log('❌ Private RPC failed:', response.status)
-            }
-          } catch (error) {
-            console.log('❌ Private RPC error:', error.message)
-          }
-        }
-
-    // OPTION 2: Fallback to other RPC providers
-    const fallbackEndpoints = [
-      'https://api.mainnet-beta.solana.com',
-      'https://rpc.ankr.com/solana'
-    ]
-    
-    for (const rpcUrl of fallbackEndpoints) {
-      try {
-        console.log(`🔄 Trying fallback RPC: ${rpcUrl}`)
-        
-        const response = await fetch(rpcUrl, {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-            jsonrpc: '2.0',
-            id: 1,
-            method: 'getBalance', 
-            params: [walletAddress]
-          }),
-          signal: AbortSignal.timeout(5000)
-        })
-        
-        if (response.ok) {
-          const data = await response.json()
-          if (data.result?.value !== undefined) {
-            const solBalance = data.result.value / 1000000000
-            console.log(`✅ Balance from ${rpcUrl}:`, solBalance, 'SOL')
-            
-            // DEPOSIT DETECTION: Check for balance increases
-            await detectDepositAndProcessFee(solBalance, walletAddress)
-            
-            return solBalance
-          }
-        }
-      } catch (error) {
-        console.log(`❌ Error with ${rpcUrl}:`, error.message)
-        continue
-      }
-    }
-    
-    // OPTION 3: Development fallback
-    console.log('📡 All RPC providers failed - using development fallback')
-    const storageKey = `solana_balance_${walletAddress}`
-    const storedBalance = localStorage.getItem(storageKey)
-    
-    if (storedBalance) {
-      const balance = parseFloat(storedBalance)
-      console.log('💾 Using stored balance:', balance, 'SOL')
-      return balance
-    }
-    
-    console.log('🔢 Using default balance: 0 SOL')
-    return 0
   }
 
   // STEP 1: Watch authentication and find wallet address
@@ -3053,17 +2676,85 @@ export default function TurfLootTactical() {
     })
   }, [setWalletBalance])
 
+  const getMockBalanceStorageKey = useCallback(() => {
+    if (typeof window === 'undefined') {
+      return null
+    }
+
+    if (!authenticated || !privyUser?.id) {
+      return null
+    }
+
+    return `turfloot_mock_balance_${privyUser.id}`
+  }, [authenticated, privyUser?.id])
+
+  const readMockBalanceFromStorage = useCallback(() => {
+    const key = getMockBalanceStorageKey()
+    if (!key) {
+      return 0
+    }
+
+    try {
+      const stored = window.localStorage.getItem(key)
+      if (!stored) {
+        return 0
+      }
+
+      const parsed = parseFloat(stored)
+      return Number.isFinite(parsed) ? Math.max(parsed, 0) : 0
+    } catch (error) {
+      console.warn('⚠️ Unable to read mock balance from storage:', error)
+      return 0
+    }
+  }, [getMockBalanceStorageKey])
+
+  const persistMockBalanceToStorage = useCallback((solAmount) => {
+    const key = getMockBalanceStorageKey()
+    if (!key || typeof window === 'undefined') {
+      return
+    }
+
+    try {
+      window.localStorage.setItem(key, solAmount.toString())
+    } catch (error) {
+      console.warn('⚠️ Unable to persist mock balance to storage:', error)
+    }
+  }, [getMockBalanceStorageKey])
+
+  const setMockBalanceState = useCallback((solAmount) => {
+    const normalizedSol = Number.isFinite(solAmount) ? Math.max(solAmount, 0) : 0
+    const usdValue = (normalizedSol * 150).toFixed(2)
+    const solValue = normalizedSol.toFixed(4)
+
+    persistMockBalanceToStorage(normalizedSol)
+    setWalletBalance({
+      sol: solValue,
+      usd: usdValue,
+      loading: false
+    })
+  }, [persistMockBalanceToStorage])
+
+  const incrementMockBalance = useCallback((deltaSol) => {
+    if (!Number.isFinite(deltaSol)) {
+      return
+    }
+
+    const currentSol = readMockBalanceFromStorage()
+    const nextSol = Math.max(0, currentSol + deltaSol)
+    setMockBalanceState(nextSol)
+  }, [readMockBalanceFromStorage, setMockBalanceState])
+
+  const checkSolanaBalance = useCallback(async () => {
+    const mockSolBalance = readMockBalanceFromStorage()
+    console.log('💰 Returning mock TurfLoot balance from storage:', mockSolBalance, 'SOL')
+    return mockSolBalance
+  }, [readMockBalanceFromStorage])
+
   // Balance check interval reference
   const balanceInterval = useRef(null)
 
   // Current wallet address being monitored
   const [currentWalletAddress, setCurrentWalletAddress] = useState(null)
-  
-  // Previous balance for deposit detection
-  const [previousBalance, setPreviousBalance] = useState(0)
-  
-  // Fee processing state
-  const [isProcessingFee, setIsProcessingFee] = useState(false)
 
   // Paid rooms system state
   const [insufficientFundsNotification, setInsufficientFundsNotification] = useState(null)
@@ -3080,7 +2771,6 @@ export default function TurfLootTactical() {
     if (!ready) {
       console.log('⏳ Privy not ready yet')
       resetWalletBalance()
-      setPreviousBalance(prev => (prev === 0 ? prev : 0))
       if (currentWalletAddress !== null) {
         setCurrentWalletAddress(null)
       }
@@ -3090,7 +2780,6 @@ export default function TurfLootTactical() {
     if (!authenticated || !privyUser) {
       console.log('👛 User not authenticated - setting default balance')
       resetWalletBalance()
-      setPreviousBalance(prev => (prev === 0 ? prev : 0))
       if (currentWalletAddress !== null) {
         setCurrentWalletAddress(null)
       }
@@ -3098,55 +2787,35 @@ export default function TurfLootTactical() {
     }
 
     const walletAddress = findWalletAddress()
+    const monitorKey = walletAddress || 'mock-balance'
 
-    if (!walletAddress) {
-      console.log('❌ No Solana wallet found')
-      resetWalletBalance()
-      setPreviousBalance(prev => (prev === 0 ? prev : 0))
-      if (currentWalletAddress !== null) {
-        setCurrentWalletAddress(null)
-      }
-      return
+    if (monitorKey !== currentWalletAddress) {
+      console.log('✅ Starting balance monitoring for:', monitorKey)
+      setCurrentWalletAddress(monitorKey)
     }
 
-    if (walletAddress !== currentWalletAddress) {
-      console.log('✅ Starting balance monitoring for:', walletAddress)
-      setCurrentWalletAddress(walletAddress)
-    }
+    fetchWalletBalance()
   }, [
     ready,
     authenticated,
     privyUser,
     walletAddressesSignature,
     currentWalletAddress,
-    resetWalletBalance
+    resetWalletBalance,
+    fetchWalletBalance
   ])
 
   // STEP 4: Expose balance to the page
-  const fetchWalletBalance = async (addressOverride = null) => {
+  const fetchWalletBalance = useCallback(async () => {
     console.log('💰 fetchWalletBalance called')
-
-    const walletAddress = addressOverride || currentWalletAddress
-
-    if (!walletAddress) {
-      console.log('👛 No wallet found - setting default balance')
-      resetWalletBalance()
-      return
-    }
-
-    console.log('🚀 Fetching balance for:', walletAddress)
 
     // Set loading state
     setWalletBalance(prev => ({ ...prev, loading: true }))
 
     try {
-      // Get SOL balance from blockchain
-      const solBalance = await checkSolanaBalance(walletAddress)
-
-      // Convert to USD (rough estimate)
+      const solBalance = await checkSolanaBalance()
       const usdBalance = (solBalance * 150).toFixed(2)
 
-      // Update UI state
       setWalletBalance({
         sol: solBalance.toFixed(4),
         usd: usdBalance,
@@ -3159,7 +2828,7 @@ export default function TurfLootTactical() {
       console.error('❌ Error in fetchWalletBalance:', error)
       resetWalletBalance()
     }
-  }
+  }, [checkSolanaBalance, resetWalletBalance])
 
   // STEP 3b: Refresh periodically once we know the active wallet
   useEffect(() => {
@@ -3172,13 +2841,12 @@ export default function TurfLootTactical() {
       return
     }
 
-    console.log('🔄 Balance monitoring active for wallet:', currentWalletAddress)
-    setPreviousBalance(prev => (prev === 0 ? prev : 0))
-    fetchWalletBalance(currentWalletAddress)
+    console.log('🔄 Balance monitoring active for wallet key:', currentWalletAddress)
+    fetchWalletBalance()
 
     balanceInterval.current = setInterval(() => {
       console.log('⏰ Periodic balance check triggered (60s interval)')
-      fetchWalletBalance(currentWalletAddress)
+      fetchWalletBalance()
     }, 60000)
 
     return () => {
@@ -3188,25 +2856,16 @@ export default function TurfLootTactical() {
         console.log('🧹 Cleaned up balance interval')
       }
     }
-  }, [currentWalletAddress])
+  }, [currentWalletAddress, fetchWalletBalance])
 
   // Manual balance update feature (for testing without RPC provider)
   const updateBalanceManually = (amount) => {
-    if (currentWalletAddress) {
-      const storageKey = `solana_balance_${currentWalletAddress}`
-      const previousBalance = parseFloat(localStorage.getItem(storageKey)) || 0
-      
-      localStorage.setItem(storageKey, amount.toString())
-      console.log(`💾 Manual balance update: ${amount} SOL for ${currentWalletAddress}`)
-      
-      // If this is an increase, trigger deposit detection
-      if (amount > previousBalance) {
-        console.log(`🧪 Simulating deposit of ${(amount - previousBalance).toFixed(4)} SOL`)
-      }
-      
-      // Trigger immediate balance refresh
-      fetchWalletBalance(currentWalletAddress)
+    if (!Number.isFinite(amount)) {
+      return
     }
+
+    console.log(`💾 Manual mock balance update: ${amount} SOL`)
+    setMockBalanceState(amount)
   }
 
   // Expose to window for testing (remove in production)
@@ -3214,8 +2873,7 @@ export default function TurfLootTactical() {
     if (typeof window !== 'undefined') {
       window.updateSolBalance = updateBalanceManually
       console.log('🧪 Testing functions available:')
-      console.log('  - window.updateSolBalance(0.5) // Updates balance to 0.5 SOL')
-      console.log('  - 💡 Try increasing balance to simulate deposit and fee processing!')
+      console.log('  - window.updateSolBalance(0.5) // Sets mock balance to 0.5 SOL')
       console.log('🎯 Challenge Testing Functions:')
       console.log('  - window.updateChallengeProgress("coins_eaten", 10) // Add 10 coins eaten')
       console.log('  - window.updateChallengeProgress("survival_time", 180) // 3 minutes survived') 
@@ -3241,7 +2899,7 @@ export default function TurfLootTactical() {
   // Handle balance refresh
   const handleBalanceRefresh = () => {
     console.log('🔄 Manual balance refresh triggered')
-    fetchWalletBalance(currentWalletAddress)
+    fetchWalletBalance()
   }
 
   // Copy wallet address to clipboard
@@ -3319,122 +2977,85 @@ export default function TurfLootTactical() {
 
   // PRIVY 3.0 SOLANA DEPOSIT - PROPER useFundWallet HOOK IMPLEMENTATION ✅
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT SOL clicked - using Privy 3.0 useFundWallet hook!')
-    
+    console.log('💰 DEPOSIT SOL clicked - platform wallet funding flow')
+
     try {
-      // Ensure user is authenticated first
-      if (!authenticated) {
+      if (!authenticated || !privyUser) {
         console.log('⚠️ User not authenticated, triggering login first')
-        await login()
+        if (typeof login === 'function') {
+          await login()
+        } else {
+          alert('Please log in to deposit funds.')
+        }
         return
       }
 
-      console.log('✅ User authenticated, performing comprehensive wallet detection...')
-      
-      // Enhanced wallet detection: Check multiple sources
-      let solanaWallet = null
-      let walletSource = null
-      
-      // Method 1: Check useWallets() hook (primary method)
-      if (wallets && wallets.length > 0) {
-        console.log('🔍 Checking wallets from useWallets():', wallets.map(w => ({ 
-          chainType: w.chainType, 
-          address: w.address?.slice(0, 8) + '...',
-          connectorType: w.connectorType 
-        })))
-        
-        solanaWallet = wallets.find(w => isSolanaChain(w.chainType) && isSolanaAddress(getWalletAddress(w)))
-        if (solanaWallet) {
-          walletSource = 'useWallets'
-        }
-      }
-      
-      // Method 2: Check embedded wallet in privyUser.wallet
-      if (!solanaWallet && privyUser?.wallet) {
-        console.log('🔍 Checking embedded wallet from privyUser.wallet:', {
-          address: privyUser.wallet.address,
-          chainType: privyUser.wallet.chainType || 'ethereum',
-          walletClientType: privyUser.wallet.walletClientType
-        })
-        
-        // Check if embedded wallet is the Solana wallet we're looking for
-        if (privyUser.wallet.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG' ||
-            isSolanaChain(privyUser.wallet.chainType)) {
-          solanaWallet = {
-            address: privyUser.wallet.address,
-            chainType: 'solana',
-            connectorType: 'embedded'
-          }
-          walletSource = 'privyUser.wallet'
-        }
-      }
-      
-      // Method 3: Check linkedAccounts for Solana wallets
-      if (!solanaWallet && privyUser?.linkedAccounts) {
-        console.log('🔍 Checking linkedAccounts for Solana wallets:', privyUser.linkedAccounts.map(acc => ({
-          type: acc.type,
-          address: acc.address?.slice(0, 8) + '...',
-          chainType: acc.chainType
-        })))
-        
-        const linkedSolanaWallet = privyUser.linkedAccounts.find(acc =>
-          acc.type === 'wallet' &&
-          (isSolanaChain(acc.chainType) || acc.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG') &&
-          isSolanaAddress(acc.address)
-        )
-        
-        if (linkedSolanaWallet) {
-          solanaWallet = {
-            address: linkedSolanaWallet.address,
-            chainType: 'solana',
-            connectorType: 'linked'
-          }
-          walletSource = 'linkedAccounts'
-        }
-      }
-      
-      // If still no Solana wallet found, show detailed error
-      if (!solanaWallet) {
-        console.log('❌ No Solana wallet found in any source')
-        console.log('Available sources checked:', {
-          useWalletsCount: wallets?.length || 0,
-          hasEmbeddedWallet: !!privyUser?.wallet,
-          embeddedWalletAddress: privyUser?.wallet?.address,
-          linkedAccountsCount: privyUser?.linkedAccounts?.length || 0,
-          linkedWallets: privyUser?.linkedAccounts?.filter(acc => acc.type === 'wallet').length || 0
-        })
-        
-        alert('No Solana wallet found. Please ensure you have a Solana wallet connected or create an embedded wallet.')
-        return
-      }
-      
-      console.log('✅ Solana wallet found via:', walletSource, {
-        address: solanaWallet.address,
-        connectorType: solanaWallet.connectorType,
-        chainType: solanaWallet.chainType
-      })
-      
-      // Check if fundWallet is available from useFundWallet hook
       if (!fundWallet || typeof fundWallet !== 'function') {
         console.error('❌ fundWallet not available from useFundWallet hook')
-        alert('Funding functionality not available. Please check Privy configuration or try refreshing the page.')
+        alert('Funding functionality not available. Please refresh the page or check Privy configuration.')
+        return
+      }
+
+      const platformWalletAddress = normalizeAddress(
+        process.env.NEXT_PUBLIC_PLATFORM_SOLANA_WALLET ||
+        process.env.NEXT_PUBLIC_SITE_FEE_WALLET ||
+        'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG'
+      )
+
+      if (!platformWalletAddress) {
+        console.error('❌ No platform Solana wallet configured for deposits')
+        alert('Deposit wallet is not configured. Please contact support.')
         return
       }
 
       const fundingRequest = {
-        address: solanaWallet.address,
+        address: platformWalletAddress,
         options: {
-          chain: 'solana:mainnet',
-          asset: 'native-currency'
+          chain: SOLANA_CHAIN,
+          asset: 'native-currency',
+          defaultFundingMethod: 'exchange',
+          uiConfig: {
+            receiveFundsTitle: 'Deposit to TurfLoot',
+            receiveFundsSubtitle: 'Funds go directly to the TurfLoot platform wallet.',
+            landing: {
+              title: 'Choose how you would like to deposit funds'
+            }
+          }
         }
       }
 
-      console.log('✅ fundWallet is available, opening Privy funding modal with options:', fundingRequest)
+      console.log('🚀 Opening Privy funding modal for platform wallet deposit:', fundingRequest)
 
-      await fundWallet(fundingRequest)
+      const result = await fundWallet(fundingRequest)
 
-      console.log('✅ SUCCESS! Privy funding modal opened with selection screen!')
-      
+      console.log('✅ Privy funding flow completed:', result)
+
+      let depositedSol = extractSolAmountFromFundingResult(result)
+
+      if (!depositedSol || depositedSol <= 0) {
+        console.warn('⚠️ Unable to infer deposit amount from Privy response. Prompting user for confirmation.')
+        if (typeof window !== 'undefined') {
+          const manualAmount = window.prompt(
+            'Deposit complete! Enter the amount of SOL you added so we can update your TurfLoot balance:'
+          )
+          const parsedAmount = manualAmount ? parseFloat(manualAmount) : NaN
+          if (Number.isFinite(parsedAmount) && parsedAmount > 0) {
+            depositedSol = parsedAmount
+          }
+        }
+      }
+
+      if (depositedSol && depositedSol > 0) {
+        console.log(`💸 Recording mock deposit of ${depositedSol.toFixed(4)} SOL`)
+        incrementMockBalance(depositedSol)
+        await fetchWalletBalance()
+        alert(`Deposit successful! ${depositedSol.toFixed(4)} SOL has been added to your TurfLoot balance.`)
+      } else {
+        console.warn('⚠️ Deposit completed but amount was not provided. Balance was not changed automatically.')
+        await fetchWalletBalance()
+        alert('Deposit completed. If your balance did not update automatically, please refresh it or enter the amount manually.')
+      }
+
     } catch (error) {
       console.error('❌ Solana funding error details:', {
         message: error.message,
@@ -3442,21 +3063,18 @@ export default function TurfLootTactical() {
         name: error.name,
         fundWalletAvailable: typeof fundWallet === 'function'
       })
-      
-      // Provide user-friendly error messages based on common issues
-      if (error.message?.includes('not enabled') || error.message?.includes('not available')) {
+
+      if (error?.message?.includes('not enabled') || error?.message?.includes('not available')) {
         alert('Wallet funding is not enabled for your account. Please contact support or check your Privy dashboard settings.')
-      } else if (error.message?.includes('unsupported') || error.message?.includes('chain')) {
+      } else if (error?.message?.includes('unsupported') || error?.message?.includes('chain')) {
         alert('Solana funding may not be supported. Please check your Privy dashboard configuration.')
-      } else if (error.message?.includes('User rejected') || error.message?.includes('cancelled')) {
+      } else if (error?.message?.includes('User rejected') || error?.message?.includes('cancelled')) {
         console.log('ℹ️ User cancelled the funding process')
-        // Don't show alert for user cancellation
       } else {
-        alert(`Unable to open funding modal: ${error.message || 'Please check browser console for details'}`)
+        alert(`Unable to open funding modal: ${error?.message || 'Please check browser console for details'}`)
       }
     }
   }
-
   const handleWithdraw = async () => {
     try {
       console.log('💸 WITHDRAW button clicked - Desktop/Mobile')
