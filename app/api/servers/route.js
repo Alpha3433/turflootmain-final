@@ -40,17 +40,22 @@ export async function GET(request) {
       canJoin: true
     }
 
-    // Define lightweight cash room templates so players can jump straight into micro-stake games
+    // Define cash room templates with direct room costs ($1, $5, $10)
     const cashRoomConfigs = [
       {
-        stake: 0.02,
-        idSuffix: '002',
-        description: 'Micro stakes head-to-head TurfLoot match for new wagers'
+        stake: 1,
+        idSuffix: '1',
+        description: 'Entry level TurfLoot arena - $1 room cost'
       },
       {
-        stake: 0.05,
-        idSuffix: '005',
-        description: 'Low stakes TurfLoot arena for casual competitive play'
+        stake: 5,
+        idSuffix: '5',
+        description: 'Mid stakes TurfLoot arena - $5 room cost'
+      },
+      {
+        stake: 10,
+        idSuffix: '10',
+        description: 'High stakes TurfLoot arena - $10 room cost'
       }
     ]
 
