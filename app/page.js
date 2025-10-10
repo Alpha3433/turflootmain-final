@@ -146,6 +146,63 @@ const normaliseSignature = (value) => {
   return null
 }
 
+const ensureTransactionBytes = (value) => {
+  if (!value) {
+    return null
+  }
+
+  if (value instanceof Uint8Array) {
+    return value
+  }
+
+  if (ArrayBuffer.isView(value)) {
+    return new Uint8Array(value.buffer.slice(value.byteOffset, value.byteOffset + value.byteLength))
+  }
+
+  if (Array.isArray(value)) {
+    return Uint8Array.from(value)
+  }
+
+  return null
+}
+
+const submitPrivyTransaction = async ({
+  signingWallet,
+  signAndSendTransactionHook,
+  transaction,
+  chain,
+  options
+}) => {
+  if (!signingWallet) {
+    throw new Error('No signing wallet provided for transaction submission')
+  }
+
+  const transactionBytes = ensureTransactionBytes(transaction)
+
+  if (!transactionBytes) {
+    throw new Error('Invalid transaction format supplied for signing')
+  }
+
+  if (typeof signingWallet.signAndSendTransaction === 'function') {
+    return signingWallet.signAndSendTransaction({
+      transaction: transactionBytes,
+      chain,
+      options
+    })
+  }
+
+  if (typeof signAndSendTransactionHook === 'function') {
+    return signAndSendTransactionHook({
+      wallet: signingWallet,
+      transaction: transactionBytes,
+      chain,
+      options
+    })
+  }
+
+  throw new Error('Transaction signing unavailable. Please refresh and try again.')
+}
+
 export default function TurfLootTactical() {
   const router = useRouter()
 
@@ -452,11 +509,6 @@ export default function TurfLootTactical() {
           return null
         }
 
-        if (typeof signAndSendTransaction !== 'function') {
-          console.error('❌ signAndSendTransaction not available for deposit transfer')
-          return null
-        }
-
         const rpcEndpoints = getPreferredSolanaRpcEndpoints()
         let connection = null
         let rpcEndpointUsed = null
@@ -522,8 +574,16 @@ export default function TurfLootTactical() {
 
         const serializedTransaction = transaction.serialize({ requireAllSignatures: false })
 
-        const response = await signAndSendTransaction({
-          wallet: signingWallet,
+        console.log('🔐 Preparing deposit transfer submission...', {
+          walletSupportsDirect: typeof signingWallet.signAndSendTransaction === 'function',
+          hookAvailable: typeof signAndSendTransaction === 'function',
+          rpcEndpointUsed,
+          chain: SOLANA_CHAIN
+        })
+
+        const response = await submitPrivyTransaction({
+          signingWallet,
+          signAndSendTransactionHook: signAndSendTransaction,
           transaction: serializedTransaction,
           chain: SOLANA_CHAIN,
           options: {
@@ -667,28 +727,18 @@ export default function TurfLootTactical() {
       console.log('✅ Embedded wallet found for signing:', signingWallet.address)
 
       // Step 4: Sign and send transaction with Privy (this will show Privy modal)
-      console.log('🔐 About to call signAndSendTransaction...')
-      console.log('🔍 signAndSendTransaction type:', typeof signAndSendTransaction)
-      console.log('🔍 signAndSendTransaction value:', signAndSendTransaction)
-      console.log('🔍 Is function?', typeof signAndSendTransaction === 'function')
-      
-      if (typeof signAndSendTransaction !== 'function') {
-        console.error('❌ signAndSendTransaction is not a function!')
-        console.error('🔍 Actual value:', signAndSendTransaction)
-        return { 
-          success: false, 
-          error: 'Transaction signing unavailable. Please refresh and try again.'
-        }
-      }
-      
-      console.log('✅ Calling signAndSendTransaction with params:', {
-        walletAddress: signingWallet.address,
-        walletClientType: signingWallet.walletClientType,
+      const directSupport = typeof signingWallet.signAndSendTransaction === 'function'
+      const hookSupport = typeof signAndSendTransaction === 'function'
+
+      console.log('🔐 Preparing to submit transaction...', {
+        walletSupportsDirect: directSupport,
+        hookAvailable: hookSupport,
         chain: SOLANA_CHAIN
       })
 
-      const result = await signAndSendTransaction({
-        wallet: signingWallet,
+      const result = await submitPrivyTransaction({
+        signingWallet,
+        signAndSendTransactionHook: signAndSendTransaction,
         transaction: serialized,
         chain: SOLANA_CHAIN,
         options: {
