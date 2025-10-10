@@ -260,27 +260,39 @@ const submitPrivyTransaction = async ({
 
   console.log('📤 Transaction serialized to bytes:', transactionBytes.length, 'bytes')
 
-  // Prefer using the hook-based signing for embedded wallets (more reliable in Privy 3.0)
+  // Debug what's available
+  console.log('🔍 Transaction signing methods available:', {
+    hasSignAndSendHook: typeof signAndSendTransactionHook === 'function',
+    hasWalletSignAndSend: typeof signingWallet?.signAndSendTransaction === 'function',
+    walletAddress: signingWallet?.address
+  })
+
+  // Try hook-based signing first (Privy 3.0 recommended approach)
   if (typeof signAndSendTransactionHook === 'function') {
-    console.log('📤 Using signAndSendTransaction HOOK with serialized bytes (Privy 3.0)')
-    return signAndSendTransactionHook(transactionBytes, {
-      address: signingWallet.address,
-      chain,
-      ...options
-    })
+    console.log('📤 Using signAndSendTransaction HOOK (Privy 3.0)')
+    try {
+      return await signAndSendTransactionHook(transactionBytes, {
+        address: signingWallet.address,
+        chain,
+        ...options
+      })
+    } catch (hookError) {
+      console.error('❌ Hook-based signing failed:', hookError)
+      // Continue to fallback
+    }
   }
 
   // Fallback to direct wallet method
-  if (typeof signingWallet.signAndSendTransaction === 'function') {
-    console.log('📤 Using wallet.signAndSendTransaction with serialized bytes')
-    return signingWallet.signAndSendTransaction({
+  if (typeof signingWallet?.signAndSendTransaction === 'function') {
+    console.log('📤 Using wallet.signAndSendTransaction (fallback)')
+    return await signingWallet.signAndSendTransaction({
       transaction: transactionBytes,
       chain,
       ...options
     })
   }
 
-  throw new Error('Transaction signing unavailable. Please refresh and try again.')
+  throw new Error('Transaction signing unavailable. Neither hook nor wallet method is available. Please refresh and try again.')
 }
 
 export default function TurfLootTactical() {
