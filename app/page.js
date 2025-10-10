@@ -222,7 +222,41 @@ const submitPrivyTransaction = async ({
     throw new Error('No signing wallet provided for transaction submission')
   }
 
-  const { connection, sendOptions, ...forwardedOptions } = options || {}
+  const { connection, sendOptions, ...restOptions } = options || {}
+
+  const forwardedOptions = (() => {
+    if (!restOptions && !sendOptions) {
+      return undefined
+    }
+
+    const cloned = restOptions ? { ...restOptions } : {}
+
+    if (cloned.uiOptions && typeof cloned.uiOptions === 'object') {
+      cloned.uiOptions = { ...cloned.uiOptions }
+    }
+
+    if (sendOptions && typeof sendOptions === 'object') {
+      const { skipPreflight, maxRetries, preflightCommitment, minContextSlot } = sendOptions
+
+      if (typeof skipPreflight !== 'undefined' && typeof cloned.skipPreflight === 'undefined') {
+        cloned.skipPreflight = skipPreflight
+      }
+
+      if (typeof maxRetries !== 'undefined' && typeof cloned.maxRetries === 'undefined') {
+        cloned.maxRetries = maxRetries
+      }
+
+      if (typeof preflightCommitment !== 'undefined' && typeof cloned.preflightCommitment === 'undefined') {
+        cloned.preflightCommitment = preflightCommitment
+      }
+
+      if (typeof minContextSlot !== 'undefined' && typeof cloned.minContextSlot === 'undefined') {
+        cloned.minContextSlot = minContextSlot
+      }
+    }
+
+    return Object.keys(cloned).length > 0 ? cloned : undefined
+  })()
 
   const resolveTransactionBytes = (value) => {
     if (!value) {
@@ -231,6 +265,10 @@ const submitPrivyTransaction = async ({
 
     if (value instanceof Uint8Array) {
       return value
+    }
+
+    if (typeof Buffer !== 'undefined' && Buffer.isBuffer && Buffer.isBuffer(value)) {
+      return new Uint8Array(value)
     }
 
     if (ArrayBuffer.isView(value)) {
@@ -247,9 +285,54 @@ const submitPrivyTransaction = async ({
   const isTransactionObject =
     transaction && typeof transaction === 'object' && typeof transaction.serialize === 'function'
 
-  const transactionForSigning = isTransactionObject ? transaction : resolveTransactionBytes(transaction)
+  const serializeTransactionObject = (value) => {
+    if (!value || typeof value.serialize !== 'function') {
+      return null
+    }
 
-  if (!transactionForSigning) {
+    try {
+      const serialized = value.serialize({ requireAllSignatures: false, verifySignatures: false })
+
+      if (serialized instanceof Uint8Array) {
+        return serialized
+      }
+
+      if (typeof Buffer !== 'undefined' && Buffer.isBuffer && Buffer.isBuffer(serialized)) {
+        return new Uint8Array(serialized)
+      }
+
+      if (ArrayBuffer.isView(serialized)) {
+        return new Uint8Array(
+          serialized.buffer.slice(serialized.byteOffset, serialized.byteOffset + serialized.byteLength)
+        )
+      }
+
+      if (Array.isArray(serialized)) {
+        return Uint8Array.from(serialized)
+      }
+
+      return null
+    } catch (error) {
+      console.error('❌ Failed to serialize transaction object for Privy submission:', error)
+      return null
+    }
+  }
+
+  const transactionBytes = isTransactionObject
+    ? serializeTransactionObject(transaction)
+    : resolveTransactionBytes(transaction)
+
+  const transactionPayloads = []
+
+  if (transactionBytes) {
+    transactionPayloads.push({ type: 'bytes', value: transactionBytes })
+  }
+
+  if (isTransactionObject) {
+    transactionPayloads.push({ type: 'transaction', value: transaction })
+  }
+
+  if (transactionPayloads.length === 0) {
     throw new Error('Invalid transaction format supplied for signing')
   }
 
@@ -261,35 +344,61 @@ const submitPrivyTransaction = async ({
   })
 
   // Try hook-based signing first (Privy 3.0 recommended approach)
+  const cloneForwardedOptions = () => {
+    if (!forwardedOptions) {
+      return undefined
+    }
+
+    const cloned = { ...forwardedOptions }
+
+    if (forwardedOptions.uiOptions && typeof forwardedOptions.uiOptions === 'object') {
+      cloned.uiOptions = { ...forwardedOptions.uiOptions }
+    }
+
+    return cloned
+  }
+
   const invokeSignAndSend = async (fn, label) => {
     if (typeof fn !== 'function') {
       return null
     }
 
-    const payload = {
-      transaction: transactionForSigning,
-      wallet: signingWallet,
-      chain,
-      options: forwardedOptions
-    }
+    let lastError = null
 
-    try {
-      return await fn(payload)
-    } catch (error) {
-      console.error(`❌ ${label} failed with structured payload:`, error)
+    for (const { type, value } of transactionPayloads) {
+      const payload = {
+        transaction: value,
+        wallet: signingWallet,
+        chain,
+        options: cloneForwardedOptions()
+      }
 
-      // Some older Privy builds still expect the legacy positional arguments.
-      // Retry once using the legacy call signature before moving on.
       try {
-        return await fn(transactionForSigning, {
-          chain,
-          ...forwardedOptions
-        })
-      } catch (legacyError) {
-        console.error(`❌ ${label} legacy invocation failed:`, legacyError)
-        throw legacyError
+        console.log(`📨 Attempting ${label} with ${type} payload`)
+        return await fn(payload)
+      } catch (error) {
+        console.error(`❌ ${label} structured ${type} payload failed:`, error)
+        lastError = error
       }
     }
+
+    for (const { type, value } of transactionPayloads) {
+      const positionalOptions = { chain, ...(cloneForwardedOptions() || {}) }
+
+      try {
+        console.log(`📨 Attempting ${label} legacy ${type} invocation`)
+        return await fn(value, positionalOptions)
+      } catch (legacyError) {
+        console.error(`❌ ${label} legacy ${type} invocation failed:`, legacyError)
+        lastError = legacyError
+      }
+    }
+
+    if (lastError) {
+      throw lastError
+    }
+
+    throw new Error(`${label} could not be executed. No payload formats succeeded.`)
   }
 
   if (typeof signAndSendTransactionHook === 'function') {
