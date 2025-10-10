@@ -2982,12 +2982,9 @@ export default function TurfLootTactical() {
     }
   }
 
-  // DEPOSIT FLOW: Fund wallet + Auto-transfer to platform
-  const [depositModalOpen, setDepositModalOpen] = useState(false)
-  const [depositStep, setDepositStep] = useState('initial') // initial, funding, transferring, complete
-  
+  // SIMPLE DEPOSIT: Just fund user's embedded wallet via Privy
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT clicked - starting deposit flow!')
+    console.log('💰 DEPOSIT SOL clicked - opening Privy funding modal!')
     
     try {
       // Ensure user is authenticated
@@ -2997,78 +2994,22 @@ export default function TurfLootTactical() {
         return
       }
       
-      // Get user wallet address
-      const userWallet = privyUser?.linkedAccounts?.find(
-        acc => acc.type === 'wallet'
-      )?.address || privyUser?.id
-      
-      if (!userWallet) {
-        console.error('❌ No wallet address found')
-        alert('Please connect a wallet first')
+      if (!ready) {
+        console.log('⚠️ Privy not ready')
         return
       }
       
-      // Open custom deposit modal
-      setDepositModalOpen(true)
-      setDepositStep('initial')
+      console.log('✅ Opening Privy funding modal for embedded wallet...')
+      
+      // Open Privy funding modal - user funds their own embedded wallet
+      await fundWallet()
+      
+      console.log('✅ Privy funding modal opened!')
+      
+      // Balance will auto-update via polling
       
     } catch (error) {
-      console.error('❌ Error starting deposit:', error)
-      alert(`Error: ${error.message}`)
-    }
-  }
-  
-  // Execute deposit: Fund wallet then transfer to platform
-  const executeDeposit = async () => {
-    try {
-      const userWallet = privyUser?.linkedAccounts?.find(
-        acc => acc.type === 'wallet'
-      )?.address
-      
-      if (!userWallet) {
-        throw new Error('No wallet found')
-      }
-      
-      // Step 1: Open Privy funding modal to fund user's wallet
-      console.log('💳 Step 1: Opening Privy funding modal...')
-      setDepositStep('funding')
-      
-      // Call fundWallet - this funds the user's own wallet via Privy/Moonpay
-      await fundWallet(userWallet, {
-        config: {
-          header: 'Add Funds to TurfLoot',
-          description: 'Step 1 of 2: Add SOL to your wallet'
-        }
-      })
-      
-      console.log('✅ User funded their wallet')
-      
-      // Step 2: Auto-transfer to platform wallet
-      console.log('💸 Step 2: Transferring to platform...')
-      setDepositStep('transferring')
-      
-      // Small delay to let blockchain confirm
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      // Trigger sweep
-      const sweepResult = await sweepWalletToBalance()
-      
-      if (sweepResult.success) {
-        console.log('✅ Transfer complete!')
-        setDepositStep('complete')
-        
-        // Close modal after 2 seconds
-        setTimeout(() => {
-          setDepositModalOpen(false)
-          setDepositStep('initial')
-        }, 2000)
-      } else {
-        throw new Error(sweepResult.error || 'Transfer failed')
-      }
-      
-    } catch (error) {
-      console.error('❌ Deposit flow error:', error)
-      setDepositStep('initial')
+      console.error('❌ Error opening funding modal:', error)
       
       if (!error.message?.includes('User') && !error.message?.includes('cancel')) {
         alert(`Error: ${error.message}`)
