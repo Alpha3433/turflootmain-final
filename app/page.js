@@ -618,12 +618,17 @@ export default function TurfLootTactical() {
       if (!signature) {
         throw new Error('Privy wallet did not return a valid transaction signature.')
       }
-      console.log('✅ Transaction sent! Signature:', signature)
+      console.log('✅ 🔗 SOLANA TRANSACTION SENT!')
+      console.log('   • Transaction Signature:', signature)
+      console.log('   • Amount Sent: ' + roomCostSol.toFixed(6) + ' SOL')
+      console.log('   • View on Solscan: https://solscan.io/tx/' + signature)
 
       // Step 4: Confirm transaction
       try {
         await connection.confirmTransaction(signature, 'confirmed')
-        console.log('✅ Transaction confirmed on-chain')
+        console.log('✅ ⛓️ SOLANA TRANSACTION CONFIRMED ON-CHAIN!')
+        console.log('   • Payment Method: SOL via Solana blockchain')
+        console.log('   • NOT USD - This is a real SOL transfer!')
       } catch (confirmationError) {
         console.warn('⚠️ Transaction confirmation issue:', confirmationError)
       }
