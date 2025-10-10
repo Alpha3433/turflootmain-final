@@ -2975,9 +2975,9 @@ export default function TurfLootTactical() {
     }
   }
 
-  // DIRECT DEPOSIT - Users deposit to platform wallet via Privy
+  // DIRECT DEPOSIT - Show deposit instructions modal
   const handleDeposit = async (amountUsd = null) => {
-    console.log('💰 DIRECT DEPOSIT clicked - depositing to platform wallet!')
+    console.log('💰 DIRECT DEPOSIT clicked - showing deposit instructions!')
     
     try {
       // Ensure user is authenticated
@@ -2998,30 +2998,61 @@ export default function TurfLootTactical() {
         return
       }
       
+      const platformWallet = process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS || 
+                            'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
+      
+      // Show deposit instructions
+      const message = `
+💰 DEPOSIT INSTRUCTIONS
+
+To add funds to your TurfLoot balance:
+
+1️⃣ Send SOL to this address:
+${platformWallet}
+
+2️⃣ Your balance will be automatically credited within 30 seconds
+
+3️⃣ Minimum: $1 USD
+    Recommended: $10-$50 USD
+
+📱 You can use:
+• Phantom Wallet
+• Solflare
+• Any Solana wallet
+• Moonpay/Ramp (buy & send)
+
+⚠️ IMPORTANT: 
+• Send from your connected wallet: ${userWallet.substring(0, 8)}...
+• We track deposits by sender address
+• Only send SOL (not tokens)
+
+Would you like to copy the platform wallet address?
+      `.trim()
+      
+      if (confirm(message)) {
+        // Copy to clipboard
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(platformWallet)
+          alert('✅ Platform wallet address copied to clipboard!')
+        }
+      }
+      
+      // Create pending deposit record
       console.log('📝 Creating pending deposit record...')
       
-      // Create pending deposit to track this user's deposit
-      const pendingResponse = await fetch('/api/deposits/pending', {
+      await fetch('/api/deposits/pending', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: userWallet,
-          amountUsd: amountUsd || 10 // Default $10 if not specified
+          amountUsd: amountUsd || 10
         })
       })
       
-      const pendingData = await pendingResponse.json()
-      console.log('✅ Pending deposit created:', pendingData.deposit._id)
-      
-      // Open Privy funding modal
-      // Note: Privy will handle the deposit to platform wallet
-      await fundWallet()
-      
-      console.log('✅ Fund wallet modal opened - deposit to platform wallet!')
-      console.log(`💡 Platform Wallet: ${pendingData.platformWallet}`)
+      console.log('✅ Pending deposit created - waiting for blockchain confirmation')
       
     } catch (error) {
-      console.error('❌ Error opening deposit modal:', error)
+      console.error('❌ Error showing deposit instructions:', error)
       alert(`Error: ${error.message}`)
     }
   }
