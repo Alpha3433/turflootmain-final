@@ -609,7 +609,7 @@ export default function TurfLootTactical() {
           uiOptions: {
             showWalletUIs: false,
             isCancellable: false,
-            description: `Submitting ${entryFeeSol.toFixed(6)} SOL arena entry fee`
+            description: `Submitting ${roomCostSol.toFixed(6)} SOL room entry`
           }
         }
       })
@@ -631,7 +631,7 @@ export default function TurfLootTactical() {
 
       // Step 5: Update local balance
       if (walletBalance?.sol) {
-        const newSolBalance = Math.max(0, parseFloat(walletBalance.sol) - entryFeeSol)
+        const newSolBalance = Math.max(0, parseFloat(walletBalance.sol) - roomCostSol)
         setWalletBalance({
           sol: newSolBalance.toFixed(6),
           usd: (newSolBalance * USD_PER_SOL).toFixed(2)
@@ -642,14 +642,14 @@ export default function TurfLootTactical() {
         success: true,
         signature,
         fees: {
-          entrySol: entryFeeSol,
-          totalSol: entryFeeSol,
-          entryUsd: entryFeeUsd,
-          totalUsd: entryFeeUsd
+          roomCostSol: roomCostSol,
+          totalSol: roomCostSol,
+          roomCostUsd: roomCostUsd,
+          totalUsd: roomCostUsd
         },
         costs: {
-          entryFee: entryFeeUsd,
-          totalCost: entryFeeUsd
+          roomCost: roomCostUsd,
+          totalCost: roomCostUsd
         }
       }
 
