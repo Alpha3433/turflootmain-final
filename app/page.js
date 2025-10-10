@@ -3039,10 +3039,21 @@ export default function TurfLootTactical() {
         return
       }
       
-      console.log('✅ Opening Privy funding modal for embedded wallet...')
+      // Get the embedded Solana wallet address
+      const embeddedWallet = privyUser?.linkedAccounts?.find(
+        account => account.type === 'wallet' && account.chainType === 'solana'
+      )
+      
+      if (!embeddedWallet) {
+        console.error('❌ No embedded Solana wallet found')
+        alert('No Solana wallet found. Please refresh and try again.')
+        return
+      }
+      
+      console.log('✅ Opening Privy funding modal for embedded wallet:', embeddedWallet.address)
       
       // Open Privy funding modal - user funds their own embedded wallet
-      await fundWallet()
+      await fundWallet({ address: embeddedWallet.address })
       
       console.log('✅ Privy funding modal opened!')
       
