@@ -2795,7 +2795,7 @@ export default function TurfLootTactical() {
 
     try {
       // Get real SOL balance from blockchain
-      const solBalance = await checkSolanaBalance()
+      const solBalance = await checkSolanaBalance(walletAddress)
 
       // Convert to USD (rough estimate: $150 per SOL)
       const usdBalance = (solBalance * 150).toFixed(2)
