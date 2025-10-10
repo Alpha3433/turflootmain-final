@@ -17,6 +17,34 @@ const DEFAULT_SITE_SWEEP_WALLET = 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG'
 // NOTE: Should be '@privy-io/react-auth/solana' per docs, but causes compatibility issues
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
+const DEFAULT_SOLANA_NETWORK = 'mainnet-beta'
+let hasWarnedAboutUnsupportedSolanaNetwork = false
+
+const resolveSolanaNetwork = (network) => {
+  const candidate = typeof network === 'string' ? network.trim().toLowerCase() : ''
+
+  if (!candidate) {
+    return DEFAULT_SOLANA_NETWORK
+  }
+
+  if (candidate.startsWith('solana:')) {
+    return resolveSolanaNetwork(candidate.split(':').slice(1).join(':'))
+  }
+
+  if (candidate === 'mainnet' || candidate === 'mainnet-beta') {
+    return DEFAULT_SOLANA_NETWORK
+  }
+
+  if (!hasWarnedAboutUnsupportedSolanaNetwork) {
+    console.warn(
+      `⚠️ Unsupported Solana network "${candidate}" configured. Paid rooms require mainnet; defaulting to ${DEFAULT_SOLANA_NETWORK}.`
+    )
+    hasWarnedAboutUnsupportedSolanaNetwork = true
+  }
+
+  return DEFAULT_SOLANA_NETWORK
+}
+
 export default function TurfLootTactical() {
   const router = useRouter()
 
@@ -65,10 +93,12 @@ export default function TurfLootTactical() {
     return calculatePaidRoomCosts(entryFee, feePercentage, options)
   }
 
+  const resolvedSolanaNetwork = resolveSolanaNetwork(process.env.NEXT_PUBLIC_SOLANA_NETWORK)
+
   const SOLANA_RPC_ENDPOINTS = useMemo(
     () =>
       buildSolanaRpcEndpointList({
-        network: process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta',
+        network: resolvedSolanaNetwork,
         privateRpc:
           process.env.NEXT_PUBLIC_SOLANA_PRIVATE_RPC ||
           process.env.NEXT_PUBLIC_SOLANA_HELIUS_RPC ||
@@ -78,30 +108,16 @@ export default function TurfLootTactical() {
         list: process.env.NEXT_PUBLIC_SOLANA_RPC_LIST,
         fallbacks: process.env.NEXT_PUBLIC_SOLANA_RPC_FALLBACKS
       }),
-    []
+    [resolvedSolanaNetwork]
   )
   const USD_PER_SOL_FALLBACK = parseFloat(process.env.NEXT_PUBLIC_USD_PER_SOL || '150')
   const SOLANA_CHAIN = useMemo(() => {
-    const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta').toLowerCase()
-
-    if (network.startsWith('solana:')) {
-      return network
+    if (resolvedSolanaNetwork === 'mainnet-beta') {
+      return 'solana:mainnet'
     }
 
-    if (network === 'mainnet' || network === 'mainnet-beta') {
-      return 'solana:mainnet-beta'
-    }
-
-    if (network === 'devnet') {
-      return 'solana:devnet'
-    }
-
-    if (network === 'testnet') {
-      return 'solana:testnet'
-    }
-
-    return `solana:${network}`
-  }, [])
+    return `solana:${resolvedSolanaNetwork}`
+  }, [resolvedSolanaNetwork])
 
   const isSolanaChain = (chainType) =>
     typeof chainType === 'string' && chainType.toLowerCase().startsWith('solana')

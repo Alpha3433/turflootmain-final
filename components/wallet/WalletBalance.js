@@ -5,14 +5,42 @@ import { useWallet } from '@solana/wallet-adapter-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { 
-  Wallet, 
-  RefreshCw, 
-  Copy, 
+import {
+  Wallet,
+  RefreshCw,
+  Copy,
   ExternalLink,
   TrendingUp,
   TrendingDown
 } from 'lucide-react'
+
+const DEFAULT_SOLANA_NETWORK = 'mainnet-beta'
+let hasWarnedAboutUnsupportedSolanaNetwork = false
+
+const resolveSolanaNetwork = (network) => {
+  const candidate = typeof network === 'string' ? network.trim().toLowerCase() : ''
+
+  if (!candidate) {
+    return DEFAULT_SOLANA_NETWORK
+  }
+
+  if (candidate.startsWith('solana:')) {
+    return resolveSolanaNetwork(candidate.split(':').slice(1).join(':'))
+  }
+
+  if (candidate === 'mainnet' || candidate === 'mainnet-beta') {
+    return DEFAULT_SOLANA_NETWORK
+  }
+
+  if (!hasWarnedAboutUnsupportedSolanaNetwork) {
+    console.warn(
+      `⚠️ Unsupported Solana network "${candidate}" configured. Paid rooms require mainnet; defaulting to ${DEFAULT_SOLANA_NETWORK}.`
+    )
+    hasWarnedAboutUnsupportedSolanaNetwork = true
+  }
+
+  return DEFAULT_SOLANA_NETWORK
+}
 
 export function WalletBalance() {
   const { publicKey, connected } = useWallet()
@@ -21,6 +49,9 @@ export function WalletBalance() {
   const [tokens, setTokens] = useState([])
   const [loading, setLoading] = useState(false)
   const [priceChange, setPriceChange] = useState(0)
+  const network = resolveSolanaNetwork(process.env.NEXT_PUBLIC_SOLANA_NETWORK)
+  const explorerCluster = network === 'mainnet-beta' ? '' : `?cluster=${network}`
+  const networkLabel = network === 'mainnet-beta' ? 'mainnet' : network
 
   // Fetch wallet balance
   const fetchBalance = async () => {
@@ -75,8 +106,7 @@ export function WalletBalance() {
   // Open in Solana Explorer
   const openInExplorer = () => {
     if (publicKey) {
-      const network = process.env.NEXT_PUBLIC_SOLANA_NETWORK === 'mainnet-beta' ? '' : '?cluster=devnet'
-      window.open(`https://explorer.solana.com/address/${publicKey.toString()}${network}`, '_blank')
+      window.open(`https://explorer.solana.com/address/${publicKey.toString()}${explorerCluster}`, '_blank')
     }
   }
 
@@ -111,7 +141,7 @@ export function WalletBalance() {
                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               </Button>
               <Badge variant="outline" className="text-xs">
-                {process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'devnet'}
+                {networkLabel}
               </Badge>
             </div>
           </CardTitle>

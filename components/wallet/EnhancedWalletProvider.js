@@ -4,33 +4,82 @@ import React, { useMemo } from 'react'
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react'
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
-import {
-  PhantomWalletAdapter
-} from '@solana/wallet-adapter-phantom'
-import {
-  SolflareWalletAdapter
-} from '@solana/wallet-adapter-solflare'
-import {
-  TorusWalletAdapter
-} from '@solana/wallet-adapter-torus'
+import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom'
+import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare'
+import { TorusWalletAdapter } from '@solana/wallet-adapter-torus'
 
 // Import wallet adapter CSS
 import '@solana/wallet-adapter-react-ui/styles.css'
 
-export function EnhancedWalletProvider({ children }) {
-  // Get network from environment
-  const network = process.env.NEXT_PUBLIC_SOLANA_NETWORK === 'mainnet-beta' 
-    ? WalletAdapterNetwork.Mainnet 
-    : WalletAdapterNetwork.Devnet
+const DEFAULT_SOLANA_NETWORK = WalletAdapterNetwork.Mainnet
+let hasWarnedAboutUnsupportedSolanaNetwork = false
+let hasWarnedAboutDevnetRpcEndpoint = false
 
-  // Get RPC endpoint
-  const endpoint = useMemo(() => {
-    if (process.env.NEXT_PUBLIC_SOLANA_RPC_URL) {
-      return process.env.NEXT_PUBLIC_SOLANA_RPC_URL
+const resolveWalletAdapterNetwork = (network) => {
+  const candidate = typeof network === 'string' ? network.trim().toLowerCase() : ''
+
+  if (!candidate) {
+    return DEFAULT_SOLANA_NETWORK
+  }
+
+  if (candidate.startsWith('solana:')) {
+    return resolveWalletAdapterNetwork(candidate.split(':').slice(1).join(':'))
+  }
+
+  if (candidate === 'mainnet' || candidate === 'mainnet-beta') {
+    return DEFAULT_SOLANA_NETWORK
+  }
+
+  if (!hasWarnedAboutUnsupportedSolanaNetwork) {
+    console.warn(
+      `⚠️ Unsupported Solana network "${candidate}" configured. Enhanced wallet provider will default to mainnet to ensure paid rooms function correctly.`
+    )
+    hasWarnedAboutUnsupportedSolanaNetwork = true
+  }
+
+  return DEFAULT_SOLANA_NETWORK
+}
+
+const sanitiseSolanaRpcEndpoint = (endpoint) => {
+  if (typeof endpoint !== 'string') {
+    return undefined
+  }
+
+  const trimmed = endpoint.trim()
+  if (!trimmed) {
+    return undefined
+  }
+
+  if (/devnet/i.test(trimmed)) {
+    if (!hasWarnedAboutDevnetRpcEndpoint) {
+      console.warn(
+        '⚠️ Devnet RPC endpoint detected in enhanced wallet provider configuration. Paid rooms require mainnet; ignoring devnet endpoint.'
+      )
+      hasWarnedAboutDevnetRpcEndpoint = true
     }
-    return network === WalletAdapterNetwork.Mainnet 
-      ? 'https://api.mainnet-beta.solana.com' 
-      : 'https://api.devnet.solana.com'
+    return undefined
+  }
+
+  return trimmed
+}
+
+export function EnhancedWalletProvider({ children }) {
+  const network = resolveWalletAdapterNetwork(process.env.NEXT_PUBLIC_SOLANA_NETWORK)
+
+  const endpoint = useMemo(() => {
+    const configuredEndpoint =
+      sanitiseSolanaRpcEndpoint(process.env.NEXT_PUBLIC_SOLANA_RPC_URL) ||
+      sanitiseSolanaRpcEndpoint(process.env.NEXT_PUBLIC_SOLANA_RPC)
+
+    if (configuredEndpoint) {
+      return configuredEndpoint
+    }
+
+    if (network !== WalletAdapterNetwork.Mainnet) {
+      return 'https://api.mainnet-beta.solana.com'
+    }
+
+    return 'https://api.mainnet-beta.solana.com'
   }, [network])
 
   // Initialize wallets

@@ -24,7 +24,7 @@ NEXT_PUBLIC_SOLANA_PRIVATE_RPC=https://mainnet.helius-rpc.com/?api-key=your-heli
 # Optional comma-separated list of additional priority RPCs
 NEXT_PUBLIC_SOLANA_RPC_PRIORITY_LIST=https://another-rpc.example.com,https://backup-rpc.example.com
 
-NEXT_PUBLIC_SOLANA_NETWORK=devnet
+NEXT_PUBLIC_SOLANA_NETWORK=mainnet-beta
 NEXT_PUBLIC_GAME_MODE=multiplayer
 NEXT_PUBLIC_MAX_PLAYERS=6
 ```

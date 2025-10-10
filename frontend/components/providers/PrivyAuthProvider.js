@@ -4,6 +4,58 @@ import { PrivyProvider } from '@privy-io/react-auth'
 import { useSolanaFundingPlugin } from '@privy-io/react-auth/solana'
 import { Component, useState, useEffect, useMemo } from 'react'
 
+const DEFAULT_SOLANA_NETWORK = 'mainnet-beta'
+let hasWarnedAboutUnsupportedSolanaNetwork = false
+let hasWarnedAboutDevnetRpcEndpoint = false
+
+const resolveSolanaNetwork = (network) => {
+  const candidate = typeof network === 'string' ? network.trim().toLowerCase() : ''
+
+  if (!candidate) {
+    return DEFAULT_SOLANA_NETWORK
+  }
+
+  if (candidate.startsWith('solana:')) {
+    return resolveSolanaNetwork(candidate.split(':').slice(1).join(':'))
+  }
+
+  if (candidate === 'mainnet' || candidate === 'mainnet-beta') {
+    return DEFAULT_SOLANA_NETWORK
+  }
+
+  if (!hasWarnedAboutUnsupportedSolanaNetwork) {
+    console.warn(
+      `⚠️ Unsupported Solana network "${candidate}" configured. Paid rooms require mainnet; defaulting to ${DEFAULT_SOLANA_NETWORK}.`
+    )
+    hasWarnedAboutUnsupportedSolanaNetwork = true
+  }
+
+  return DEFAULT_SOLANA_NETWORK
+}
+
+const sanitiseSolanaRpcEndpoint = (endpoint) => {
+  if (typeof endpoint !== 'string') {
+    return undefined
+  }
+
+  const trimmed = endpoint.trim()
+  if (!trimmed) {
+    return undefined
+  }
+
+  if (/devnet/i.test(trimmed)) {
+    if (!hasWarnedAboutDevnetRpcEndpoint) {
+      console.warn(
+        '⚠️ Devnet RPC endpoint detected in configuration. Paid rooms require mainnet; ignoring devnet endpoint.'
+      )
+      hasWarnedAboutDevnetRpcEndpoint = true
+    }
+    return undefined
+  }
+
+  return trimmed
+}
+
 // Error boundary for Privy-related errors
 class PrivyErrorBoundary extends Component {
   constructor(props) {
@@ -164,18 +216,18 @@ export default function PrivyAuthProvider({ children }) {
   useSolanaFundingPlugin()
 
   const solanaChain = useMemo(() => {
-    const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta').toLowerCase()
+    const network = resolveSolanaNetwork(process.env.NEXT_PUBLIC_SOLANA_NETWORK)
 
-    if (network.startsWith('solana:')) return network
-    if (network === 'mainnet' || network === 'mainnet-beta') return 'solana:mainnet-beta'
-    if (network === 'devnet') return 'solana:devnet'
-    if (network === 'testnet') return 'solana:testnet'
+    if (network === 'mainnet-beta') {
+      return 'solana:mainnet'
+    }
+
     return `solana:${network}`
   }, [])
 
   const solanaRpcUrl =
-    process.env.NEXT_PUBLIC_SOLANA_RPC ||
-    process.env.NEXT_PUBLIC_HELIUS_RPC ||
+    sanitiseSolanaRpcEndpoint(process.env.NEXT_PUBLIC_SOLANA_RPC) ||
+    sanitiseSolanaRpcEndpoint(process.env.NEXT_PUBLIC_HELIUS_RPC) ||
     'https://api.mainnet-beta.solana.com'
 
   const solanaWsUrl =
