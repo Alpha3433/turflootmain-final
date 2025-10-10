@@ -263,7 +263,9 @@ const submitPrivyTransaction = async ({
   // For embedded wallets with direct signAndSendTransaction
   if (typeof signingWallet.signAndSendTransaction === 'function') {
     console.log('📤 Using wallet.signAndSendTransaction with serialized bytes')
-    return signingWallet.signAndSendTransaction(transactionBytes, {
+    // Privy expects a single options object with transaction property
+    return signingWallet.signAndSendTransaction({
+      transaction: transactionBytes,
       chain,
       ...options
     })
