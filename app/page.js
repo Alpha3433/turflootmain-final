@@ -504,10 +504,10 @@ export default function TurfLootTactical() {
 
 
 
-  // 🚀 Privy 3.0 + Helius: Room entry fee deduction (embedded wallet using Solana provider)
-  const deductRoomFees = async (entryFee, userWalletAddress) => {
-    console.log('💰 Privy 3.0 Transaction Flow Started')
-    console.log('📋 Entry Fee:', entryFee, 'USD')
+  // 🚀 Simple Room Entry: Deduct SOL from embedded wallet
+  const deductRoomFees = async (entryFeeUsd, userWalletAddress) => {
+    console.log('💰 Room Entry Transaction Started')
+    console.log('📋 Entry Fee: $', entryFeeUsd, 'USD')
     console.log('📋 User Wallet:', userWalletAddress)
 
     // Step 1: Verify embedded Solana wallet exists in linkedAccounts
