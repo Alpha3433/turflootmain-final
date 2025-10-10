@@ -729,12 +729,6 @@ export default function TurfLootTactical() {
     return true
   }
 
-  const checkSolanaBalance = useCallback(async () => {
-    const mockSolBalance = readMockBalanceFromStorage()
-    console.log('💰 Returning mock TurfLoot balance from storage:', mockSolBalance, 'SOL')
-    return mockSolBalance
-  }, [readMockBalanceFromStorage])
-
   // STEP 1: Watch authentication and find wallet address
   const findWalletAddress = () => {
     if (!authenticated || !privyUser) {
@@ -2749,6 +2743,12 @@ export default function TurfLootTactical() {
     const nextSol = Math.max(0, currentSol + deltaSol)
     setMockBalanceState(nextSol)
   }, [readMockBalanceFromStorage, setMockBalanceState])
+
+  const checkSolanaBalance = useCallback(async () => {
+    const mockSolBalance = readMockBalanceFromStorage()
+    console.log('💰 Returning mock TurfLoot balance from storage:', mockSolBalance, 'SOL')
+    return mockSolBalance
+  }, [readMockBalanceFromStorage])
 
   // Balance check interval reference
   const balanceInterval = useRef(null)
