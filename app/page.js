@@ -131,7 +131,21 @@ export default function TurfLootTactical() {
   const { createWallet } = useCreateWallet()
   const { wallets, ready: walletsReady } = useSolanaWallets()
   const { signTransaction } = useSignTransaction()
-  const { signAndSendTransaction } = useSignAndSendTransaction()
+  const signAndSendTransactionResponse = useSignAndSendTransaction()
+  const privySignAndSendTransaction = useMemo(() => {
+    if (typeof signAndSendTransactionResponse === 'function') {
+      return signAndSendTransactionResponse
+    }
+
+    if (
+      signAndSendTransactionResponse &&
+      typeof signAndSendTransactionResponse.signAndSendTransaction === 'function'
+    ) {
+      return signAndSendTransactionResponse.signAndSendTransaction
+    }
+
+    return undefined
+  }, [signAndSendTransactionResponse])
   useSolanaFundingPlugin()
 
   const { fundWallet } = useFundWallet()
@@ -143,20 +157,28 @@ export default function TurfLootTactical() {
   useEffect(() => {
     if (typeof window !== 'undefined' && authenticated) {
       const signTxKeys = signTransaction ? Object.keys(signTransaction) : []
-      const signAndSendKeys = signAndSendTransaction ? Object.keys(signAndSendTransaction) : []
+      const signAndSendValue = signAndSendTransactionResponse
+      const signAndSendType = typeof signAndSendValue
+      const signAndSendKeys =
+        signAndSendValue && typeof signAndSendValue === 'object'
+          ? Object.keys(signAndSendValue)
+          : []
       
       console.log('🔍 Privy Hooks Debug:', {
         signTransactionType: typeof signTransaction,
-        signAndSendTransactionType: typeof signAndSendTransaction,
+        signAndSendTransactionType: signAndSendType,
         signTransactionKeys: signTxKeys,
         signAndSendKeys: signAndSendKeys,
         signTransactionFirstKey: signTxKeys[0],
         signAndSendFirstKey: signAndSendKeys[0],
         signTransactionFn: signTransaction?.[signTxKeys[0]],
-        signAndSendFn: signAndSendTransaction?.[signAndSendKeys[0]]
+        signAndSendFn:
+          signAndSendType === 'function'
+            ? signAndSendValue
+            : signAndSendValue?.[signAndSendKeys[0]]
       })
     }
-  }, [signTransaction, signAndSendTransaction, authenticated])
+  }, [signTransaction, signAndSendTransactionResponse, authenticated])
   
   // Get embedded Privy wallet
   const embeddedWallet = useMemo(() => {
@@ -299,7 +321,7 @@ export default function TurfLootTactical() {
       entryFeeUsd: roomCostUsd,
       privyUser,
       wallets,
-      signAndSendTransaction,
+      signAndSendTransaction: privySignAndSendTransaction,
       signTransaction,
       chain: SOLANA_CHAIN,
       usdPerSol: USD_PER_SOL_FALLBACK,

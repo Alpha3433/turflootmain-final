@@ -40,7 +40,20 @@ export default function TurfLootTactical() {
     return undefined
   }, [fundWalletHook])
   const signAndSendTransactionResponse = useSignAndSendTransaction()
-  const privySignAndSendTransaction = signAndSendTransactionResponse?.signAndSendTransaction
+  const privySignAndSendTransaction = useMemo(() => {
+    if (typeof signAndSendTransactionResponse === 'function') {
+      return signAndSendTransactionResponse
+    }
+
+    if (
+      signAndSendTransactionResponse &&
+      typeof signAndSendTransactionResponse.signAndSendTransaction === 'function'
+    ) {
+      return signAndSendTransactionResponse.signAndSendTransaction
+    }
+
+    return undefined
+  }, [signAndSendTransactionResponse])
   
   // LOYALTY SYSTEM STATE
   const [loyaltyData, setLoyaltyData] = useState(null)
