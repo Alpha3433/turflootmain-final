@@ -2759,6 +2759,31 @@ export default function TurfLootTactical() {
   // Paid rooms system state
   const [insufficientFundsNotification, setInsufficientFundsNotification] = useState(null)
 
+  // STEP 4: Expose balance to the page
+  const fetchWalletBalance = useCallback(async () => {
+    console.log('💰 fetchWalletBalance called')
+
+    // Set loading state
+    setWalletBalance(prev => ({ ...prev, loading: true }))
+
+    try {
+      const solBalance = await checkSolanaBalance()
+      const usdBalance = (solBalance * 150).toFixed(2)
+
+      setWalletBalance({
+        sol: solBalance.toFixed(4),
+        usd: usdBalance,
+        loading: false
+      })
+
+      console.log('✅ Balance updated:', { sol: solBalance, usd: usdBalance })
+
+    } catch (error) {
+      console.error('❌ Error in fetchWalletBalance:', error)
+      resetWalletBalance()
+    }
+  }, [checkSolanaBalance, resetWalletBalance])
+
   // STEP 3: Watch authentication and wallet availability
   useEffect(() => {
     console.log('🔄 Authentication state changed:', {
@@ -2804,31 +2829,6 @@ export default function TurfLootTactical() {
     resetWalletBalance,
     fetchWalletBalance
   ])
-
-  // STEP 4: Expose balance to the page
-  const fetchWalletBalance = useCallback(async () => {
-    console.log('💰 fetchWalletBalance called')
-
-    // Set loading state
-    setWalletBalance(prev => ({ ...prev, loading: true }))
-
-    try {
-      const solBalance = await checkSolanaBalance()
-      const usdBalance = (solBalance * 150).toFixed(2)
-
-      setWalletBalance({
-        sol: solBalance.toFixed(4),
-        usd: usdBalance,
-        loading: false
-      })
-
-      console.log('✅ Balance updated:', { sol: solBalance, usd: usdBalance })
-
-    } catch (error) {
-      console.error('❌ Error in fetchWalletBalance:', error)
-      resetWalletBalance()
-    }
-  }, [checkSolanaBalance, resetWalletBalance])
 
   // STEP 3b: Refresh periodically once we know the active wallet
   useEffect(() => {
