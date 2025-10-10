@@ -12,7 +12,7 @@ import sys
 from datetime import datetime
 
 # Configuration from .env
-BASE_URL = "https://turfloot-arena-6.preview.emergentagent.com"
+BASE_URL = "https://privy-arena.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class MobileOrientationBackendTester:

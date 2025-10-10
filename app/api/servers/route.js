@@ -40,17 +40,22 @@ export async function GET(request) {
       canJoin: true
     }
 
-    // Define lightweight cash room templates so players can jump straight into micro-stake games
+    // Define cash room templates with SOL room costs for testing ($0.02, $0.05, $0.10)
     const cashRoomConfigs = [
       {
         stake: 0.02,
         idSuffix: '002',
-        description: 'Micro stakes head-to-head TurfLoot match for new wagers'
+        description: 'Entry level TurfLoot arena - $0.02 SOL room cost'
       },
       {
         stake: 0.05,
         idSuffix: '005',
-        description: 'Low stakes TurfLoot arena for casual competitive play'
+        description: 'Mid stakes TurfLoot arena - $0.05 SOL room cost'
+      },
+      {
+        stake: 0.10,
+        idSuffix: '010',
+        description: 'High stakes TurfLoot arena - $0.10 SOL room cost'
       }
     ]
 
@@ -104,7 +109,7 @@ export async function GET(request) {
     arenaServer.lastUpdated = timestamp
     arenaServer.timestamp = timestamp
 
-    // Build dedicated cash rooms for $0.02 and $0.05 wagers
+    // Build dedicated cash rooms for $0.02 and $0.05 SOL
     const cashRooms = cashRoomConfigs.map(config => ({
       id: `colyseus-cash-${config.idSuffix}-au`,
       roomType: 'cash',

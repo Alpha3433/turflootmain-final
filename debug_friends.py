@@ -7,7 +7,7 @@ import requests
 import json
 import time
 
-BASE_URL = "https://turfloot-arena-6.preview.emergentagent.com"
+BASE_URL = "https://privy-arena.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 def debug_friend_request_flow():

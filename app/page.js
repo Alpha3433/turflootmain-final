@@ -242,30 +242,57 @@ const submitPrivyTransaction = async ({
     throw new Error('No signing wallet provided for transaction submission')
   }
 
-  const transactionBytes = ensureTransactionBytes(transaction)
+  // Serialize Transaction object to bytes if needed
+  let transactionBytes
+  if (transaction && typeof transaction.serialize === 'function') {
+    console.log('📦 Serializing Solana Transaction object to bytes...')
+    transactionBytes = transaction.serialize({
+      requireAllSignatures: false,
+      verifySignatures: false
+    })
+  } else {
+    transactionBytes = ensureTransactionBytes(transaction)
+  }
 
   if (!transactionBytes) {
     throw new Error('Invalid transaction format supplied for signing')
   }
 
-  if (typeof signingWallet.signAndSendTransaction === 'function') {
-    return signingWallet.signAndSendTransaction({
-      transaction: transactionBytes,
-      chain,
-      options
-    })
-  }
+  console.log('📤 Transaction serialized to bytes:', transactionBytes.length, 'bytes')
 
+  // Debug what's available
+  console.log('🔍 Transaction signing methods available:', {
+    hasSignAndSendHook: typeof signAndSendTransactionHook === 'function',
+    hasWalletSignAndSend: typeof signingWallet?.signAndSendTransaction === 'function',
+    walletAddress: signingWallet?.address
+  })
+
+  // Try hook-based signing first (Privy 3.0 recommended approach)
   if (typeof signAndSendTransactionHook === 'function') {
-    return signAndSendTransactionHook({
-      wallet: signingWallet,
+    console.log('📤 Using signAndSendTransaction HOOK (Privy 3.0)')
+    try {
+      return await signAndSendTransactionHook(transactionBytes, {
+        address: signingWallet.address,
+        chain,
+        ...options
+      })
+    } catch (hookError) {
+      console.error('❌ Hook-based signing failed:', hookError)
+      // Continue to fallback
+    }
+  }
+
+  // Fallback to direct wallet method
+  if (typeof signingWallet?.signAndSendTransaction === 'function') {
+    console.log('📤 Using wallet.signAndSendTransaction (fallback)')
+    return await signingWallet.signAndSendTransaction({
       transaction: transactionBytes,
       chain,
-      options
+      ...options
     })
   }
 
-  throw new Error('Transaction signing unavailable. Please refresh and try again.')
+  throw new Error('Transaction signing unavailable. Neither hook nor wallet method is available. Please refresh and try again.')
 }
 
 export default function TurfLootTactical() {
@@ -385,7 +412,7 @@ export default function TurfLootTactical() {
   // PAID ROOMS SYSTEM - Balance checking and validation with dynamic server fees
   
   const parseStakeAmount = (stakeString) => {
-    // Convert stake string to USD number (e.g., "$0.01" -> 0.01, "$0.02" -> 0.02, "$0.05" -> 0.05)
+    // Convert stake string to USD number (e.g., "$0.02" -> 0.02, "$0.05" -> 0.05, "$0.10" -> 0.10)
     return parseFloat(stakeString.replace('$', '')) || 0
   }
   
@@ -504,11 +531,12 @@ export default function TurfLootTactical() {
 
 
 
-  // 🚀 Privy 3.0 + Helius: Room entry fee deduction (embedded wallet using Solana provider)
-  const deductRoomFees = async (entryFee, userWalletAddress) => {
-    console.log('💰 Privy 3.0 Transaction Flow Started')
-    console.log('📋 Entry Fee:', entryFee, 'USD')
+  // 🚀 Paid Room Entry: Deduct SOL from embedded wallet based on room cost
+  const deductRoomFees = async (roomCostUsd, userWalletAddress) => {
+    console.log('💰 🔗 SOLANA BLOCKCHAIN TRANSACTION STARTING 🔗')
+    console.log('📋 Room Cost (USD denomination): $', roomCostUsd, 'USD')
     console.log('📋 User Wallet:', userWalletAddress)
+    console.log('⛓️ Payment Method: SOLANA (SOL) via Privy Embedded Wallet')
 
     // Step 1: Verify embedded Solana wallet exists in linkedAccounts
     const embeddedWalletAccount = privyUser?.linkedAccounts?.find(
@@ -548,65 +576,66 @@ export default function TurfLootTactical() {
     })
 
     try {
-      // Step 2: Build Solana transaction with Helius
-      const {
-        buildEntryFeeTransaction,
-        calculateFees,
-        getServerWalletAddress,
-        confirmTransaction
-      } = await import('../lib/paid/cleanFeeManager')
+      // Step 2: Build simple SOL transfer transaction
+      const { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } = await import('@solana/web3.js')
+      
+      // Get Helius RPC connection
+      const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://mainnet.helius-rpc.com/?api-key=9ce7937c-f2a5-4759-8d79-dd8f9ca63fa5'
+      const connection = new Connection(heliusRpc, 'confirmed')
+      console.log('🌐 Connected to Solana via Helius')
 
+      // Platform wallet address from env
+      const platformWalletAddress = process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS || 'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
+      
+      // Convert room cost from USD to SOL (assuming $150/SOL)
       const USD_PER_SOL = 150
-      const estimatedFees = calculateFees(entryFee, USD_PER_SOL)
-      const SERVER_WALLET = getServerWalletAddress()
+      const roomCostSol = roomCostUsd / USD_PER_SOL
+      const lamportsToSend = Math.floor(roomCostSol * LAMPORTS_PER_SOL)
+      
+      console.log('💵 🔗 SOLANA TRANSFER DETAILS (ON-CHAIN):')
+      console.log('   • Room Cost: $' + roomCostUsd + ' USD (pricing)')
+      console.log('   • SOL Amount: ' + roomCostSol.toFixed(6) + ' SOL')
+      console.log('   • Lamports: ' + lamportsToSend + ' lamports')
+      console.log('   • From Wallet: ' + embeddedWalletAccount.address)
+      console.log('   • To Platform: ' + platformWalletAddress)
+      console.log('   • Network: Solana Mainnet (via Helius RPC)')
+      console.log('   • Transaction Type: SystemProgram.transfer()')
 
-      console.log('🔨 Building transaction...')
-      console.log('💵 Fees:', {
-        entry: `${estimatedFees.entrySol.toFixed(4)} SOL`,
-        platform: `${estimatedFees.serverSol.toFixed(4)} SOL`,
-        total: `${estimatedFees.totalSol.toFixed(4)} SOL`
+      // Create transfer instruction
+      const fromPubkey = new PublicKey(embeddedWalletAccount.address)
+      const toPubkey = new PublicKey(platformWalletAddress)
+      
+      const transferInstruction = SystemProgram.transfer({
+        fromPubkey,
+        toPubkey,
+        lamports: lamportsToSend
       })
 
-      const { serialized, fees: calculatedFees, connection } = await buildEntryFeeTransaction({
-        entryFeeUsd: entryFee,
-        userWalletAddress: embeddedWalletAccount.address,
-        serverWalletAddress: SERVER_WALLET,
-        usdPerSol: USD_PER_SOL
-      })
-
+      // Build transaction
+      const { blockhash } = await connection.getLatestBlockhash('confirmed')
+      const transaction = new Transaction({
+        recentBlockhash: blockhash,
+        feePayer: fromPubkey
+      }).add(transferInstruction)
+      
       console.log('✅ Transaction built successfully')
+      console.log('   • Blockhash:', blockhash)
+      console.log('   • Fee Payer:', fromPubkey.toString())
 
-      const fees = {
-        ...calculatedFees,
-        totalCost: calculatedFees.totalUsd,
-        entryFee: calculatedFees.entryFeeUsd,
-        serverFee: calculatedFees.serverFeeUsd
-      }
-
-      // Step 3: Check if embedded wallet is available in useWallets
-      console.log('✅ Embedded wallet found for signing:', signingWallet.address)
-
-      // Step 4: Sign and send transaction with Privy (this will show Privy modal)
-      const directSupport = typeof signingWallet.signAndSendTransaction === 'function'
-      const hookSupport = typeof signAndSendTransaction === 'function'
-
-      console.log('🔐 Preparing to submit transaction...', {
-        walletSupportsDirect: directSupport,
-        hookAvailable: hookSupport,
-        chain: SOLANA_CHAIN
-      })
+      // Step 3: Sign and send transaction with Privy
+      console.log('🔐 Signing transaction with Privy wallet...')
 
       const result = await submitPrivyTransaction({
         signingWallet,
         signAndSendTransactionHook: signAndSendTransaction,
-        transaction: serialized,
+        transaction: transaction, // Will be serialized inside submitPrivyTransaction
         chain: SOLANA_CHAIN,
         options: {
           commitment: 'confirmed',
           uiOptions: {
             showWalletUIs: false,
             isCancellable: false,
-            description: 'Submitting arena entry fee to TurfLoot'
+            description: `Submitting ${roomCostSol.toFixed(6)} SOL room entry`
           }
         }
       })
@@ -616,30 +645,42 @@ export default function TurfLootTactical() {
       if (!signature) {
         throw new Error('Privy wallet did not return a valid transaction signature.')
       }
-      console.log('✅ Transaction sent! Signature:', signature)
+      console.log('✅ 🔗 SOLANA TRANSACTION SENT!')
+      console.log('   • Transaction Signature:', signature)
+      console.log('   • Amount Sent: ' + roomCostSol.toFixed(6) + ' SOL')
+      console.log('   • View on Solscan: https://solscan.io/tx/' + signature)
 
+      // Step 4: Confirm transaction
       try {
-        await confirmTransaction(connection, signature)
+        await connection.confirmTransaction(signature, 'confirmed')
+        console.log('✅ ⛓️ SOLANA TRANSACTION CONFIRMED ON-CHAIN!')
+        console.log('   • Payment Method: SOL via Solana blockchain')
+        console.log('   • NOT USD - This is a real SOL transfer!')
       } catch (confirmationError) {
-        console.warn('⚠️ Transaction confirmation encountered an issue:', confirmationError)
+        console.warn('⚠️ Transaction confirmation issue:', confirmationError)
       }
 
       // Step 5: Update local balance
-      if (walletBalance?.usd && walletBalance?.sol) {
+      if (walletBalance?.sol) {
+        const newSolBalance = Math.max(0, parseFloat(walletBalance.sol) - roomCostSol)
         setWalletBalance({
-          usd: Math.max(0, parseFloat(walletBalance.usd) - fees.totalUsd).toFixed(2),
-          sol: Math.max(0, parseFloat(walletBalance.sol) - fees.totalSol).toFixed(6)
+          sol: newSolBalance.toFixed(6),
+          usd: (newSolBalance * USD_PER_SOL).toFixed(2)
         })
       }
 
       return {
         success: true,
         signature,
-        fees,
+        fees: {
+          roomCostSol: roomCostSol,
+          totalSol: roomCostSol,
+          roomCostUsd: roomCostUsd,
+          totalUsd: roomCostUsd
+        },
         costs: {
-          entryFee: fees.entryFee,
-          serverFee: fees.serverFee,
-          totalCost: fees.totalCost
+          roomCost: roomCostUsd,
+          totalCost: roomCostUsd
         }
       }
 
@@ -704,28 +745,25 @@ export default function TurfLootTactical() {
   }
   
   const validatePaidRoom = (actionName = 'join paid room') => {
-    // Get currently selected stake amount
-    const entryFee = parseStakeAmount(selectedStake)
-    const costs = calculateTotalCost(entryFee)
+    // Get room cost (no additional fees, just the direct cost)
+    const roomCost = parseStakeAmount(selectedStake)
     const currentBalance = parseFloat(walletBalance.usd) || 0
     
     console.log(`💰 Validating paid room access for ${actionName}:`)
-    console.log(`   Entry Fee: $${costs.entryFee.toFixed(3)}`)
-    console.log(`   Server Fee (${costs.feePercentage.toFixed(2)}%): $${costs.serverFee.toFixed(3)}`)
-    console.log(`   Total Required: $${costs.totalCost.toFixed(3)}`)
-    console.log(`   Current Balance: $${currentBalance.toFixed(3)}`)
+    console.log(`   Room Cost: $${roomCost.toFixed(2)}`)
+    console.log(`   Current Balance: $${currentBalance.toFixed(2)}`)
     
-    if (currentBalance < costs.totalCost) {
-      console.log(`❌ Insufficient funds: Need $${costs.totalCost.toFixed(3)}, have $${currentBalance.toFixed(3)}`)
+    if (currentBalance < roomCost) {
+      console.log(`❌ Insufficient funds: Need $${roomCost.toFixed(2)}, have $${currentBalance.toFixed(2)}`)
       
-      // Enhanced notification showing fee breakdown
-      const message = `💰 Insufficient Balance\n\nRequired for ${selectedStake} room:\n• Entry Fee: $${costs.entryFee.toFixed(3)}\n• Server Fee (${costs.feePercentage.toFixed(2)}%): +$${costs.serverFee.toFixed(3)}\n• Total Cost: $${costs.totalCost.toFixed(3)}\n\nYour Balance: $${currentBalance.toFixed(3)}\nShortfall: $${(costs.totalCost - currentBalance).toFixed(3)}\n\nPlease deposit more funds to play.`
+      // Simple notification showing room cost
+      const message = `💰 Insufficient Balance\n\nRequired for ${selectedStake} room: $${roomCost.toFixed(2)}\nYour Balance: $${currentBalance.toFixed(2)}\nShortfall: $${(roomCost - currentBalance).toFixed(2)}\n\nPlease deposit more SOL to play.`
       
       alert(message)
       return false
     }
     
-    console.log(`✅ Sufficient funds for ${actionName}: $${currentBalance.toFixed(3)} >= $${costs.totalCost.toFixed(3)}`)
+    console.log(`✅ Sufficient funds for ${actionName}: $${currentBalance.toFixed(2)} >= $${roomCost.toFixed(2)}`)
     return true
   }
 
@@ -835,7 +873,7 @@ export default function TurfLootTactical() {
   }, [ready, authenticated, privyUser])
   
   // Real-time Solana balance tracking
-  const [selectedStake, setSelectedStake] = useState('$0.01')
+  const [selectedStake, setSelectedStake] = useState('$0.02')
   const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
   const [userName, setUserName] = useState('PLAYER')
   const [isMobile, setIsMobile] = useState(false)
@@ -2744,11 +2782,38 @@ export default function TurfLootTactical() {
     setMockBalanceState(nextSol)
   }, [readMockBalanceFromStorage, setMockBalanceState])
 
-  const checkSolanaBalance = useCallback(async () => {
-    const mockSolBalance = readMockBalanceFromStorage()
-    console.log('💰 Returning mock TurfLoot balance from storage:', mockSolBalance, 'SOL')
-    return mockSolBalance
-  }, [readMockBalanceFromStorage])
+  const checkSolanaBalance = useCallback(async (walletAddress = null) => {
+    try {
+      // Wallet address must be passed as parameter
+      if (!walletAddress) {
+        console.log('⚠️ No wallet address provided')
+        return 0
+      }
+      
+      console.log('🔍 Fetching REAL SOL balance from blockchain for:', walletAddress)
+      
+      // Import Solana web3.js
+      const { Connection, PublicKey } = await import('@solana/web3.js')
+      
+      // Connect to Solana via Helius
+      const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC || 
+                        'https://mainnet.helius-rpc.com/?api-key=privy-arena'
+      const connection = new Connection(heliusRpc, 'confirmed')
+      
+      // Get real balance
+      const publicKey = new PublicKey(walletAddress)
+      const lamports = await connection.getBalance(publicKey)
+      const solBalance = lamports / 1_000_000_000
+      
+      console.log('✅ Real blockchain balance:', solBalance, 'SOL')
+      
+      return solBalance
+      
+    } catch (error) {
+      console.error('❌ Error fetching real balance:', error)
+      return 0
+    }
+  }, [])
 
   // Balance check interval reference
   const balanceInterval = useRef(null)
@@ -2759,30 +2824,47 @@ export default function TurfLootTactical() {
   // Paid rooms system state
   const [insufficientFundsNotification, setInsufficientFundsNotification] = useState(null)
 
-  // STEP 4: Expose balance to the page
-  const fetchWalletBalance = useCallback(async () => {
+  // STEP 4: Expose balance to the page - Real SOL balance only
+  const fetchWalletBalance = useCallback(async (addressOverride = null) => {
     console.log('💰 fetchWalletBalance called')
+
+    const walletAddress = addressOverride || currentWalletAddress
+
+    if (!walletAddress) {
+      console.log('👛 No wallet found - setting default balance')
+      resetWalletBalance()
+      return
+    }
+
+    console.log('🚀 Fetching real SOL balance for:', walletAddress)
 
     // Set loading state
     setWalletBalance(prev => ({ ...prev, loading: true }))
 
     try {
-      const solBalance = await checkSolanaBalance()
+      // Get real SOL balance from blockchain
+      const solBalance = await checkSolanaBalance(walletAddress)
+
+      // Convert to USD (rough estimate: $150 per SOL)
       const usdBalance = (solBalance * 150).toFixed(2)
 
+      // Update UI state with REAL balance only
       setWalletBalance({
         sol: solBalance.toFixed(4),
         usd: usdBalance,
         loading: false
       })
 
-      console.log('✅ Balance updated:', { sol: solBalance, usd: usdBalance })
+      console.log('✅ Real balance updated:', { 
+        sol: solBalance, 
+        usd: usdBalance 
+      })
 
     } catch (error) {
       console.error('❌ Error in fetchWalletBalance:', error)
       resetWalletBalance()
     }
-  }, [checkSolanaBalance, resetWalletBalance])
+  }, [currentWalletAddress, checkSolanaBalance, resetWalletBalance])
 
   // STEP 3: Watch authentication and wallet availability
   useEffect(() => {
@@ -2975,103 +3057,48 @@ export default function TurfLootTactical() {
     }
   }
 
-  // PRIVY 3.0 SOLANA DEPOSIT - PROPER useFundWallet HOOK IMPLEMENTATION ✅
+  // SIMPLE DEPOSIT: Just fund user's embedded wallet via Privy
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT SOL clicked - platform wallet funding flow')
-
+    console.log('💰 DEPOSIT SOL clicked - opening Privy funding modal!')
+    
     try {
-      if (!authenticated || !privyUser) {
-        console.log('⚠️ User not authenticated, triggering login first')
-        if (typeof login === 'function') {
-          await login()
-        } else {
-          alert('Please log in to deposit funds.')
-        }
+      // Ensure user is authenticated
+      if (!authenticated) {
+        console.log('⚠️ User not authenticated')
+        await login()
         return
       }
-
-      if (!fundWallet || typeof fundWallet !== 'function') {
-        console.error('❌ fundWallet not available from useFundWallet hook')
-        alert('Funding functionality not available. Please refresh the page or check Privy configuration.')
+      
+      if (!ready) {
+        console.log('⚠️ Privy not ready')
         return
       }
-
-      const platformWalletAddress = normalizeAddress(
-        process.env.NEXT_PUBLIC_PLATFORM_SOLANA_WALLET ||
-        process.env.NEXT_PUBLIC_SITE_FEE_WALLET ||
-        'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG'
+      
+      // Get the embedded Solana wallet address
+      const embeddedWallet = privyUser?.linkedAccounts?.find(
+        account => account.type === 'wallet' && account.chainType === 'solana'
       )
-
-      if (!platformWalletAddress) {
-        console.error('❌ No platform Solana wallet configured for deposits')
-        alert('Deposit wallet is not configured. Please contact support.')
+      
+      if (!embeddedWallet) {
+        console.error('❌ No embedded Solana wallet found')
+        alert('No Solana wallet found. Please refresh and try again.')
         return
       }
-
-      const fundingRequest = {
-        address: platformWalletAddress,
-        options: {
-          chain: SOLANA_CHAIN,
-          asset: 'native-currency',
-          defaultFundingMethod: 'exchange',
-          uiConfig: {
-            receiveFundsTitle: 'Deposit to TurfLoot',
-            receiveFundsSubtitle: 'Funds go directly to the TurfLoot platform wallet.',
-            landing: {
-              title: 'Choose how you would like to deposit funds'
-            }
-          }
-        }
-      }
-
-      console.log('🚀 Opening Privy funding modal for platform wallet deposit:', fundingRequest)
-
-      const result = await fundWallet(fundingRequest)
-
-      console.log('✅ Privy funding flow completed:', result)
-
-      let depositedSol = extractSolAmountFromFundingResult(result)
-
-      if (!depositedSol || depositedSol <= 0) {
-        console.warn('⚠️ Unable to infer deposit amount from Privy response. Prompting user for confirmation.')
-        if (typeof window !== 'undefined') {
-          const manualAmount = window.prompt(
-            'Deposit complete! Enter the amount of SOL you added so we can update your TurfLoot balance:'
-          )
-          const parsedAmount = manualAmount ? parseFloat(manualAmount) : NaN
-          if (Number.isFinite(parsedAmount) && parsedAmount > 0) {
-            depositedSol = parsedAmount
-          }
-        }
-      }
-
-      if (depositedSol && depositedSol > 0) {
-        console.log(`💸 Recording mock deposit of ${depositedSol.toFixed(4)} SOL`)
-        incrementMockBalance(depositedSol)
-        await fetchWalletBalance()
-        alert(`Deposit successful! ${depositedSol.toFixed(4)} SOL has been added to your TurfLoot balance.`)
-      } else {
-        console.warn('⚠️ Deposit completed but amount was not provided. Balance was not changed automatically.')
-        await fetchWalletBalance()
-        alert('Deposit completed. If your balance did not update automatically, please refresh it or enter the amount manually.')
-      }
-
+      
+      console.log('✅ Opening Privy funding modal for embedded wallet:', embeddedWallet.address)
+      
+      // Open Privy funding modal - user funds their own embedded wallet
+      await fundWallet({ address: embeddedWallet.address })
+      
+      console.log('✅ Privy funding modal opened!')
+      
+      // Balance will auto-update via polling
+      
     } catch (error) {
-      console.error('❌ Solana funding error details:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name,
-        fundWalletAvailable: typeof fundWallet === 'function'
-      })
-
-      if (error?.message?.includes('not enabled') || error?.message?.includes('not available')) {
-        alert('Wallet funding is not enabled for your account. Please contact support or check your Privy dashboard settings.')
-      } else if (error?.message?.includes('unsupported') || error?.message?.includes('chain')) {
-        alert('Solana funding may not be supported. Please check your Privy dashboard configuration.')
-      } else if (error?.message?.includes('User rejected') || error?.message?.includes('cancelled')) {
-        console.log('ℹ️ User cancelled the funding process')
-      } else {
-        alert(`Unable to open funding modal: ${error?.message || 'Please check browser console for details'}`)
+      console.error('❌ Error opening funding modal:', error)
+      
+      if (!error.message?.includes('User') && !error.message?.includes('cancel')) {
+        alert(`Error: ${error.message}`)
       }
     }
   }
@@ -6257,7 +6284,7 @@ export default function TurfLootTactical() {
 
           {/* Stakes */}
           <div style={{ display: 'flex', gap: '12px', marginBottom: '32px', justifyContent: 'center' }}>
-            {['$0.01', '$0.02', '$0.05'].map((stake) => (
+            {['$0.02', '$0.05', '$0.10'].map((stake) => (
               <button
                 key={stake}
                 onClick={() => setSelectedStake(stake)}
@@ -10510,7 +10537,7 @@ export default function TurfLootTactical() {
 
           {/* Stakes */}
           <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', justifyContent: 'center' }}>
-            {['$0.01', '$0.02', '$0.05'].map((stake) => (
+            {['$0.02', '$0.05', '$0.10'].map((stake) => (
               <button
                 key={stake}
                 onClick={() => setSelectedStake(stake)}
