@@ -714,28 +714,25 @@ export default function TurfLootTactical() {
   }
   
   const validatePaidRoom = (actionName = 'join paid room') => {
-    // Get currently selected stake amount
-    const entryFee = parseStakeAmount(selectedStake)
-    const costs = calculateTotalCost(entryFee)
+    // Get room cost (no additional fees, just the direct cost)
+    const roomCost = parseStakeAmount(selectedStake)
     const currentBalance = parseFloat(walletBalance.usd) || 0
     
     console.log(`💰 Validating paid room access for ${actionName}:`)
-    console.log(`   Entry Fee: $${costs.entryFee.toFixed(3)}`)
-    console.log(`   Server Fee (${costs.feePercentage.toFixed(2)}%): $${costs.serverFee.toFixed(3)}`)
-    console.log(`   Total Required: $${costs.totalCost.toFixed(3)}`)
-    console.log(`   Current Balance: $${currentBalance.toFixed(3)}`)
+    console.log(`   Room Cost: $${roomCost.toFixed(2)}`)
+    console.log(`   Current Balance: $${currentBalance.toFixed(2)}`)
     
-    if (currentBalance < costs.totalCost) {
-      console.log(`❌ Insufficient funds: Need $${costs.totalCost.toFixed(3)}, have $${currentBalance.toFixed(3)}`)
+    if (currentBalance < roomCost) {
+      console.log(`❌ Insufficient funds: Need $${roomCost.toFixed(2)}, have $${currentBalance.toFixed(2)}`)
       
-      // Enhanced notification showing fee breakdown
-      const message = `💰 Insufficient Balance\n\nRequired for ${selectedStake} room:\n• Entry Fee: $${costs.entryFee.toFixed(3)}\n• Server Fee (${costs.feePercentage.toFixed(2)}%): +$${costs.serverFee.toFixed(3)}\n• Total Cost: $${costs.totalCost.toFixed(3)}\n\nYour Balance: $${currentBalance.toFixed(3)}\nShortfall: $${(costs.totalCost - currentBalance).toFixed(3)}\n\nPlease deposit more funds to play.`
+      // Simple notification showing room cost
+      const message = `💰 Insufficient Balance\n\nRequired for ${selectedStake} room: $${roomCost.toFixed(2)}\nYour Balance: $${currentBalance.toFixed(2)}\nShortfall: $${(roomCost - currentBalance).toFixed(2)}\n\nPlease deposit more SOL to play.`
       
       alert(message)
       return false
     }
     
-    console.log(`✅ Sufficient funds for ${actionName}: $${currentBalance.toFixed(3)} >= $${costs.totalCost.toFixed(3)}`)
+    console.log(`✅ Sufficient funds for ${actionName}: $${currentBalance.toFixed(2)} >= $${roomCost.toFixed(2)}`)
     return true
   }
 
