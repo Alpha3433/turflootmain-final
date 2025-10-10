@@ -143,14 +143,12 @@ export default function PrivyAuthProvider({ children }) {
   // Removed useMemo to avoid SSR issues
   const debugInfo = { solanaChain, solanaRpcUrl, solanaWsUrl }
 
-  const emptySolanaConnectors = useMemo(
-    () => ({
-      onMount: () => {},
-      onUnmount: () => {},
-      get: () => []
-    }),
-    []
-  )
+  // Removed useMemo to avoid SSR issues
+  const emptySolanaConnectors = {
+    onMount: () => {},
+    onUnmount: () => {},
+    get: () => []
+  }
 
   const config = {
     // UI Appearance
