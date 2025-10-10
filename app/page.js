@@ -214,6 +214,7 @@ const extractSolAmountFromFundingResult = (result) => {
 const submitPrivyTransaction = async ({
   signingWallet,
   signAndSendTransactionHook,
+  signTransactionHook,
   transaction,
   chain,
   options
@@ -493,23 +494,198 @@ const submitPrivyTransaction = async ({
     throw new Error(`${label} could not be executed. No payload formats succeeded.`)
   }
 
-  if (typeof signAndSendTransactionHook !== 'function') {
-    throw new Error('Transaction signing unavailable. Privy signAndSendTransaction hook is required for arena entry transactions.')
-  }
+  const walletCandidates = (() => {
+    const candidates = []
 
-  console.log('📤 Using signAndSendTransaction HOOK (Privy 3.0)')
-
-  try {
-    return await invokeSignAndSend(signAndSendTransactionHook, 'Hook-based signing')
-  } catch (hookError) {
-    console.error('❌ Hook-based signing failed:', hookError)
-
-    if (hookError instanceof Error) {
-      throw hookError
+    const pushCandidate = candidate => {
+      if (candidate && typeof candidate === 'object') {
+        candidates.push(candidate)
+      }
     }
 
-    throw new Error('Hook-based signing failed. Please verify your wallet connection and try again.')
+    pushCandidate(signingWallet)
+    pushCandidate(signingWallet?.wallet)
+    pushCandidate(signingWallet?.walletClient)
+    pushCandidate(signingWallet?.provider)
+    pushCandidate(signingWallet?.adapter)
+
+    return candidates
+  })()
+
+  let lastError = null
+
+  if (typeof signAndSendTransactionHook === 'function') {
+    console.log('📤 Using signAndSendTransaction HOOK (Privy 3.0)')
+
+    try {
+      return await invokeSignAndSend(signAndSendTransactionHook, 'Hook-based signing')
+    } catch (hookError) {
+      console.error('❌ Hook-based signing failed:', hookError)
+      lastError = hookError instanceof Error ? hookError : new Error(String(hookError))
+    }
+  } else {
+    console.warn('⚠️ signAndSendTransaction hook unavailable. Falling back to wallet signing methods.')
   }
+
+  const candidateSignAndSendFunctions = walletCandidates
+    .map(candidate => {
+      if (typeof candidate?.signAndSendTransaction === 'function') {
+        return candidate.signAndSendTransaction.bind(candidate)
+      }
+
+      if (typeof candidate?.sendAndConfirmTransaction === 'function') {
+        return async payload => candidate.sendAndConfirmTransaction(payload.transaction, payload.connection, payload.sendOptions)
+      }
+
+      if (
+        typeof candidate?.sendTransaction === 'function' &&
+        transaction &&
+        typeof transaction === 'object' &&
+        typeof transaction.serialize === 'function'
+      ) {
+        return async payload => {
+          const connectionToUse = payload.connection || connection
+          if (!connectionToUse || typeof connectionToUse.sendTransaction !== 'function') {
+            throw new Error('No Solana connection available for sendTransaction fallback')
+          }
+
+          const sendOpts = payload?.sendOptions || payload?.options?.sendOptions || cloneSendOptions()
+          const txToSend =
+            payload.transaction && typeof payload.transaction === 'object' && typeof payload.transaction.serialize === 'function'
+              ? payload.transaction
+              : transaction
+
+          return connectionToUse.sendTransaction(txToSend, [], sendOpts)
+        }
+      }
+
+      return null
+    })
+    .filter(Boolean)
+
+  for (const fn of candidateSignAndSendFunctions) {
+    try {
+      return await invokeSignAndSend(fn, 'Wallet-based signing')
+    } catch (walletError) {
+      console.error('❌ Wallet-based signing attempt failed:', walletError)
+      lastError = walletError instanceof Error ? walletError : new Error(String(walletError))
+    }
+  }
+
+  const normalizeSignedResult = value => {
+    if (!value) {
+      return null
+    }
+
+    if (value instanceof Uint8Array) {
+      return value
+    }
+
+    if (typeof Buffer !== 'undefined' && Buffer.isBuffer && Buffer.isBuffer(value)) {
+      return new Uint8Array(value)
+    }
+
+    if (ArrayBuffer.isView(value)) {
+      return new Uint8Array(value.buffer.slice(value.byteOffset, value.byteOffset + value.byteLength))
+    }
+
+    if (typeof value === 'object') {
+      if (value.signedTransaction) {
+        return normalizeSignedResult(value.signedTransaction)
+      }
+
+      if (typeof value.serialize === 'function') {
+        try {
+          return normalizeSignedResult(value.serialize())
+        } catch (serializeError) {
+          console.error('❌ Failed to serialize signed transaction result:', serializeError)
+        }
+      }
+    }
+
+    return null
+  }
+
+  const attemptManualSignAndSend = async () => {
+    const signers = []
+
+    for (const candidate of walletCandidates) {
+      if (typeof candidate?.signTransaction === 'function') {
+        signers.push(candidate.signTransaction.bind(candidate))
+      }
+    }
+
+    if (typeof signTransactionHook === 'function') {
+      signers.push(signTransactionHook)
+    }
+
+    if (signers.length === 0) {
+      return null
+    }
+
+    const attemptSign = async (fn, label) => {
+      try {
+        for (const { type, value } of transactionPayloads) {
+          const payload = buildStructuredPayload(value)
+          const clonedOptions = cloneForwardedOptions()
+          if (clonedOptions) {
+            payload.options = clonedOptions
+          }
+
+          const signed = await fn(payload)
+          const normalized = normalizeSignedResult(signed)
+          if (normalized) {
+            return normalized
+          }
+
+          console.warn(`⚠️ ${label} returned unsupported format for ${type} payload`)
+        }
+      } catch (error) {
+        console.error(`❌ ${label} failed:`, error)
+        lastError = error instanceof Error ? error : new Error(String(error))
+      }
+
+      return null
+    }
+
+    for (const signer of signers) {
+      const signedBytes = await attemptSign(signer, 'Manual signTransaction')
+      if (signedBytes) {
+        if (!connection || typeof connection.sendRawTransaction !== 'function') {
+          throw new Error('Signed transaction available but no Solana connection to submit it')
+        }
+
+        const sendOpts = cloneSendOptions()
+
+        const rawPayload =
+          typeof Buffer !== 'undefined' && typeof Buffer.from === 'function'
+            ? Buffer.from(signedBytes)
+            : signedBytes
+
+        const rawSignature = await connection.sendRawTransaction(rawPayload, sendOpts)
+
+        return { signature: rawSignature }
+      }
+    }
+
+    return null
+  }
+
+  try {
+    const manualResult = await attemptManualSignAndSend()
+    if (manualResult) {
+      return manualResult
+    }
+  } catch (manualError) {
+    console.error('❌ Manual sign-and-send fallback failed:', manualError)
+    lastError = manualError instanceof Error ? manualError : new Error(String(manualError))
+  }
+
+  if (lastError) {
+    throw lastError
+  }
+
+  throw new Error('Transaction signing unavailable. No valid signing strategy succeeded.')
 }
 
 export default function TurfLootTactical() {
@@ -845,6 +1021,7 @@ export default function TurfLootTactical() {
       const result = await submitPrivyTransaction({
         signingWallet,
         signAndSendTransactionHook: signAndSendTransaction,
+        signTransactionHook: signTransaction,
         transaction: transaction,
         chain: SOLANA_CHAIN,
         options: {
