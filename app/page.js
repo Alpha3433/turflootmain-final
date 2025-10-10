@@ -567,12 +567,14 @@ export default function TurfLootTactical() {
       const roomCostSol = roomCostUsd / USD_PER_SOL
       const lamportsToSend = Math.floor(roomCostSol * LAMPORTS_PER_SOL)
       
-      console.log('💵 SOL Transfer Details:', {
-        roomCostUsd: `$${roomCostUsd}`,
-        roomCostSol: `${roomCostSol.toFixed(6)} SOL`,
-        lamports: lamportsToSend,
-        platformWallet: platformWalletAddress
-      })
+      console.log('💵 🔗 SOLANA TRANSFER DETAILS (ON-CHAIN):')
+      console.log('   • Room Cost: $' + roomCostUsd + ' USD (pricing)')
+      console.log('   • SOL Amount: ' + roomCostSol.toFixed(6) + ' SOL')
+      console.log('   • Lamports: ' + lamportsToSend + ' lamports')
+      console.log('   • From Wallet: ' + embeddedWalletAccount.address)
+      console.log('   • To Platform: ' + platformWalletAddress)
+      console.log('   • Network: Solana Mainnet (via Helius RPC)')
+      console.log('   • Transaction Type: SystemProgram.transfer()')
 
       // Create transfer instruction
       const fromPubkey = new PublicKey(embeddedWalletAccount.address)
