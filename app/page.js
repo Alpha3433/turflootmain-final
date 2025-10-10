@@ -559,14 +559,14 @@ export default function TurfLootTactical() {
       // Platform wallet address from env
       const platformWalletAddress = process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS || 'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
       
-      // Convert USD entry fee to SOL (assuming $150/SOL)
+      // Convert room cost from USD to SOL (assuming $150/SOL)
       const USD_PER_SOL = 150
-      const entryFeeSol = entryFeeUsd / USD_PER_SOL
-      const lamportsToSend = Math.floor(entryFeeSol * LAMPORTS_PER_SOL)
+      const roomCostSol = roomCostUsd / USD_PER_SOL
+      const lamportsToSend = Math.floor(roomCostSol * LAMPORTS_PER_SOL)
       
       console.log('💵 SOL Transfer Details:', {
-        entryFeeUsd: `$${entryFeeUsd}`,
-        entryFeeSol: `${entryFeeSol.toFixed(6)} SOL`,
+        roomCostUsd: `$${roomCostUsd}`,
+        roomCostSol: `${roomCostSol.toFixed(6)} SOL`,
         lamports: lamportsToSend,
         platformWallet: platformWalletAddress
       })
