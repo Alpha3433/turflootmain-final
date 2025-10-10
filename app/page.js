@@ -261,27 +261,54 @@ const submitPrivyTransaction = async ({
   })
 
   // Try hook-based signing first (Privy 3.0 recommended approach)
-  if (typeof signAndSendTransactionHook === 'function') {
-    console.log('📤 Using signAndSendTransaction HOOK (Privy 3.0)')
+  const invokeSignAndSend = async (fn, label) => {
+    if (typeof fn !== 'function') {
+      return null
+    }
+
+    const payload = {
+      transaction: transactionForSigning,
+      wallet: signingWallet,
+      chain,
+      options: forwardedOptions
+    }
+
     try {
-      return await signAndSendTransactionHook(transactionForSigning, {
-        address: signingWallet.address,
-        chain,
-        ...forwardedOptions
-      })
-    } catch (hookError) {
-      console.error('❌ Hook-based signing failed:', hookError)
-      // Continue to fallback
+      return await fn(payload)
+    } catch (error) {
+      console.error(`❌ ${label} failed with structured payload:`, error)
+
+      // Some older Privy builds still expect the legacy positional arguments.
+      // Retry once using the legacy call signature before moving on.
+      try {
+        return await fn(transactionForSigning, {
+          chain,
+          ...forwardedOptions
+        })
+      } catch (legacyError) {
+        console.error(`❌ ${label} legacy invocation failed:`, legacyError)
+        throw legacyError
+      }
     }
   }
 
-  // Fallback to direct wallet method
+  if (typeof signAndSendTransactionHook === 'function') {
+    console.log('📤 Using signAndSendTransaction HOOK (Privy 3.0)')
+    try {
+      return await invokeSignAndSend(signAndSendTransactionHook, 'Hook-based signing')
+    } catch (hookError) {
+      console.error('❌ Hook-based signing failed:', hookError)
+      // Continue to fallback chain
+    }
+  }
+
   if (typeof signingWallet?.signAndSendTransaction === 'function') {
     console.log('📤 Using wallet.signAndSendTransaction (fallback)')
-    return await signingWallet.signAndSendTransaction(transactionForSigning, {
-      chain,
-      ...forwardedOptions
-    })
+    try {
+      return await invokeSignAndSend(signingWallet.signAndSendTransaction.bind(signingWallet), 'Wallet signAndSendTransaction')
+    } catch (walletError) {
+      console.error('❌ wallet.signAndSendTransaction fallback failed:', walletError)
+    }
   }
 
   // Manual signing fallback when hook methods are unavailable
@@ -291,10 +318,63 @@ const submitPrivyTransaction = async ({
     }
 
     console.log('✍️ Using manual signTransaction fallback')
-    const signedTransaction = await signingWallet.signTransaction(transaction)
-    const signedBytes = signedTransaction?.serialize
-      ? signedTransaction.serialize()
-      : resolveTransactionBytes(signedTransaction)
+
+    const attemptSignTransaction = async (fn) => {
+      try {
+        return await fn({
+          transaction,
+          wallet: signingWallet,
+          chain,
+          options: forwardedOptions
+        })
+      } catch (structuredError) {
+        console.warn('⚠️ signTransaction structured payload failed, retrying legacy call...', structuredError)
+        return await fn(transaction)
+      }
+    }
+
+    const signFn = signingWallet.signTransaction.bind(signingWallet)
+    const signedTransactionResult = await attemptSignTransaction(signFn)
+
+    const extractSignedTransaction = value => {
+      if (!value) {
+        return null
+      }
+
+      if (typeof value.serialize === 'function') {
+        return value
+      }
+
+      if (Array.isArray(value)) {
+        return extractSignedTransaction(value[0])
+      }
+
+      if (typeof value === 'object') {
+        if (typeof value.signedTransaction?.serialize === 'function') {
+          return value.signedTransaction
+        }
+
+        if (typeof value.transaction?.serialize === 'function') {
+          return value.transaction
+        }
+
+        if (value.rawTransaction) {
+          return value.rawTransaction
+        }
+
+        if (value.serializedTransaction) {
+          return value.serializedTransaction
+        }
+      }
+
+      return value
+    }
+
+    const normalizedSignedTransaction = extractSignedTransaction(signedTransactionResult)
+
+    const signedBytes = normalizedSignedTransaction?.serialize
+      ? normalizedSignedTransaction.serialize()
+      : resolveTransactionBytes(normalizedSignedTransaction)
 
     if (!signedBytes) {
       throw new Error('Failed to serialize signed transaction for submission')
