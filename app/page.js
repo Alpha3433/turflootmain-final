@@ -520,13 +520,35 @@ export default function TurfLootTactical() {
         transaction.lastValidBlockHeight = latestBlockhash.lastValidBlockHeight
         transaction.feePayer = fromPublicKey
 
-        const serializedTransaction = transaction.serialize({ requireAllSignatures: false })
+        const attemptSignAndSend = async (options) =>
+          signAndSendTransaction({
+            wallet: signingWallet,
+            transaction,
+            chain: SOLANA_CHAIN,
+            ...(options ? { options } : {})
+          })
 
-        const response = await signAndSendTransaction({
-          wallet: signingWallet,
-          transaction: serializedTransaction,
-          chain: SOLANA_CHAIN
-        })
+        let response
+        try {
+          response = await attemptSignAndSend({
+            commitment: 'confirmed',
+            uiOptions: {
+              showWalletUIs: false,
+              isCancellable: false,
+              description: 'Transferring TurfLoot deposit to arena pool'
+            }
+          })
+        } catch (headlessError) {
+          console.warn('⚠️ Headless deposit transfer failed, falling back to default Privy flow', headlessError)
+
+          const fallbackNeeded = /sendTransaction/i.test(headlessError?.message || '')
+
+          if (!fallbackNeeded) {
+            throw headlessError
+          }
+
+          response = await attemptSignAndSend()
+        }
 
         const signature = normaliseSignature(response?.signature ?? response)
 
@@ -639,7 +661,7 @@ export default function TurfLootTactical() {
         total: `${estimatedFees.totalSol.toFixed(4)} SOL`
       })
 
-      const { serialized, fees: calculatedFees, connection } = await buildEntryFeeTransaction({
+      const { transaction, fees: calculatedFees, connection } = await buildEntryFeeTransaction({
         entryFeeUsd: entryFee,
         userWalletAddress: embeddedWalletAccount.address,
         serverWalletAddress: SERVER_WALLET,
@@ -679,11 +701,35 @@ export default function TurfLootTactical() {
         chain: SOLANA_CHAIN
       })
 
-      const result = await signAndSendTransaction({
-        wallet: signingWallet,
-        transaction: serialized,
-        chain: SOLANA_CHAIN
-      })
+      const attemptSignAndSend = async (options) =>
+        signAndSendTransaction({
+          wallet: signingWallet,
+          transaction,
+          chain: SOLANA_CHAIN,
+          ...(options ? { options } : {})
+        })
+
+      let result
+      try {
+        result = await attemptSignAndSend({
+          commitment: 'confirmed',
+          uiOptions: {
+            showWalletUIs: false,
+            isCancellable: false,
+            description: 'Submitting arena entry fee to TurfLoot'
+          }
+        })
+      } catch (headlessError) {
+        console.warn('⚠️ Headless arena entry failed, retrying with standard Privy modal', headlessError)
+
+        const fallbackNeeded = /sendTransaction/i.test(headlessError?.message || '')
+
+        if (!fallbackNeeded) {
+          throw headlessError
+        }
+
+        result = await attemptSignAndSend()
+      }
 
       const signature = normaliseSignature(result?.signature ?? result)
 

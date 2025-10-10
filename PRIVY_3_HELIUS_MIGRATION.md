@@ -75,7 +75,7 @@ NEXT_PUBLIC_HELIUS_RPC=https://mainnet.helius-rpc.com
 NEXT_PUBLIC_HELIUS_WS=wss://mainnet.helius-rpc.com
 
 # Server Wallet
-NEXT_PUBLIC_SERVER_WALLET_ADDRESS=7vWLfwtq4KZrcEoZhMQFfHTNPF4oVqBx4JmUUFXDJ6wy
+NEXT_PUBLIC_SERVER_WALLET_ADDRESS=GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa
 ```
 
 ## 💻 Implementation Details
@@ -107,11 +107,31 @@ await confirmTransaction(connection, signature)
 const wallet = wallets.find(w => w.address === userWalletAddress)
 
 // Sign and send
-const { signature } = await signAndSendTransaction({
-  wallet,           // Wallet object from useWallets()
-  transaction,      // Uint8Array from buildEntryFeeTransaction()
-  chain: 'solana:mainnet'
-})
+let response
+try {
+  response = await signAndSendTransaction({
+    wallet,           // Wallet object from useWallets()
+    transaction,      // VersionedTransaction from buildEntryFeeTransaction()
+    chain: 'solana:mainnet',
+    options: {
+      commitment: 'confirmed',
+      uiOptions: {
+        showWalletUIs: false, // Skip Privy's confirmation modal when supported
+        isCancellable: false,
+        description: 'Submitting arena entry fee to TurfLoot'
+      }
+    }
+  })
+} catch (error) {
+  if (/sendTransaction/i.test(error?.message || '')) {
+    // Some wallets still require the standard Privy modal
+    response = await signAndSendTransaction({ wallet, transaction, chain: 'solana:mainnet' })
+  } else {
+    throw error
+  }
+}
+
+const signature = response?.signature ?? response
 ```
 
 ## ⚠️ Current Issue: SSR Compatibility
