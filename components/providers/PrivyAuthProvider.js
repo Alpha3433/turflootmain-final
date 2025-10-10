@@ -96,14 +96,16 @@ export default function PrivyAuthProvider({ children }) {
   const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID
   useSolanaFundingPlugin()
 
-  const solanaChain = useMemo(() => {
+  // Compute solanaChain directly without useMemo to avoid SSR issues
+  const getSolanaChain = () => {
     const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta').toLowerCase()
     if (network.startsWith('solana:')) return network
     if (network === 'mainnet' || network === 'mainnet-beta') return 'solana:mainnet'
     if (network === 'devnet') return 'solana:devnet'
     if (network === 'testnet') return 'solana:testnet'
     return 'solana:mainnet'
-  }, [])
+  }
+  const solanaChain = getSolanaChain()
 
   const solanaRpcUrl =
     process.env.NEXT_PUBLIC_SOLANA_RPC ||
