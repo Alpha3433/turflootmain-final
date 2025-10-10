@@ -385,7 +385,7 @@ export default function TurfLootTactical() {
   // PAID ROOMS SYSTEM - Balance checking and validation with dynamic server fees
   
   const parseStakeAmount = (stakeString) => {
-    // Convert stake string to USD number (e.g., "$0.02" -> 0.02, "$0.05" -> 0.05)
+    // Convert stake string to USD number (e.g., "$0.02" -> 0.02, "$0.05" -> 0.05, "$0.10" -> 0.10)
     return parseFloat(stakeString.replace('$', '')) || 0
   }
   
