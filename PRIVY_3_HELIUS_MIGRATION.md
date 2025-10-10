@@ -110,7 +110,15 @@ const wallet = wallets.find(w => w.address === userWalletAddress)
 const { signature } = await signAndSendTransaction({
   wallet,           // Wallet object from useWallets()
   transaction,      // Uint8Array from buildEntryFeeTransaction()
-  chain: 'solana:mainnet'
+  chain: 'solana:mainnet',
+  options: {
+    commitment: 'confirmed',
+    uiOptions: {
+      showWalletUIs: false, // Skip Privy's confirmation modal
+      isCancellable: false,
+      description: 'Submitting arena entry fee to TurfLoot'
+    }
+  }
 })
 ```
 

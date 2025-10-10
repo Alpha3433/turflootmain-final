@@ -525,7 +525,15 @@ export default function TurfLootTactical() {
         const response = await signAndSendTransaction({
           wallet: signingWallet,
           transaction: serializedTransaction,
-          chain: SOLANA_CHAIN
+          chain: SOLANA_CHAIN,
+          options: {
+            commitment: 'confirmed',
+            uiOptions: {
+              showWalletUIs: false,
+              isCancellable: false,
+              description: 'Transferring TurfLoot deposit to arena pool'
+            }
+          }
         })
 
         const signature = normaliseSignature(response?.signature ?? response)
@@ -682,7 +690,15 @@ export default function TurfLootTactical() {
       const result = await signAndSendTransaction({
         wallet: signingWallet,
         transaction: serialized,
-        chain: SOLANA_CHAIN
+        chain: SOLANA_CHAIN,
+        options: {
+          commitment: 'confirmed',
+          uiOptions: {
+            showWalletUIs: false,
+            isCancellable: false,
+            description: 'Submitting arena entry fee to TurfLoot'
+          }
+        }
       })
 
       const signature = normaliseSignature(result?.signature ?? result)
