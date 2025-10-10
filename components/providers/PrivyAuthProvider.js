@@ -2,7 +2,7 @@
 
 import { PrivyProvider } from '@privy-io/react-auth'
 import { useSolanaFundingPlugin } from '@privy-io/react-auth/solana'
-import { Component, useState, useEffect, useMemo } from 'react'
+import { Component, useState, useEffect } from 'react'
 
 // Error boundary for Privy-related errors
 class PrivyErrorBoundary extends Component {
@@ -96,14 +96,16 @@ export default function PrivyAuthProvider({ children }) {
   const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID
   useSolanaFundingPlugin()
 
-  const solanaChain = useMemo(() => {
+  // Compute solanaChain directly without useMemo to avoid SSR issues
+  const getSolanaChain = () => {
     const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta').toLowerCase()
     if (network.startsWith('solana:')) return network
     if (network === 'mainnet' || network === 'mainnet-beta') return 'solana:mainnet'
     if (network === 'devnet') return 'solana:devnet'
     if (network === 'testnet') return 'solana:testnet'
     return 'solana:mainnet'
-  }, [])
+  }
+  const solanaChain = getSolanaChain()
 
   const solanaRpcUrl =
     process.env.NEXT_PUBLIC_SOLANA_RPC ||
@@ -115,21 +117,19 @@ export default function PrivyAuthProvider({ children }) {
     process.env.NEXT_PUBLIC_HELIUS_WS ||
     solanaRpcUrl.replace(/^http/, 'ws')
 
-  const solanaFundingConfig = useMemo(
-    () => ({
-      chain: solanaChain,
-      asset: 'native-currency',
-      defaultFundingMethod: 'exchange',
-      uiConfig: {
-        receiveFundsTitle: 'Receive SOL',
-        receiveFundsSubtitle: 'Top up your TurfLoot balance with Solana',
-        landing: {
-          title: 'Choose how you would like to fund your wallet'
-        }
+  // Removed useMemo to avoid SSR issues
+  const solanaFundingConfig = {
+    chain: solanaChain,
+    asset: 'native-currency',
+    defaultFundingMethod: 'exchange',
+    uiConfig: {
+      receiveFundsTitle: 'Receive SOL',
+      receiveFundsSubtitle: 'Top up your TurfLoot balance with Solana',
+      landing: {
+        title: 'Choose how you would like to fund your wallet'
       }
-    }),
-    [solanaChain]
-  )
+    }
+  }
 
   // Validate required environment variables
   if (!appId) {
@@ -140,19 +140,15 @@ export default function PrivyAuthProvider({ children }) {
   console.log('🔧 Initializing Privy with App ID:', appId.substring(0, 10) + '...')
 
   // 🚀 Privy 3.0 Configuration - SOLANA ONLY
-  const debugInfo = useMemo(
-    () => ({ solanaChain, solanaRpcUrl, solanaWsUrl }),
-    [solanaChain, solanaRpcUrl, solanaWsUrl]
-  )
+  // Removed useMemo to avoid SSR issues
+  const debugInfo = { solanaChain, solanaRpcUrl, solanaWsUrl }
 
-  const emptySolanaConnectors = useMemo(
-    () => ({
-      onMount: () => {},
-      onUnmount: () => {},
-      get: () => []
-    }),
-    []
-  )
+  // Removed useMemo to avoid SSR issues
+  const emptySolanaConnectors = {
+    onMount: () => {},
+    onUnmount: () => {},
+    get: () => []
+  }
 
   const config = {
     // UI Appearance
