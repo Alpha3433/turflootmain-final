@@ -189,8 +189,19 @@ export default function PrivyAuthProvider({ children }) {
       }
     },
 
-    // 🎯 PRIVY 3.0: No External Wallet Connectors - Using Embedded Wallets Only
-    // This should resolve connector initialization errors
+    // 🎯 PRIVY 3.0: Solana Wallet Connectors - Essential wallets only
+    externalWallets: {
+      solana: {
+        connectors: [
+          // Only include Phantom as it's the most stable Solana wallet
+          createSolanaWalletConnector({
+            name: 'phantom',
+            iconUrl: 'https://phantom.app/img/phantom-logo.svg',
+            rdns: 'app.phantom'
+          })
+        ]
+      }
+    },
 
     funding: {
       solana: solanaFundingConfig
