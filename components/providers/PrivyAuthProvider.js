@@ -188,17 +188,10 @@ export default function PrivyAuthProvider({ children }) {
       }
     },
 
-    // 🎯 PRIVY 3.0: Solana Wallet Connectors - Essential wallets only
+    // 🎯 PRIVY 3.0: Solana Wallet Connectors - Minimal configuration to satisfy requirements
     externalWallets: {
       solana: {
-        connectors: [
-          // Only include Phantom as it's the most stable Solana wallet
-          createSolanaWalletConnector({
-            name: 'phantom',
-            iconUrl: 'https://phantom.app/img/phantom-logo.svg',
-            rdns: 'app.phantom'
-          })
-        ]
+        connectors: []  // Empty array to satisfy requirement without external connectors
       }
     },
 
