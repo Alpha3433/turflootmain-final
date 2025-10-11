@@ -144,6 +144,9 @@ export default function PrivyAuthProvider({ children }) {
   }
 
   console.log('🔧 Initializing Privy with App ID:', appId.substring(0, 10) + '...')
+  console.log('🔧 Solana Chain:', solanaChain)
+  console.log('🔧 Solana RPC URL:', solanaRpcUrl)
+  console.log('🔧 Solana WS URL:', solanaWsUrl)
 
   // 🚀 Privy 3.0 Configuration - SOLANA ONLY
   // Removed useMemo to avoid SSR issues
