@@ -2457,22 +2457,52 @@ export default function TurfLootTactical() {
       console.log('🔍 Fetching REAL SOL balance from blockchain for:', walletAddress)
       
       // Import Solana web3.js
-      const { Connection, PublicKey } = await import('@solana/web3.js')
-      
+      const solanaWeb3 = await import('@solana/web3.js')
+      const Connection = solanaWeb3.Connection || solanaWeb3.default?.Connection
+      const PublicKey = solanaWeb3.PublicKey || solanaWeb3.default?.PublicKey
+
       // Connect to Solana via Helius
-      const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC || 
+      const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC ||
                         'https://mainnet.helius-rpc.com/?api-key=privy-arena'
-      const connection = new Connection(heliusRpc, 'confirmed')
-      
+      const connection = Connection ? new Connection(heliusRpc, 'confirmed') : null
+
       // Get real balance
-      const publicKey = new PublicKey(walletAddress)
-      const lamports = await connection.getBalance(publicKey)
-      const solBalance = lamports / 1_000_000_000
-      
-      console.log('✅ Real blockchain balance:', solBalance, 'SOL')
-      
-      return solBalance
-      
+      if (connection && typeof connection.getBalance === 'function' && PublicKey) {
+        const publicKey = new PublicKey(walletAddress)
+        const lamports = await connection.getBalance(publicKey)
+        const solBalance = lamports / 1_000_000_000
+
+        console.log('✅ Real blockchain balance:', solBalance, 'SOL')
+
+        return solBalance
+      }
+
+      console.warn('⚠️ Connection.getBalance unavailable – falling back to manual RPC request')
+
+      const response = await fetch(heliusRpc, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'getBalance',
+          params: [walletAddress]
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        const lamports = data?.result?.value ?? 0
+        const solBalance = lamports / 1_000_000_000
+
+        console.log('✅ Real blockchain balance (fallback):', solBalance, 'SOL')
+
+        return solBalance
+      }
+
+      console.warn('⚠️ Fallback RPC balance request failed:', response.status, response.statusText)
+      return 0
+
     } catch (error) {
       console.error('❌ Error fetching real balance:', error)
       return 0
