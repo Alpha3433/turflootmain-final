@@ -189,12 +189,8 @@ export default function PrivyAuthProvider({ children }) {
       }
     },
 
-    // 🎯 PRIVY 3.0: Solana Wallet Connectors - Using official Privy configuration
-    externalWallets: {
-      solana: {
-        connectors: toSolanaWalletConnectors()
-      }
-    },
+    // 🎯 PRIVY 3.0: Focus on embedded wallets only to avoid getBalance conflicts
+    // Removing external connectors to isolate embedded wallet functionality
 
     funding: {
       solana: solanaFundingConfig
