@@ -181,12 +181,13 @@ export default function PrivyAuthProvider({ children }) {
       noPromptOnSignature: false
     },
 
-    // 🎯 PRIVY 3.0: Solana RPC configuration - using string format only
+    // 🎯 PRIVY 3.0: Official Solana RPC configuration using @solana/kit
     solana: {
-      defaultChain: solanaChain,
-      chains: [solanaChain],
       rpcs: {
-        [solanaChain]: solanaRpcUrl
+        [solanaChain]: {
+          rpc: createSolanaRpc(solanaRpcUrl),
+          rpcSubscriptions: createSolanaRpcSubscriptions(solanaWsUrl)
+        }
       }
     },
 
