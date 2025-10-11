@@ -2591,7 +2591,32 @@ export default function TurfLootTactical() {
         console.log('⚠️ getSolanaProvider method not available on wallet')
       }
       
-      console.log('⚠️ Could not retrieve balance from Privy embedded wallet')
+      // Fallback: Use Privy REST API for balance checking
+      // This approach works even when getSolanaProvider has issues
+      try {
+        console.log('🔄 Trying Privy REST API balance fallback...')
+        
+        const response = await fetch(`/api/privy/wallet-balance`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            walletAddress,
+            walletId: matchingWallet.id 
+          })
+        })
+        
+        if (response.ok) {
+          const balanceData = await response.json()
+          if (balanceData.success && typeof balanceData.balance === 'number') {
+            console.log('✅ Privy REST API balance:', balanceData.balance, 'SOL')
+            return balanceData.balance
+          }
+        }
+      } catch (apiError) {
+        console.log('⚠️ Privy REST API fallback failed:', apiError.message)
+      }
+      
+      console.log('⚠️ All Privy balance methods exhausted')
       return 0
       
     } catch (error) {
