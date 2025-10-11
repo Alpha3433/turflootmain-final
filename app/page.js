@@ -2662,12 +2662,6 @@ export default function TurfLootTactical() {
     }
 
     console.log('🚀 Fetching real SOL balance for authenticated user:', walletAddress)
-    console.log('🔍 Available wallets:', wallets.map(w => ({ 
-      address: w.address, 
-      type: w.walletClientType, 
-      id: w.id,
-      chainType: w.chainType 
-    })))
 
     // Set loading state
     setWalletBalance(prev => ({ ...prev, loading: true }))
