@@ -352,7 +352,7 @@ export default function TurfLootTactical() {
       const { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } = await import('@solana/web3.js')
       
       // Setup connection
-      const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://mainnet.helius-rpc.com/?api-key=9ce7937c-f2a5-4759-8d79-dd8f9ca63fa5'
+      const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://mainnet.helius-rpc.com/?api-key=solana-gaming'
       const connection = new Connection(heliusRpc, 'confirmed')
       console.log('✅ Connected to Solana')
 
