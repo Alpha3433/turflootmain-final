@@ -186,22 +186,8 @@ export default function PrivyAuthProvider({ children }) {
       }
     },
 
-    // 🎯 PRIVY 3.0: External Wallet Connectors - SOLANA ONLY
-    // Minimal connector to satisfy Privy requirements without external HTTP calls
-    externalWallets: {
-      solana: {
-        connectors: [
-          // Basic Solana connector without external service dependencies
-          {
-            name: 'phantom',
-            iconUrl: 'https://phantom.app/img/phantom-logo.svg',
-            downloadUrls: {
-              browserExtension: 'https://phantom.app/'
-            }
-          }
-        ]
-      }
-    },
+    // 🎯 PRIVY 3.0: No External Wallet Connectors - Using Embedded Wallets Only
+    // This should resolve connector initialization errors
 
     funding: {
       solana: solanaFundingConfig
