@@ -396,7 +396,11 @@ export default function TurfLootTactical() {
 
       // Sign and send with Privy
       console.log('🔐 Signing with Privy...')
-      const signature = await privySignAndSendTransaction(txBytes)
+      console.log('   Hook available:', typeof signAndSendTransactionResponse)
+      console.log('   Keys:', signAndSendTransactionResponse ? Object.keys(signAndSendTransactionResponse) : 'undefined')
+      
+      // Use the hook directly - it should be a function according to Privy docs
+      const signature = await signAndSendTransactionResponse(txBytes)
       
       console.log('✅ Transaction sent! Signature:', signature)
 
