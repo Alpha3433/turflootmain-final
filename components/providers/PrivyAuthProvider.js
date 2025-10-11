@@ -5,6 +5,7 @@ import {
   useSolanaFundingPlugin,
   toSolanaWalletConnectors
 } from '@privy-io/react-auth/solana'
+import { createSolanaRpc, createSolanaRpcSubscriptions } from '@solana/kit'
 import { Component, useState, useEffect } from 'react'
 
 // Error boundary for Privy-related errors
