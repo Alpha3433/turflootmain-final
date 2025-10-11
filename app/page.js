@@ -411,7 +411,15 @@ export default function TurfLootTactical() {
       
       console.log('   Wallet for signing:', embeddedWalletObj ? 'Found' : 'Not found')
       
+      if (!embeddedWalletObj) {
+        throw new Error('Embedded wallet not found for transaction signing')
+      }
+      
+      // Add a small delay to ensure wallet is fully initialized
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
       // Call with wallet context - Privy needs the wallet object
+      console.log('🚀 Attempting transaction signature...')
       const signature = await embeddedWalletObj.signAndSendTransaction(txBytes)
       
       console.log('✅ Transaction sent! Signature:', signature)
