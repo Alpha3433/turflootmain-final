@@ -120,7 +120,7 @@ export default function PrivyAuthProvider({ children }) {
   const solanaWsUrl =
     process.env.NEXT_PUBLIC_SOLANA_WS ||
     process.env.NEXT_PUBLIC_HELIUS_WS ||
-    solanaRpcUrl.replace(/^http/, 'ws')
+    solanaRpcUrl.replace(/^https/, 'wss').replace(/^http/, 'ws')
 
   // Removed useMemo to avoid SSR issues
   const solanaFundingConfig = {
