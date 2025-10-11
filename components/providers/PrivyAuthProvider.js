@@ -16,7 +16,9 @@ class PrivyErrorBoundary extends Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('🚨 Privy Error Boundary:', error, errorInfo)
+    console.error('🚨 Privy Error Boundary - Full Error:', error)
+    console.error('🚨 Privy Error Boundary - Error Info:', errorInfo)
+    console.error('🚨 Privy Error Boundary - Stack:', error.stack)
   }
 
   render() {
