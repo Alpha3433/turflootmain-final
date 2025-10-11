@@ -184,6 +184,13 @@ export default function PrivyAuthProvider({ children }) {
       }
     },
 
+    // 🎯 PRIVY 3.0: External Wallet Connectors - SOLANA SUPPORT
+    externalWallets: {
+      solana: {
+        connectors: toSolanaWalletConnectors()
+      }
+    },
+
     funding: {
       solana: solanaFundingConfig
     },
