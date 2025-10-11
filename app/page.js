@@ -403,7 +403,16 @@ export default function TurfLootTactical() {
       const signAndSendFn = signAndSendTransactionResponse.signAndSendTransaction
       console.log('   Method available:', typeof signAndSendFn)
       
-      const signature = await signAndSendFn(txBytes)
+      // Get the embedded wallet object from useWallets
+      const embeddedWalletObj = wallets.find(w => {
+        const addr = w.address || w.publicKey?.toString() || w.publicKey?.toBase58?.()
+        return addr === userWalletAddress
+      })
+      
+      console.log('   Wallet for signing:', embeddedWalletObj ? 'Found' : 'Not found')
+      
+      // Call with wallet context - Privy needs the wallet object
+      const signature = await embeddedWalletObj.signAndSendTransaction(txBytes)
       
       console.log('✅ Transaction sent! Signature:', signature)
 
