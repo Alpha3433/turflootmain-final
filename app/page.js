@@ -2598,12 +2598,24 @@ export default function TurfLootTactical() {
 
   // STEP 4: Expose balance to the page - Real SOL balance only
   const fetchWalletBalance = useCallback(async (addressOverride = null) => {
-    console.log('💰 fetchWalletBalance called')
+    console.log('💰 fetchWalletBalance called - Auth:', authenticated, 'Ready:', walletsReady, 'Wallets:', wallets.length)
 
     const walletAddress = addressOverride || currentWalletAddress
 
     if (!walletAddress) {
-      console.log('👛 No wallet found - setting default balance')
+      console.log('👛 No wallet address - setting default balance')
+      resetWalletBalance()
+      return
+    }
+
+    if (!authenticated) {
+      console.log('⚠️ User not authenticated yet - skipping balance check')
+      resetWalletBalance()
+      return
+    }
+
+    if (!walletsReady || wallets.length === 0) {
+      console.log('⚠️ Wallets not ready yet - skipping balance check')
       resetWalletBalance()
       return
     }
