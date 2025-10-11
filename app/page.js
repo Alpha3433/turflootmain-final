@@ -332,52 +332,112 @@ export default function TurfLootTactical() {
 
   // 🚀 Paid Room Entry: Deduct SOL from embedded wallet based on room cost
   const deductRoomFees = async (roomCostUsd, _userWalletAddress = null, feePercentageOverride = null) => {
-    console.log('💰 Initiating Privyy arena entry payment', {
-      roomCostUsd,
-      feePercentageOverride
-    })
+    console.log('💰 Starting Privy SOL Payment')
+    console.log('   Room Cost: $' + roomCostUsd)
 
-    const result = await executePrivyyArenaEntry({
-      entryFeeUsd: roomCostUsd,
-      privyUser,
-      wallets,
-      signAndSendTransaction: privySignAndSendTransaction,
-      signTransaction,
-      chain: SOLANA_CHAIN,
-      usdPerSol: USD_PER_SOL_FALLBACK,
-      feePercentage: feePercentageOverride || undefined
-    })
+    try {
+      // Get embedded wallet address
+      const embeddedWallet = privyUser?.linkedAccounts?.find(
+        account => account.type === 'wallet' && account.chainType === 'solana'
+      )
 
-    if (!result.success) {
-      console.error('❌ Privyy arena entry payment failed:', result.error)
-      return result
-    }
+      if (!embeddedWallet) {
+        throw new Error('No Solana wallet found')
+      }
 
-    const totalSolCost = Number.isFinite(result.costs?.sol?.totalCost)
-      ? result.costs.sol.totalCost
-      : Number.isFinite(result.fees?.totalSol)
-        ? result.fees.totalSol
-        : 0
+      const userWalletAddress = embeddedWallet.address
+      console.log('   From Wallet:', userWalletAddress)
 
-    const currentSolBalance = Number.isFinite(parseFloat(walletBalance?.sol))
-      ? parseFloat(walletBalance.sol)
-      : 0
-    const updatedSolBalance = Math.max(0, currentSolBalance - (totalSolCost || 0))
-    const effectiveUsdPerSol = Number.isFinite(result.fees?.usdPerSol)
-      ? result.fees.usdPerSol
-      : USD_PER_SOL_FALLBACK
-    const updatedUsdBalance = updatedSolBalance * effectiveUsdPerSol
+      // Import Solana libraries
+      const { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } = await import('@solana/web3.js')
+      
+      // Setup connection
+      const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://mainnet.helius-rpc.com/?api-key=9ce7937c-f2a5-4759-8d79-dd8f9ca63fa5'
+      const connection = new Connection(heliusRpc, 'confirmed')
+      console.log('✅ Connected to Solana')
 
-    setWalletBalance({
-      sol: updatedSolBalance.toFixed(6),
-      usd: updatedUsdBalance.toFixed(2),
-      loading: false
-    })
+      // Calculate SOL amount
+      const platformWallet = process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS || 'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
+      const USD_PER_SOL = 150
+      const solAmount = roomCostUsd / USD_PER_SOL
+      const lamports = Math.floor(solAmount * LAMPORTS_PER_SOL)
+      
+      console.log('💵 Payment Details:')
+      console.log('   SOL Amount:', solAmount.toFixed(6), 'SOL')
+      console.log('   Lamports:', lamports)
+      console.log('   To Platform:', platformWallet)
 
-    return {
-      ...result,
-      newBalance: updatedUsdBalance,
-      newBalanceSol: updatedSolBalance
+      // Build transaction
+      const fromPubkey = new PublicKey(userWalletAddress)
+      const toPubkey = new PublicKey(platformWallet)
+      
+      const transferIx = SystemProgram.transfer({
+        fromPubkey,
+        toPubkey,
+        lamports
+      })
+
+      const { blockhash } = await connection.getLatestBlockhash('confirmed')
+      const transaction = new Transaction({
+        recentBlockhash: blockhash,
+        feePayer: fromPubkey
+      }).add(transferIx)
+
+      // Serialize transaction - CRITICAL: Must be Uint8Array for Privy
+      const serializedTx = transaction.serialize({
+        requireAllSignatures: false,
+        verifySignatures: false
+      })
+      
+      // Force convert to proper Uint8Array (not Buffer)
+      const txBytes = Uint8Array.from(serializedTx)
+      
+      console.log('📦 Transaction ready:', txBytes.length, 'bytes (Uint8Array)')
+
+      // Sign and send with Privy
+      console.log('🔐 Signing with Privy...')
+      const signature = await privySignAndSendTransaction(txBytes)
+      
+      console.log('✅ Transaction sent! Signature:', signature)
+
+      // Confirm on-chain
+      try {
+        await connection.confirmTransaction(signature, 'confirmed')
+        console.log('✅ Confirmed on Solana blockchain')
+      } catch (confirmError) {
+        console.warn('⚠️ Confirmation pending')
+      }
+
+      // Update balance
+      const currentSolBalance = parseFloat(walletBalance?.sol) || 0
+      const updatedSolBalance = Math.max(0, currentSolBalance - solAmount)
+      const updatedUsdBalance = updatedSolBalance * USD_PER_SOL
+
+      setWalletBalance({
+        sol: updatedSolBalance.toFixed(6),
+        usd: updatedUsdBalance.toFixed(2),
+        loading: false
+      })
+
+      return {
+        success: true,
+        signature,
+        fees: {
+          totalSol: solAmount,
+          totalUsd: roomCostUsd
+        },
+        costs: {
+          totalCost: roomCostUsd
+        },
+        newBalance: updatedUsdBalance,
+        newBalanceSol: updatedSolBalance
+      }
+    } catch (error) {
+      console.error('❌ Privy payment failed:', error)
+      return {
+        success: false,
+        error: error.message || 'Transaction failed'
+      }
     }
   }
   // SMART MATCHMAKING SYSTEM with HATHORA INTEGRATION
