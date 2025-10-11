@@ -171,7 +171,8 @@ export default function PrivyAuthProvider({ children }) {
       priceDisplay: {
         primary: 'native-token'
       },
-      noPromptOnSignature: true // Disable confirmation modal as per user request
+      // Require the embedded wallet confirmation modal to resolve signature issues
+      noPromptOnSignature: false
     },
 
     // 🎯 PRIVY 3.0: Solana RPC configuration
