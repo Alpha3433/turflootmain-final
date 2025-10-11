@@ -2550,6 +2550,18 @@ export default function TurfLootTactical() {
       }
       
       console.log('🔍 Using Privy-native balance checking for:', walletAddress)
+      console.log('🔍 Available wallets:', wallets.length, 'wallets ready:', walletsReady)
+      
+      // Debug: Log all available wallets
+      if (wallets.length > 0) {
+        wallets.forEach((wallet, index) => {
+          console.log(`🔍 Wallet ${index}:`, {
+            address: wallet.address,
+            chainType: wallet.chainType,
+            methods: Object.keys(wallet)
+          })
+        })
+      }
       
       // Find the Privy wallet object that matches this address
       const matchingWallet = wallets.find(wallet => 
@@ -2558,32 +2570,51 @@ export default function TurfLootTactical() {
       
       if (!matchingWallet) {
         console.log('⚠️ No matching Privy wallet found for address:', walletAddress)
+        console.log('🔍 Looking for address:', walletAddress)
+        console.log('🔍 Available addresses:', wallets.map(w => w.address))
         return 0
       }
       
-      // Use Privy's native Solana provider to get balance
+      console.log('✅ Found matching Privy wallet:', matchingWallet.address)
+      console.log('🔍 Wallet methods available:', Object.keys(matchingWallet))
+      
+      // Check if wallet has Solana provider method
       if (matchingWallet.getSolanaProvider && typeof matchingWallet.getSolanaProvider === 'function') {
         console.log('✅ Using Privy wallet getSolanaProvider method')
         const provider = await matchingWallet.getSolanaProvider()
         
+        console.log('🔍 Provider object:', provider ? 'Available' : 'NULL')
+        console.log('🔍 Provider methods:', provider ? Object.keys(provider) : 'None')
+        
         if (provider && provider.getBalance) {
+          console.log('🔍 Attempting getBalance call...')
           const lamports = await provider.getBalance(walletAddress)
           const solBalance = lamports / 1_000_000_000
           
           console.log('✅ Privy-native balance:', solBalance, 'SOL')
           return solBalance
+        } else {
+          console.log('⚠️ Provider getBalance method not available')
         }
+      } else {
+        console.log('⚠️ getSolanaProvider method not available on wallet')
       }
       
-      // Fallback: If Privy provider unavailable, return 0 instead of making direct RPC calls
+      // Check alternative methods that might exist
+      if (matchingWallet.provider) {
+        console.log('🔍 Trying wallet.provider approach...')
+        // Try different provider patterns
+      }
+      
       console.warn('⚠️ Privy Solana provider unavailable for balance checking')
       return 0
       
     } catch (error) {
       console.error('❌ Error with Privy-native balance checking:', error)
+      console.error('❌ Error stack:', error.stack)
       return 0
     }
-  }, [wallets])
+  }, [wallets, walletsReady])
 
   // Balance check interval reference
   const balanceInterval = useRef(null)
