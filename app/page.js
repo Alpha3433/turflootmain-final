@@ -458,9 +458,20 @@ export default function TurfLootTactical() {
       }
     } catch (error) {
       console.error('❌ Privy payment failed:', error)
+      
+      // Handle specific wallet balance errors
+      let errorMessage = 'Transaction failed'
+      if (error.message && error.message.includes('getBalance')) {
+        errorMessage = 'Wallet balance check failed. Please ensure your wallet is properly connected and try again.'
+      } else if (error.message && error.message.includes('signAndSendTransaction')) {
+        errorMessage = 'Transaction signing failed. Please ensure your wallet is unlocked and try again.'
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
       return {
         success: false,
-        error: error.message || 'Transaction failed'
+        error: errorMessage
       }
     }
   }
