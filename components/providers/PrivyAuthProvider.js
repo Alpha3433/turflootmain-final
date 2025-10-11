@@ -180,15 +180,12 @@ export default function PrivyAuthProvider({ children }) {
       noPromptOnSignature: false
     },
 
-    // 🎯 PRIVY 3.0: Solana RPC configuration with WebSocket support
+    // 🎯 PRIVY 3.0: Solana RPC configuration - using string format only
     solana: {
       defaultChain: solanaChain,
       chains: [solanaChain],
       rpcs: {
-        [solanaChain]: {
-          http: solanaRpcUrl,
-          webSocket: solanaWsUrl
-        }
+        [solanaChain]: solanaRpcUrl
       }
     },
 
