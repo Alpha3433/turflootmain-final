@@ -35,6 +35,11 @@ class PrivyErrorBoundary extends Component {
 }
 
 // Client-side wrapper for Privy to prevent SSR issues
+function SolanaFundingPluginProvider({ children }) {
+  useSolanaFundingPlugin()
+  return children
+}
+
 function ClientOnlyPrivyProvider({ children, appId, config, debugInfo }) {
   const [isClient, setIsClient] = useState(false)
 
@@ -154,14 +159,13 @@ function ClientOnlyPrivyProvider({ children, appId, config, debugInfo }) {
   console.log('🚀 Initializing Privy with Solana-Only Configuration')
   return (
     <PrivyProvider appId={appId} config={config}>
-      {children}
+      <SolanaFundingPluginProvider>{children}</SolanaFundingPluginProvider>
     </PrivyProvider>
   )
 }
 
 export default function PrivyAuthProvider({ children }) {
   const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID
-  useSolanaFundingPlugin()
 
   const solanaChain = useMemo(() => {
     const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta').toLowerCase()
