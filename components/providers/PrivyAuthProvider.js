@@ -184,11 +184,20 @@ export default function PrivyAuthProvider({ children }) {
       }
     },
 
-    // 🎯 PRIVY 3.0: External Wallet Connectors - SOLANA ONLY (Minimal Set)
-    // Using minimal connector set to avoid Ethereum wallet errors
+    // 🎯 PRIVY 3.0: External Wallet Connectors - SOLANA ONLY
+    // Minimal connector to satisfy Privy requirements without external HTTP calls
     externalWallets: {
       solana: {
-        connectors: []  // Use empty array to rely on embedded wallets only
+        connectors: [
+          // Basic Solana connector without external service dependencies
+          {
+            name: 'phantom',
+            iconUrl: 'https://phantom.app/img/phantom-logo.svg',
+            downloadUrls: {
+              browserExtension: 'https://phantom.app/'
+            }
+          }
+        ]
       }
     },
 
