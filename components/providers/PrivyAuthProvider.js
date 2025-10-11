@@ -99,7 +99,7 @@ function ClientOnlyPrivyProvider({ children, appId, config, debugInfo }) {
 
 export default function PrivyAuthProvider({ children }) {
   const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID
-  useSolanaFundingPlugin()
+  // useSolanaFundingPlugin() removed - causes React hook context issues when called outside PrivyProvider
 
   // Compute solanaChain directly without useMemo to avoid SSR issues
   const getSolanaChain = () => {
