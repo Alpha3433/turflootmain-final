@@ -172,16 +172,12 @@ export default function PrivyAuthProvider({ children }) {
     // Authentication methods
     loginMethods: ['google', 'email', 'wallet'],
 
-    // 🎯 PRIVY 3.0: Embedded Wallets configuration - ENABLED
-    // Users get embedded wallets and use real SOL balance
+    // 🎯 PRIVY 3.0: Embedded Wallets configuration - V3.0 FORMAT
+    // Solana-specific embedded wallet configuration
     embeddedWallets: {
-      createOnLogin: 'users-without-wallets', // Create embedded wallet for users
-      requireUserPasswordOnCreate: false,
-      priceDisplay: {
-        primary: 'native-token'
-      },
-      // Require the embedded wallet confirmation modal to resolve signature issues
-      noPromptOnSignature: false
+      solana: {
+        createOnLogin: 'all-users' // Ensure all users get Solana embedded wallets
+      }
     },
 
     // 🎯 PRIVY 3.0: Official Solana RPC configuration using @solana/kit
