@@ -2,8 +2,7 @@
 
 import { PrivyProvider } from '@privy-io/react-auth'
 import { 
-  useSolanaFundingPlugin, 
-  createSolanaWalletConnector 
+  useSolanaFundingPlugin
 } from '@privy-io/react-auth/solana'
 import { Component, useState, useEffect } from 'react'
 
