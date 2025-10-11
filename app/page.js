@@ -144,6 +144,26 @@ export default function TurfLootTactical() {
       return signAndSendTransactionResponse.signAndSendTransaction
     }
 
+    if (
+      signAndSendTransactionResponse &&
+      typeof signAndSendTransactionResponse.sendTransaction === 'function'
+    ) {
+      return signAndSendTransactionResponse.sendTransaction
+    }
+
+    if (
+      signAndSendTransactionResponse &&
+      typeof signAndSendTransactionResponse === 'object'
+    ) {
+      const firstFunctionKey = Object.keys(signAndSendTransactionResponse).find(
+        (key) => typeof signAndSendTransactionResponse[key] === 'function'
+      )
+
+      if (firstFunctionKey) {
+        return signAndSendTransactionResponse[firstFunctionKey]
+      }
+    }
+
     return undefined
   }, [signAndSendTransactionResponse])
   useSolanaFundingPlugin()
