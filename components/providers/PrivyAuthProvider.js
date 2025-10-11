@@ -184,10 +184,11 @@ export default function PrivyAuthProvider({ children }) {
       }
     },
 
-    // 🎯 PRIVY 3.0: External Wallet Connectors - SOLANA SUPPORT
+    // 🎯 PRIVY 3.0: External Wallet Connectors - SOLANA ONLY (Minimal Set)
+    // Using minimal connector set to avoid Ethereum wallet errors
     externalWallets: {
       solana: {
-        connectors: toSolanaWalletConnectors()
+        connectors: []  // Use empty array to rely on embedded wallets only
       }
     },
 
