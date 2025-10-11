@@ -162,7 +162,7 @@ export default function PrivyAuthProvider({ children }) {
       accentColor: '#14F195', // TurfLoot green
       logo: undefined,
       showWalletLoginFirst: false,
-      walletChainType: 'solana-only'
+      walletChainType: 'solana'
     },
 
     // Authentication methods
