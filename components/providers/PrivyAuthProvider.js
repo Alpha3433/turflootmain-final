@@ -189,10 +189,10 @@ export default function PrivyAuthProvider({ children }) {
       }
     },
 
-    // 🎯 PRIVY 3.0: Solana Wallet Connectors - Minimal configuration to satisfy requirements
+    // 🎯 PRIVY 3.0: Solana Wallet Connectors - Using official Privy configuration
     externalWallets: {
       solana: {
-        connectors: []  // Empty array to satisfy requirement without external connectors
+        connectors: toSolanaWalletConnectors()
       }
     },
 
