@@ -2550,16 +2550,30 @@ export default function TurfLootTactical() {
       }
       
       console.log('🔍 Privy balance check for:', walletAddress)
+      console.log('🔍 Available wallets:', wallets.map(w => ({ 
+        address: w.address, 
+        type: w.walletClientType, 
+        chainType: w.chainType 
+      })))
       
       // Find the Privy wallet object that matches this address  
       const matchingWallet = wallets.find(wallet => 
-        wallet.address && wallet.address.toLowerCase() === walletAddress.toLowerCase() &&
-        wallet.walletClientType === 'privy' // Ensure it's a Privy embedded wallet
+        wallet.address && wallet.address.toLowerCase() === walletAddress.toLowerCase()
       )
       
       if (!matchingWallet) {
-        console.log('⚠️ No matching Privy embedded wallet found')
-        console.log('🔍 Available wallets:', wallets.map(w => ({ address: w.address, type: w.walletClientType })))
+        console.log('⚠️ No wallet found with matching address')
+        
+        // Try to find ANY Solana wallet if address matching fails
+        const anyPrivyWallet = wallets.find(w => 
+          w.chainType === 'solana' && w.walletClientType === 'privy'
+        )
+        
+        if (anyPrivyWallet) {
+          console.log('🔄 Using fallback Privy Solana wallet:', anyPrivyWallet.address)
+          return await checkSolanaBalance(anyPrivyWallet.address) // Recursive call with correct address
+        }
+        
         return 0
       }
       
