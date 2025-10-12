@@ -2673,6 +2673,48 @@ const MultiplayerArena = () => {
         
         // Cash out text removed as per user request
       }
+      
+      // Draw money indicator above player head in paid arenas
+      if (player.isPaidArena && player.currentValue > 0) {
+        const textY = player.y - playerRadius - 35 // Position above player
+        const displayValue = `$${player.currentValue.toFixed(2)}`
+        
+        // Draw background for better visibility
+        this.ctx.font = 'bold 16px Arial'
+        this.ctx.textAlign = 'center'
+        this.ctx.textBaseline = 'middle'
+        
+        // Measure text for background
+        const textMetrics = this.ctx.measureText(displayValue)
+        const textWidth = textMetrics.width
+        const padding = 8
+        
+        // Draw semi-transparent background
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'
+        this.ctx.fillRect(
+          player.x - textWidth / 2 - padding,
+          textY - 12,
+          textWidth + padding * 2,
+          24
+        )
+        
+        // Draw green border
+        this.ctx.strokeStyle = '#10b981'
+        this.ctx.lineWidth = 2
+        this.ctx.strokeRect(
+          player.x - textWidth / 2 - padding,
+          textY - 12,
+          textWidth + padding * 2,
+          24
+        )
+        
+        // Draw $ symbol in gold
+        this.ctx.fillStyle = '#FFD700'
+        this.ctx.shadowColor = '#000000'
+        this.ctx.shadowBlur = 4
+        this.ctx.fillText(displayValue, player.x, textY)
+        this.ctx.shadowBlur = 0
+      }
     }
     
     // Helper function to adjust color brightness
