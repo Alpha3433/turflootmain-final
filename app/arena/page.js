@@ -2668,7 +2668,7 @@ const MultiplayerArena = () => {
           
           this.ctx.lineWidth = 6
           this.ctx.beginPath()
-          this.ctx.arc(player.x, player.y, ringRadius, startAngle, endAngle)
+          this.ctx.arc(drawX, drawY, ringRadius, startAngle, endAngle)
           this.ctx.stroke()
         }
         
@@ -2687,7 +2687,7 @@ const MultiplayerArena = () => {
           
           this.ctx.lineWidth = 3
           this.ctx.beginPath()
-          this.ctx.arc(player.x, player.y, innerRingRadius, startAngle, endAngle)
+          this.ctx.arc(drawX, drawY, innerRingRadius, startAngle, endAngle)
           this.ctx.stroke()
         }
         
