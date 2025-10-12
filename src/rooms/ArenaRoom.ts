@@ -58,6 +58,7 @@ export class Player extends Schema {
   @type("number") currentValue: number = 0; // Current USD value based on mass (for display)
   @type("number") cashOutValue: number = 0; // Accumulated cash-out value (entry fee + eliminated players)
   @type("boolean") isPaidArena: boolean = false; // Whether this is a paid arena
+  @type("string") userWalletAddress: string = ""; // User's Solana wallet address for cash-outs
 }
 
 // Coin state schema
