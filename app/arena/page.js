@@ -4122,12 +4122,12 @@ const MultiplayerArena = () => {
             textShadow: '0 1px 2px rgba(0, 0, 0, 0.8)'
           }}>
             {cashOutComplete 
-              ? `✅ Cashed Out! +$${score}`
+              ? `✅ Cashed Out! +$${isPaidArena ? score.toFixed(2) : score}`
               : isMobile 
-                ? (isCashingOut ? `🔥 ${Math.floor(cashOutProgress)}%` : `🔥 Hold E ($${score})`)
+                ? (isCashingOut ? `🔥 ${Math.floor(cashOutProgress)}%` : `🔥 Hold E ($${isPaidArena ? score.toFixed(2) : score})`)
                 : (isCashingOut 
                   ? `🔥 Cashing Out... ${Math.floor(cashOutProgress)}%`
-                  : `🔥 Hold E to Cash Out ($${score})`)
+                  : `🔥 Hold E to Cash Out ($${isPaidArena ? score.toFixed(2) : score})`)
             }
           </span>
         </div>
