@@ -1420,13 +1420,24 @@ const MultiplayerArena = () => {
         setShowLoadingModal(false)
       }, 15000)
       
+      // Get user's wallet address for paid arenas
+      let userWalletAddress = ""
+      if (isPaidArena && user) {
+        const embeddedWallet = user.linkedAccounts?.find(
+          account => account.type === 'wallet' && account.chainType === 'solana'
+        )
+        userWalletAddress = embeddedWallet?.address || ""
+        console.log('👛 User wallet for paid arena:', userWalletAddress)
+      }
+
       const room = await client.joinOrCreate("arena", {
         roomName: roomId,
         playerName: playerName,
         privyUserId: privyUserId,
         selectedSkin: skinPayload, // Pass skin data to server for multiplayer visibility
         isPaidArena: isPaidArena, // Pass paid arena flag
-        entryFee: entryFee // Pass entry fee amount
+        entryFee: entryFee, // Pass entry fee amount
+        userWalletAddress: userWalletAddress // Pass wallet address for cash-outs
       })
       
       // Clear timeout if connection succeeds
