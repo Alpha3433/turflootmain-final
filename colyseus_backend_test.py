@@ -15,7 +15,7 @@ from datetime import datetime
 class ColyseusBackendTester:
     def __init__(self):
         # Get base URL from environment
-        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://solana-gaming.preview.emergentagent.com')
+        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://privy-game-hub.preview.emergentagent.com')
         self.api_base = f"{self.base_url}/api"
         
         print(f"🎮 Colyseus Backend Testing Suite")

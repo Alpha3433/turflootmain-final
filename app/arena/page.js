@@ -243,6 +243,8 @@ const MultiplayerArena = () => {
   
   // Parse URL parameters and get authenticated user data
   const roomId = searchParams.get('roomId') || 'global-turfloot-arena'
+  const entryFee = parseFloat(searchParams.get('fee')) || 0
+  const isPaidArena = searchParams.get('paid') === 'true' || entryFee > 0
   
   const privyUserId = user?.id || null
   const walletAddress = user?.wallet?.address
@@ -1406,6 +1408,12 @@ const MultiplayerArena = () => {
       console.log('🎯 Joining arena room:', roomId)
       console.log('🎯 Player details - Name:', playerName, 'PrivyID:', privyUserId)
       console.log('🎨 Selected skin payload:', skinPayload)
+      console.log('💰 Arena Details:', {
+        isPaidArena,
+        entryFee,
+        roomId,
+        userWalletAddress
+      })
       
       // Add timeout to connection attempt
       const connectionTimeout = setTimeout(() => {
@@ -1418,11 +1426,24 @@ const MultiplayerArena = () => {
         setShowLoadingModal(false)
       }, 15000)
       
+      // Get user's wallet address for paid arenas
+      let userWalletAddress = ""
+      if (isPaidArena && user) {
+        const embeddedWallet = user.linkedAccounts?.find(
+          account => account.type === 'wallet' && account.chainType === 'solana'
+        )
+        userWalletAddress = embeddedWallet?.address || ""
+        console.log('👛 User wallet for paid arena:', userWalletAddress)
+      }
+
       const room = await client.joinOrCreate("arena", {
         roomName: roomId,
         playerName: playerName,
         privyUserId: privyUserId,
-        selectedSkin: skinPayload // Pass skin data to server for multiplayer visibility
+        selectedSkin: skinPayload, // Pass skin data to server for multiplayer visibility
+        isPaidArena: isPaidArena, // Pass paid arena flag
+        entryFee: entryFee, // Pass entry fee amount
+        userWalletAddress: userWalletAddress // Pass wallet address for cash-outs
       })
       
       // Clear timeout if connection succeeds
@@ -2033,16 +2054,27 @@ const MultiplayerArena = () => {
                    'session:', currentPlayer.sessionId, 
                    'at', currentPlayer.x?.toFixed(1), currentPlayer.y?.toFixed(1))
         
-        // PURE SERVER AUTHORITY - No client-side prediction, just use server position
-        console.log('🎮 Applying server authoritative position:', {
-          server: { x: currentPlayer.x.toFixed(1), y: currentPlayer.y.toFixed(1) }
+        // SERVER AUTHORITY with CLIENT-SIDE INTERPOLATION for smooth movement
+        console.log('🎮 Applying server authoritative position with interpolation:', {
+          server: { x: currentPlayer.x.toFixed(1), y: currentPlayer.y.toFixed(1) },
+          current: { x: this.player.x.toFixed(1), y: this.player.y.toFixed(1) }
         })
         
-        // Always use server position (no reconciliation needed)
-        this.player.x = currentPlayer.x
-        this.player.y = currentPlayer.y
-        this.player.targetX = currentPlayer.x  
+        // Set target positions for interpolation instead of snapping directly
+        this.player.targetX = currentPlayer.x
         this.player.targetY = currentPlayer.y
+        
+        // Only snap if the difference is too large (teleport/spawn case)
+        const dx = currentPlayer.x - this.player.x
+        const dy = currentPlayer.y - this.player.y
+        const distance = Math.sqrt(dx * dx + dy * dy)
+        
+        // If position difference is > 100 pixels, snap directly (spawn/teleport)
+        if (distance > 100) {
+          console.log('🎯 Large position difference detected, snapping directly')
+          this.player.x = currentPlayer.x
+          this.player.y = currentPlayer.y
+        }
         
         // Verify spawn position is within playable area (for debugging)
         const worldCenterX = this.world.width / 4 // 2000 - left-side playable area
@@ -2060,11 +2092,15 @@ const MultiplayerArena = () => {
         })
         
         // Update mass and score (server is always authoritative for these)
-        const currentScoreRounded = Math.max(0, Math.round(currentPlayer.score || 0))
+        // For paid arenas, use cashOutValue instead of score
+        const currentScoreRounded = isPaidArena 
+          ? (currentPlayer.cashOutValue || 0)
+          : Math.max(0, Math.round(currentPlayer.score || 0))
         const rawMass = Number.isFinite(currentPlayer.mass) ? currentPlayer.mass : 0
         const roundedMass = Math.max(0, Math.round(rawMass))
 
         console.log('🎯 Mass update from server:', currentPlayer.mass, '(rounded:', roundedMass || 25, ')')
+        console.log('💰 Cash-out value update:', isPaidArena ? `$${currentScoreRounded.toFixed(2)}` : currentScoreRounded)
         setMass(roundedMass || 25)
         setScore(currentScoreRounded)
 
@@ -2385,8 +2421,59 @@ const MultiplayerArena = () => {
       }
     }
     
+    interpolatePosition() {
+      // Smooth interpolation from current position to target position
+      const interpolationSpeed = 0.3 // Higher = faster catch-up (0.2-0.4 is good)
+      
+      if (this.player && this.player.targetX !== undefined && this.player.targetY !== undefined) {
+        // Calculate the difference
+        const dx = this.player.targetX - this.player.x
+        const dy = this.player.targetY - this.player.y
+        
+        // Interpolate towards target position
+        this.player.x += dx * interpolationSpeed
+        this.player.y += dy * interpolationSpeed
+      }
+      
+      // Interpolate other players' positions as well
+      if (this.serverState && this.serverState.players) {
+        this.serverState.players.forEach(serverPlayer => {
+          if (!serverPlayer.isCurrentPlayer && serverPlayer.alive) {
+            // Find or create client-side interpolation data for this player
+            if (!this.playerInterpolation) {
+              this.playerInterpolation = new Map()
+            }
+            
+            if (!this.playerInterpolation.has(serverPlayer.sessionId)) {
+              // Initialize interpolation data
+              this.playerInterpolation.set(serverPlayer.sessionId, {
+                x: serverPlayer.x,
+                y: serverPlayer.y
+              })
+            }
+            
+            const interpData = this.playerInterpolation.get(serverPlayer.sessionId)
+            
+            // Interpolate towards server position
+            const dx = serverPlayer.x - interpData.x
+            const dy = serverPlayer.y - interpData.y
+            
+            interpData.x += dx * interpolationSpeed
+            interpData.y += dy * interpolationSpeed
+            
+            // Update the visual position (not the authoritative server position)
+            serverPlayer.clientX = interpData.x
+            serverPlayer.clientY = interpData.y
+          }
+        })
+      }
+    }
+    
     render() {
       if (!this.ctx || !this.running) return
+      
+      // Interpolate positions before rendering for smooth movement
+      this.interpolatePosition()
       
       // Clear canvas with pure black background like local agario
       this.ctx.fillStyle = '#000000' // Pure black background to match local agario
@@ -2506,10 +2593,14 @@ const MultiplayerArena = () => {
       // Use server-provided skin color for all players (enables multiplayer skin visibility)
       const playerSkinColor = player.skinColor || player.color || this.selectedSkin?.color || '#4A90E2'
       
+      // Use interpolated position for other players, direct position for current player
+      const drawX = isCurrentPlayer ? this.player.x : (player.clientX || player.x)
+      const drawY = isCurrentPlayer ? this.player.y : (player.clientY || player.y)
+      
       // Player circle with gradient using server-provided skin color
       const gradient = this.ctx.createRadialGradient(
-        player.x, player.y, 0,
-        player.x, player.y, playerRadius
+        drawX, drawY, 0,
+        drawX, drawY, playerRadius
       )
       
       // All players now use their server-side skin colors
@@ -2525,7 +2616,7 @@ const MultiplayerArena = () => {
       this.ctx.shadowColor = 'transparent'
       this.ctx.shadowBlur = 0
       this.ctx.beginPath()
-      this.ctx.arc(player.x, player.y, playerRadius, 0, Math.PI * 2)
+      this.ctx.arc(drawX, drawY, playerRadius, 0, Math.PI * 2)
       this.ctx.fill()
 
       // Enhanced border
@@ -2542,12 +2633,12 @@ const MultiplayerArena = () => {
       
       // Left eye
       this.ctx.beginPath()
-      this.ctx.arc(player.x - eyeOffsetX, player.y + eyeOffsetY, eyeSize, 0, Math.PI * 2)
+      this.ctx.arc(drawX - eyeOffsetX, drawY + eyeOffsetY, eyeSize, 0, Math.PI * 2)
       this.ctx.fill()
       
       // Right eye
       this.ctx.beginPath()
-      this.ctx.arc(player.x + eyeOffsetX, player.y + eyeOffsetY, eyeSize, 0, Math.PI * 2)
+      this.ctx.arc(drawX + eyeOffsetX, drawY + eyeOffsetY, eyeSize, 0, Math.PI * 2)
       this.ctx.fill()
       
       // Draw spawn protection ring with blue checkered pattern
@@ -2577,7 +2668,7 @@ const MultiplayerArena = () => {
           
           this.ctx.lineWidth = 6
           this.ctx.beginPath()
-          this.ctx.arc(player.x, player.y, ringRadius, startAngle, endAngle)
+          this.ctx.arc(drawX, drawY, ringRadius, startAngle, endAngle)
           this.ctx.stroke()
         }
         
@@ -2596,7 +2687,7 @@ const MultiplayerArena = () => {
           
           this.ctx.lineWidth = 3
           this.ctx.beginPath()
-          this.ctx.arc(player.x, player.y, innerRingRadius, startAngle, endAngle)
+          this.ctx.arc(drawX, drawY, innerRingRadius, startAngle, endAngle)
           this.ctx.stroke()
         }
         
@@ -2619,8 +2710,8 @@ const MultiplayerArena = () => {
         if (isCurrentPlayer) {
           console.log('💰 Cash out ring rendering:', {
             playerName: player.name,
-            playerX: player.x,
-            playerY: player.y,
+            playerX: drawX,
+            playerY: drawY,
             playerRadius: playerRadius,
             serverIsCashingOut: player.isCashingOut,
             serverProgress: player.cashOutProgress,
@@ -2635,14 +2726,14 @@ const MultiplayerArena = () => {
         
         // Draw background ring (full circle)
         this.ctx.beginPath()
-        this.ctx.arc(player.x, player.y, ringRadius, 0, Math.PI * 2)
+        this.ctx.arc(drawX, drawY, ringRadius, 0, Math.PI * 2)
         this.ctx.strokeStyle = 'rgba(255, 193, 7, 0.3)' // Semi-transparent yellow background
         this.ctx.lineWidth = 6
         this.ctx.stroke()
         
         // Draw the main progress arc - bright yellow
         this.ctx.beginPath()
-        this.ctx.arc(player.x, player.y, ringRadius, -Math.PI / 2, -Math.PI / 2 + progressAngle)
+        this.ctx.arc(drawX, drawY, ringRadius, -Math.PI / 2, -Math.PI / 2 + progressAngle)
         this.ctx.strokeStyle = '#ffff00' // Bright yellow
         this.ctx.lineWidth = 6
         this.ctx.lineCap = 'round'
@@ -2650,7 +2741,7 @@ const MultiplayerArena = () => {
         
         // Add outer glow effect
         this.ctx.beginPath()
-        this.ctx.arc(player.x, player.y, ringRadius + 2, -Math.PI / 2, -Math.PI / 2 + progressAngle)
+        this.ctx.arc(drawX, drawY, ringRadius + 2, -Math.PI / 2, -Math.PI / 2 + progressAngle)
         this.ctx.strokeStyle = 'rgba(255, 255, 0, 0.6)' // Subtle yellow glow
         this.ctx.lineWidth = 3
         this.ctx.lineCap = 'round'
@@ -2663,7 +2754,7 @@ const MultiplayerArena = () => {
         
         // Draw inner glow for cash out
         this.ctx.beginPath()
-        this.ctx.arc(player.x, player.y, ringRadius - 2, -Math.PI / 2, -Math.PI / 2 + progressAngle)
+        this.ctx.arc(drawX, drawY, ringRadius - 2, -Math.PI / 2, -Math.PI / 2 + progressAngle)
         this.ctx.strokeStyle = '#ffff66' // Bright yellow inner glow
         this.ctx.lineWidth = 3
         this.ctx.lineCap = 'round'
@@ -2672,6 +2763,48 @@ const MultiplayerArena = () => {
         this.ctx.globalAlpha = 1.0 // Reset alpha
         
         // Cash out text removed as per user request
+      }
+      
+      // Draw money indicator above player head in paid arenas
+      if (player.isPaidArena && player.cashOutValue > 0) {
+        const textY = drawY - playerRadius - 35 // Position above player
+        const displayValue = `$${player.cashOutValue.toFixed(2)}`
+        
+        // Draw background for better visibility
+        this.ctx.font = 'bold 16px Arial'
+        this.ctx.textAlign = 'center'
+        this.ctx.textBaseline = 'middle'
+        
+        // Measure text for background
+        const textMetrics = this.ctx.measureText(displayValue)
+        const textWidth = textMetrics.width
+        const padding = 8
+        
+        // Draw semi-transparent background
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'
+        this.ctx.fillRect(
+          drawX - textWidth / 2 - padding,
+          textY - 12,
+          textWidth + padding * 2,
+          24
+        )
+        
+        // Draw green border
+        this.ctx.strokeStyle = '#10b981'
+        this.ctx.lineWidth = 2
+        this.ctx.strokeRect(
+          drawX - textWidth / 2 - padding,
+          textY - 12,
+          textWidth + padding * 2,
+          24
+        )
+        
+        // Draw $ symbol in gold
+        this.ctx.fillStyle = '#FFD700'
+        this.ctx.shadowColor = '#000000'
+        this.ctx.shadowBlur = 4
+        this.ctx.fillText(displayValue, drawX, textY)
+        this.ctx.shadowBlur = 0
       }
     }
     
@@ -3536,24 +3669,29 @@ const MultiplayerArena = () => {
                     return
                   }
 
-                  const playerScore = Math.floor(player.score || 0)
+                  // Use cashOutValue for paid arenas, otherwise use score
+                  const playerValue = isPaidArena 
+                    ? (player.cashOutValue || 0)
+                    : Math.floor(player.score || 0)
                   const existingEntry = leaderboardMap.get(ownerId)
                   const isCurrentPlayer = !!player.isCurrentPlayer
 
                   if (existingEntry) {
-                    const useNewName = playerScore > existingEntry.score && player?.name
+                    const useNewName = playerValue > existingEntry.score && player?.name
                     leaderboardMap.set(ownerId, {
                       ownerId,
                       name: useNewName ? player.name : existingEntry.name,
-                      score: Math.max(existingEntry.score, playerScore),
-                      isPlayer: existingEntry.isPlayer || isCurrentPlayer
+                      score: Math.max(existingEntry.score, playerValue),
+                      isPlayer: existingEntry.isPlayer || isCurrentPlayer,
+                      isPaid: isPaidArena
                     })
                   } else {
                     leaderboardMap.set(ownerId, {
                       ownerId,
                       name: player.name || 'Anonymous',
-                      score: playerScore,
-                      isPlayer: isCurrentPlayer
+                      score: playerValue,
+                      isPlayer: isCurrentPlayer,
+                      isPaid: isPaidArena
                     })
                   }
                 })
@@ -3599,12 +3737,12 @@ const MultiplayerArena = () => {
                     </span>
                   </div>
                   <span style={{ 
-                    color: '#fbbf24', 
+                    color: player.isPaid ? '#10b981' : '#fbbf24', 
                     fontSize: isMobile ? (leaderboardExpanded ? '8px' : '7px') : '12px', 
                     fontWeight: '700',
-                    textShadow: '0 0 4px rgba(251, 191, 36, 0.6)'
+                    textShadow: player.isPaid ? '0 0 4px rgba(16, 185, 129, 0.6)' : '0 0 4px rgba(251, 191, 36, 0.6)'
                   }}>
-                    {player.score}
+                    {player.isPaid ? `$${player.score.toFixed(2)}` : player.score}
                   </span>
                 </div>
               ))
@@ -4067,12 +4205,12 @@ const MultiplayerArena = () => {
             textShadow: '0 1px 2px rgba(0, 0, 0, 0.8)'
           }}>
             {cashOutComplete 
-              ? `✅ Cashed Out! +$${score}`
+              ? `✅ Cashed Out! +$${isPaidArena ? score.toFixed(2) : score}`
               : isMobile 
-                ? (isCashingOut ? `🔥 ${Math.floor(cashOutProgress)}%` : `🔥 Hold E ($${score})`)
+                ? (isCashingOut ? `🔥 ${Math.floor(cashOutProgress)}%` : `🔥 Hold E ($${isPaidArena ? score.toFixed(2) : score})`)
                 : (isCashingOut 
                   ? `🔥 Cashing Out... ${Math.floor(cashOutProgress)}%`
-                  : `🔥 Hold E to Cash Out ($${score})`)
+                  : `🔥 Hold E to Cash Out ($${isPaidArena ? score.toFixed(2) : score})`)
             }
           </span>
         </div>

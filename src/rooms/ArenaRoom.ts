@@ -35,6 +35,7 @@ export class Player extends Schema {
   @type("boolean") isCashingOut: boolean = false; // Whether player is cashing out
   @type("number") cashOutProgress: number = 0; // Cash out progress (0-100)
   @type("number") cashOutStartTime: number = 0; // When cash out started
+  @type("boolean") cashOutComplete: boolean = false; // Whether cash out has been completed
   
   // Server-side skin properties for multiplayer visibility
   @type("string") skinId: string = "default";
@@ -53,6 +54,12 @@ export class Player extends Schema {
   @type("number") momentumY: number = 0; // Momentum velocity Y
   @type("number") noMergeUntil: number = 0; // Timestamp when merge is allowed
   @type("number") lastSplitTime: number = 0; // Last time this player split (for cooldown)
+  
+  // Money indicator for paid arenas
+  @type("number") currentValue: number = 0; // Current USD value based on mass (for display)
+  @type("number") cashOutValue: number = 0; // Accumulated cash-out value (entry fee + eliminated players)
+  @type("boolean") isPaidArena: boolean = false; // Whether this is a paid arena
+  @type("string") userWalletAddress: string = ""; // User's Solana wallet address for cash-outs
 }
 
 // Coin state schema
@@ -89,6 +96,10 @@ export class ArenaRoom extends Room<GameState> {
   maxCoins = 3000; // Tripled coin density within the playable arena
   maxViruses = 30; // Doubled virus (spike) density for arena mode
   tickRate = parseInt(process.env.TICK_RATE || '20'); // TPS server logic
+  
+  // Paid arena configuration
+  private isPaidArena: boolean = false;
+  private entryFee: number = 0;
 
   private spawnOffsets: Array<{ x: number, y: number }> = [
     { x: 0, y: 0 },
@@ -102,8 +113,38 @@ export class ArenaRoom extends Room<GameState> {
   ];
   private nextSpawnIndex = 0;
   
-  onCreate() {
+  onCreate(options: any = {}) {
     console.log("🌍 Arena room initialized");
+    console.log("📋 Room creation options:", JSON.stringify(options, null, 2));
+    
+    // Determine if this is a paid arena from roomName or options
+    const roomName = options.roomName || '';
+    
+    // Parse entry fee from room name (e.g., "colyseus-cash-050-au" -> $0.50)
+    // or from options
+    if (roomName.includes('cash-')) {
+      const match = roomName.match(/cash-(\d+)/);
+      if (match) {
+        const feeStr = match[1]; // e.g., "050", "002", "065"
+        this.entryFee = parseInt(feeStr) / 100; // Convert "050" to 0.50
+        this.isPaidArena = true;
+        console.log(`💰 Parsed from roomName: Entry fee $${this.entryFee.toFixed(2)}`);
+      }
+    } else if (options.entryFee > 0) {
+      // Fallback to options
+      this.isPaidArena = true;
+      this.entryFee = options.entryFee;
+      console.log(`💰 From options: Entry fee $${this.entryFee.toFixed(2)}`);
+    } else {
+      this.isPaidArena = false;
+      this.entryFee = 0;
+    }
+    
+    if (this.isPaidArena) {
+      console.log(`✅ Paid Arena Initialized: Entry fee $${this.entryFee.toFixed(2)}`);
+    } else {
+      console.log(`✅ Free Practice Arena Initialized`);
+    }
 
     // Initialize game state
     this.setState(new GameState());
@@ -271,6 +312,20 @@ export class ArenaRoom extends Room<GameState> {
     player.spawnProtection = true;
     player.spawnProtectionStart = Date.now();
     player.spawnProtectionTime = 4000; // 4 seconds protection
+    
+    // Set paid arena flag and initial value
+    player.isPaidArena = this.isPaidArena;
+    if (this.isPaidArena) {
+      // Initialize with entry fee value for both display and cash-out
+      player.currentValue = this.entryFee;
+      player.cashOutValue = this.entryFee; // Start with entry fee as cash-out balance
+      
+      // Store user's wallet address for cash-outs
+      player.userWalletAddress = options.userWalletAddress || "";
+      
+      console.log(`💰 Player ${playerName} starts with $${player.cashOutValue.toFixed(2)} cash-out balance in paid arena`);
+      console.log(`👛 User wallet address: ${player.userWalletAddress || 'NOT PROVIDED'}`);
+    }
     
     console.log(`🎨 Player ${playerName} joined with skin: ${player.skinName} (${player.skinColor})`);
     
@@ -608,12 +663,20 @@ export class ArenaRoom extends Room<GameState> {
         player.cashOutProgress = progress;
         
         // Complete cash out when progress reaches 100%
-        if (progress >= 100) {
+        if (progress >= 100 && !player.cashOutComplete) {
           player.isCashingOut = false;
           player.cashOutProgress = 0;
           player.cashOutStartTime = 0;
+          player.cashOutComplete = true; // Mark as complete to prevent multiple calls
+          
           console.log(`💰 Cash out completed for ${player.name} - score: ${player.score}`);
-          // Here you could add logic to actually cash out the player's score
+          
+          // Process real money cash-out for paid arenas
+          if (this.isPaidArena && player.isPaidArena && player.cashOutValue > 0) {
+            this.processCashOut(player, ownerSessionId).catch(error => {
+              console.error(`❌ Cash-out processing error for ${player.name}:`, error.message);
+            });
+          }
         }
       }
       
@@ -762,6 +825,18 @@ export class ArenaRoom extends Room<GameState> {
     this.checkPlayerCollisions(player, sessionId);
   }
 
+  // Calculate player's current USD value based on mass growth in paid arenas
+  private updatePlayerValue(player: Player) {
+    if (!this.isPaidArena || !player.isPaidArena) return;
+    
+    // Calculate value based on mass growth
+    // Starting mass is 25, entry fee is the base value
+    // Formula: currentValue = entryFee * (currentMass / startingMass)
+    const startingMass = 25;
+    const massRatio = player.mass / startingMass;
+    player.currentValue = this.entryFee * massRatio;
+  }
+
   checkCoinCollisions(player: Player) {
     this.state.coins.forEach((coin, coinId) => {
       const dx = player.x - coin.x;
@@ -773,6 +848,8 @@ export class ArenaRoom extends Room<GameState> {
         player.mass += coin.value;
         player.score += coin.value;
         player.radius = Math.sqrt(player.mass) * 3; // Match agario radius formula
+        
+        // Note: Cash-out value is NOT affected by coins, only by eliminating other players
         
         // Remove coin and spawn new one
         this.state.coins.delete(coinId);
@@ -872,6 +949,17 @@ export class ArenaRoom extends Room<GameState> {
           player.mass += otherPlayer.mass * 0.8;
           player.score += otherPlayer.score * 0.5;
           player.radius = Math.sqrt(player.mass) * 3; // Match agario radius formula
+          
+          // Update player value in paid arenas
+          this.updatePlayerValue(player);
+          
+          // Transfer cash-out value in paid arenas
+          if (this.isPaidArena && player.isPaidArena && otherPlayer.isPaidArena) {
+            const eliminatedBalance = otherPlayer.cashOutValue;
+            player.cashOutValue += eliminatedBalance;
+            player.currentValue = player.cashOutValue; // Update display value to match cash-out value
+            console.log(`💰 ${player.name} gained $${eliminatedBalance.toFixed(2)} from ${otherPlayer.name}. New balance: $${player.cashOutValue.toFixed(2)}`);
+          }
           
           // Eliminate other player
           otherPlayer.alive = false;
@@ -993,6 +1081,75 @@ export class ArenaRoom extends Room<GameState> {
       '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9'
     ];
     return colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  async processCashOut(player: Player, sessionId: string) {
+    try {
+      console.log(`💰 Processing cash-out for ${player.name}...`);
+      console.log(`   Cash-out value: $${player.cashOutValue.toFixed(2)}`);
+      console.log(`   User wallet: ${player.userWalletAddress || 'NOT PROVIDED'}`);
+
+      // Validate wallet address
+      if (!player.userWalletAddress) {
+        throw new Error('User wallet address not available');
+      }
+
+      // Get Privy user ID from client
+      const client = this.clients.find(c => c.sessionId === sessionId);
+      const privyUserId = (client as any)?.userData?.privyUserId || 'unknown';
+
+      // Call cash-out API
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+      const cashOutUrl = `${baseUrl}/api/cashout`;
+
+      console.log(`📡 Calling cash-out API: ${cashOutUrl}`);
+
+      const response = await fetch(cashOutUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userWalletAddress: player.userWalletAddress,
+          cashOutValueUSD: player.cashOutValue,
+          privyUserId: privyUserId,
+          playerName: player.name
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Cash-out API request failed');
+      }
+
+      console.log(`✅ Cash-out successful for ${player.name}!`);
+      console.log(`   Transaction signature: ${result.signature}`);
+      console.log(`   Payout: $${result.payoutUSD} (${result.payoutSOL} SOL)`);
+      console.log(`   Platform fee: $${result.platformFeeUSD} (10%)`);
+
+      // Broadcast success message to client
+      if (client) {
+        this.broadcast('cashOutSuccess', {
+          playerName: player.name,
+          payoutUSD: result.payoutUSD,
+          payoutSOL: result.payoutSOL,
+          signature: result.signature
+        });
+      }
+
+    } catch (error) {
+      console.error(`❌ Cash-out failed for ${player.name}:`, error.message);
+      
+      // Broadcast error to client
+      const client = this.clients.find(c => c.sessionId === sessionId);
+      if (client) {
+        this.broadcast('cashOutError', {
+          playerName: player.name,
+          error: error.message
+        });
+      }
+    }
   }
 
   onDispose() {
