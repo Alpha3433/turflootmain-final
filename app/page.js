@@ -2579,62 +2579,39 @@ export default function TurfLootTactical() {
       
       console.log('✅ Found Privy embedded wallet:', matchingWallet.address)
       
-      // Try Privy's getSolanaProvider method - simplified approach
+      // Use Privy's embedded wallet balance - direct approach (no fallbacks)
+      console.log('✅ Found matching Privy wallet:', matchingWallet.address)
+      
       try {
+        // For Privy embedded wallets, the balance should be available directly
         if (matchingWallet.getSolanaProvider) {
-          const solanaProvider = await matchingWallet.getSolanaProvider()
+          console.log('🔄 Getting Solana provider from Privy wallet...')
+          const provider = await matchingWallet.getSolanaProvider()
           
-          if (solanaProvider?.connection?.getBalance) {
-            // Use the connection directly from Privy's provider
-            const { PublicKey } = await import('@solana/web3.js')
-            const publicKey = new PublicKey(walletAddress)
-            const lamports = await solanaProvider.connection.getBalance(publicKey)
-            const solBalance = lamports / 1_000_000_000
+          if (provider) {
+            console.log('✅ Privy Solana provider obtained')
             
-            console.log('✅ Privy balance via connection:', solBalance, 'SOL')
-            return solBalance
-          }
-          
-          // Alternative: Try provider.getBalance directly
-          if (solanaProvider.getBalance) {
-            const balance = await solanaProvider.getBalance(walletAddress)
-            const solBalance = balance / 1_000_000_000
-            
-            console.log('✅ Privy balance via provider:', solBalance, 'SOL')  
-            return solBalance
+            // Try the RPC connection approach
+            if (provider.connection) {
+              const { PublicKey } = await import('@solana/web3.js')
+              const publicKey = new PublicKey(walletAddress)
+              const balance = await provider.connection.getBalance(publicKey)
+              const solBalance = balance / 1_000_000_000
+              
+              console.log('✅ Privy embedded wallet balance:', solBalance, 'SOL')
+              return solBalance
+            }
           }
         }
-      } catch (providerError) {
-        console.log('⚠️ getSolanaProvider failed:', providerError.message)
-      }
-      
-      // Fallback: Use Privy REST API for balance checking
-      // This approach works even when getSolanaProvider has issues
-      try {
-        console.log('🔄 Trying Privy REST API balance fallback...')
         
-        const response = await fetch(`/api/privy/wallet-balance`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            walletAddress,
-            walletId: matchingWallet.id 
-          })
-        })
+        // If getSolanaProvider doesn't work, the wallet might not be ready
+        console.log('⚠️ Privy wallet not ready for balance checking yet')
+        return 0
         
-        if (response.ok) {
-          const balanceData = await response.json()
-          if (balanceData.success && typeof balanceData.balance === 'number') {
-            console.log('✅ Privy REST API balance:', balanceData.balance, 'SOL')
-            return balanceData.balance
-          }
-        }
-      } catch (apiError) {
-        console.log('⚠️ Privy REST API fallback failed:', apiError.message)
+      } catch (error) {
+        console.error('❌ Privy balance error:', error.message)
+        return 0
       }
-      
-      console.log('⚠️ All Privy balance methods exhausted')
-      return 0
       
     } catch (error) {
       console.error('❌ Error with Privy balance checking:', error.message)
