@@ -786,6 +786,18 @@ export class ArenaRoom extends Room<GameState> {
     this.checkPlayerCollisions(player, sessionId);
   }
 
+  // Calculate player's current USD value based on mass growth in paid arenas
+  private updatePlayerValue(player: Player) {
+    if (!this.isPaidArena || !player.isPaidArena) return;
+    
+    // Calculate value based on mass growth
+    // Starting mass is 25, entry fee is the base value
+    // Formula: currentValue = entryFee * (currentMass / startingMass)
+    const startingMass = 25;
+    const massRatio = player.mass / startingMass;
+    player.currentValue = this.entryFee * massRatio;
+  }
+
   checkCoinCollisions(player: Player) {
     this.state.coins.forEach((coin, coinId) => {
       const dx = player.x - coin.x;
@@ -797,6 +809,9 @@ export class ArenaRoom extends Room<GameState> {
         player.mass += coin.value;
         player.score += coin.value;
         player.radius = Math.sqrt(player.mass) * 3; // Match agario radius formula
+        
+        // Update player value in paid arenas
+        this.updatePlayerValue(player);
         
         // Remove coin and spawn new one
         this.state.coins.delete(coinId);
