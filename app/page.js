@@ -2583,25 +2583,39 @@ export default function TurfLootTactical() {
       console.log('✅ Found matching Privy wallet:', matchingWallet.address)
       
       try {
-        // For Privy embedded wallets, the balance should be available directly
+        // For Privy embedded wallets, try multiple approaches
+        console.log('🔄 Attempting to get balance from Privy wallet...')
+        console.log('🔍 Wallet details:', {
+          address: matchingWallet.address,
+          type: matchingWallet.walletClientType,
+          chainType: matchingWallet.chainType,
+          hasGetSolanaProvider: !!matchingWallet.getSolanaProvider
+        })
+        
         if (matchingWallet.getSolanaProvider) {
           console.log('🔄 Getting Solana provider from Privy wallet...')
           const provider = await matchingWallet.getSolanaProvider()
           
-          if (provider) {
-            console.log('✅ Privy Solana provider obtained')
+          console.log('🔍 Provider details:', {
+            hasProvider: !!provider,
+            hasConnection: !!(provider?.connection),
+            providerMethods: provider ? Object.keys(provider) : []
+          })
+          
+          if (provider?.connection) {
+            console.log('✅ Using provider.connection for balance...')
+            const { PublicKey } = await import('@solana/web3.js')
+            const publicKey = new PublicKey(walletAddress)
+            const balance = await provider.connection.getBalance(publicKey)
+            const solBalance = balance / 1_000_000_000
             
-            // Try the RPC connection approach
-            if (provider.connection) {
-              const { PublicKey } = await import('@solana/web3.js')
-              const publicKey = new PublicKey(walletAddress)
-              const balance = await provider.connection.getBalance(publicKey)
-              const solBalance = balance / 1_000_000_000
-              
-              console.log('✅ Privy embedded wallet balance:', solBalance, 'SOL')
-              return solBalance
-            }
+            console.log('✅ Privy embedded wallet balance:', solBalance, 'SOL')
+            return solBalance
+          } else {
+            console.log('⚠️ Provider exists but no connection available')
           }
+        } else {
+          console.log('⚠️ getSolanaProvider method not available on wallet')
         }
         
         // If getSolanaProvider doesn't work, the wallet might not be ready
