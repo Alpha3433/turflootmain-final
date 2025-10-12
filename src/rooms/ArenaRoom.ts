@@ -292,9 +292,10 @@ export class ArenaRoom extends Room<GameState> {
     // Set paid arena flag and initial value
     player.isPaidArena = this.isPaidArena;
     if (this.isPaidArena) {
-      // Initialize with entry fee value
+      // Initialize with entry fee value for both display and cash-out
       player.currentValue = this.entryFee;
-      console.log(`💰 Player ${playerName} starts with $${player.currentValue.toFixed(2)} in paid arena`);
+      player.cashOutValue = this.entryFee; // Start with entry fee as cash-out balance
+      console.log(`💰 Player ${playerName} starts with $${player.cashOutValue.toFixed(2)} cash-out balance in paid arena`);
     }
     
     console.log(`🎨 Player ${playerName} joined with skin: ${player.skinName} (${player.skinColor})`);
