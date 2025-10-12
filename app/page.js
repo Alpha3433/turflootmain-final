@@ -332,52 +332,150 @@ export default function TurfLootTactical() {
 
   // 🚀 Paid Room Entry: Deduct SOL from embedded wallet based on room cost
   const deductRoomFees = async (roomCostUsd, _userWalletAddress = null, feePercentageOverride = null) => {
-    console.log('💰 Initiating Privyy arena entry payment', {
-      roomCostUsd,
-      feePercentageOverride
-    })
+    console.log('💰 Starting Privy SOL Payment')
+    console.log('   Room Cost: $' + roomCostUsd)
 
-    const result = await executePrivyyArenaEntry({
-      entryFeeUsd: roomCostUsd,
-      privyUser,
-      wallets,
-      signAndSendTransaction: privySignAndSendTransaction,
-      signTransaction,
-      chain: SOLANA_CHAIN,
-      usdPerSol: USD_PER_SOL_FALLBACK,
-      feePercentage: feePercentageOverride || undefined
-    })
+    try {
+      // Get embedded wallet address
+      const embeddedWallet = privyUser?.linkedAccounts?.find(
+        account => account.type === 'wallet' && account.chainType === 'solana'
+      )
 
-    if (!result.success) {
-      console.error('❌ Privyy arena entry payment failed:', result.error)
-      return result
-    }
+      if (!embeddedWallet) {
+        throw new Error('No Solana wallet found')
+      }
 
-    const totalSolCost = Number.isFinite(result.costs?.sol?.totalCost)
-      ? result.costs.sol.totalCost
-      : Number.isFinite(result.fees?.totalSol)
-        ? result.fees.totalSol
-        : 0
+      const userWalletAddress = embeddedWallet.address
+      console.log('   From Wallet:', userWalletAddress)
 
-    const currentSolBalance = Number.isFinite(parseFloat(walletBalance?.sol))
-      ? parseFloat(walletBalance.sol)
-      : 0
-    const updatedSolBalance = Math.max(0, currentSolBalance - (totalSolCost || 0))
-    const effectiveUsdPerSol = Number.isFinite(result.fees?.usdPerSol)
-      ? result.fees.usdPerSol
-      : USD_PER_SOL_FALLBACK
-    const updatedUsdBalance = updatedSolBalance * effectiveUsdPerSol
+      // Import Solana libraries
+      const { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } = await import('@solana/web3.js')
+      
+      // Setup connection
+      const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://mainnet.helius-rpc.com/?api-key=solana-gaming'
+      const connection = new Connection(heliusRpc, 'confirmed')
+      console.log('✅ Connected to Solana')
 
-    setWalletBalance({
-      sol: updatedSolBalance.toFixed(6),
-      usd: updatedUsdBalance.toFixed(2),
-      loading: false
-    })
+      // Calculate SOL amount
+      const platformWallet = process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS || 'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
+      const USD_PER_SOL = 150
+      const solAmount = roomCostUsd / USD_PER_SOL
+      const lamports = Math.floor(solAmount * LAMPORTS_PER_SOL)
+      
+      console.log('💵 Payment Details:')
+      console.log('   SOL Amount:', solAmount.toFixed(6), 'SOL')
+      console.log('   Lamports:', lamports)
+      console.log('   To Platform:', platformWallet)
 
-    return {
-      ...result,
-      newBalance: updatedUsdBalance,
-      newBalanceSol: updatedSolBalance
+      // Build transaction
+      const fromPubkey = new PublicKey(userWalletAddress)
+      const toPubkey = new PublicKey(platformWallet)
+      
+      const transferIx = SystemProgram.transfer({
+        fromPubkey,
+        toPubkey,
+        lamports
+      })
+
+      const { blockhash } = await connection.getLatestBlockhash('confirmed')
+      const transaction = new Transaction({
+        recentBlockhash: blockhash,
+        feePayer: fromPubkey
+      }).add(transferIx)
+
+      // Serialize transaction - CRITICAL: Must be Uint8Array for Privy
+      const serializedTx = transaction.serialize({
+        requireAllSignatures: false,
+        verifySignatures: false
+      })
+      
+      // Force convert to proper Uint8Array (not Buffer)
+      const txBytes = Uint8Array.from(serializedTx)
+      
+      console.log('📦 Transaction ready:', txBytes.length, 'bytes (Uint8Array)')
+
+      // Sign and send with Privy v3.0 - Use hook method directly
+      console.log('🔐 Signing with Privy v3.0...')
+      console.log('   Hook available:', !!privySignAndSendTransaction)
+      
+      if (!privySignAndSendTransaction) {
+        throw new Error('Privy signAndSendTransaction hook not available')
+      }
+      
+      // Get the embedded wallet object from useWallets  
+      const embeddedWalletObj = wallets.find(w => {
+        const addr = w.address || w.publicKey?.toString() || w.publicKey?.toBase58?.()
+        return addr === userWalletAddress
+      })
+      
+      console.log('   Wallet for signing:', embeddedWalletObj ? 'Found' : 'Not found')
+      
+      if (!embeddedWalletObj) {
+        throw new Error('Embedded wallet not found for transaction signing')
+      }
+      
+      console.log('🚀 Attempting Privy transaction signature...')
+      
+      // Use Privy v3.0 hook method with wallet context
+      const result = await privySignAndSendTransaction({
+        transaction: txBytes,
+        wallet: embeddedWalletObj
+      })
+      
+      const signature = result.signature || result
+      console.log('✅ Privy transaction result:', signature)
+      
+      console.log('✅ Transaction sent! Signature:', signature)
+
+      // Confirm on-chain
+      try {
+        await connection.confirmTransaction(signature, 'confirmed')
+        console.log('✅ Confirmed on Solana blockchain')
+      } catch (confirmError) {
+        console.warn('⚠️ Confirmation pending')
+      }
+
+      // Update balance
+      const currentSolBalance = parseFloat(walletBalance?.sol) || 0
+      const updatedSolBalance = Math.max(0, currentSolBalance - solAmount)
+      const updatedUsdBalance = updatedSolBalance * USD_PER_SOL
+
+      setWalletBalance({
+        sol: updatedSolBalance.toFixed(6),
+        usd: updatedUsdBalance.toFixed(2),
+        loading: false
+      })
+
+      return {
+        success: true,
+        signature,
+        fees: {
+          totalSol: solAmount,
+          totalUsd: roomCostUsd
+        },
+        costs: {
+          totalCost: roomCostUsd
+        },
+        newBalance: updatedUsdBalance,
+        newBalanceSol: updatedSolBalance
+      }
+    } catch (error) {
+      console.error('❌ Privy payment failed:', error)
+      
+      // Handle specific wallet balance errors
+      let errorMessage = 'Transaction failed'
+      if (error.message && error.message.includes('getBalance')) {
+        errorMessage = 'Wallet balance check failed. Please ensure your wallet is properly connected and try again.'
+      } else if (error.message && error.message.includes('signAndSendTransaction')) {
+        errorMessage = 'Transaction signing failed. Please ensure your wallet is unlocked and try again.'
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
+      return {
+        success: false,
+        error: errorMessage
+      }
     }
   }
   // SMART MATCHMAKING SYSTEM with HATHORA INTEGRATION
@@ -2454,57 +2552,58 @@ export default function TurfLootTactical() {
         return 0
       }
       
-      console.log('🔍 Fetching REAL SOL balance from blockchain for:', walletAddress)
+      console.log('🔍 Helius RPC balance check for:', walletAddress)
       
-      // Import Solana web3.js
-      const solanaWeb3 = await import('@solana/web3.js')
-      const Connection = solanaWeb3.Connection || solanaWeb3.default?.Connection
-      const PublicKey = solanaWeb3.PublicKey || solanaWeb3.default?.PublicKey
-
-      // Connect to Solana via Helius
-      const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC ||
-                        'https://mainnet.helius-rpc.com/?api-key=privy-arena'
-      const connection = Connection ? new Connection(heliusRpc, 'confirmed') : null
-
-      // Get real balance
-      if (connection && typeof connection.getBalance === 'function' && PublicKey) {
+      // Use Helius RPC directly for reliable balance fetching
+      const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://mainnet.helius-rpc.com/?api-key=9ce7937c-f2a5-4759-8d79-dd8f9ca63fa5'
+      
+      try {
+        // Import Solana web3.js for balance checking
+        const { Connection, PublicKey } = await import('@solana/web3.js')
+        
+        // Create connection to Helius RPC
+        const connection = new Connection(heliusRpc, 'confirmed')
         const publicKey = new PublicKey(walletAddress)
+        
+        console.log('📡 Fetching balance from Helius RPC...')
         const lamports = await connection.getBalance(publicKey)
-        const solBalance = lamports / 1_000_000_000
-
-        console.log('✅ Real blockchain balance:', solBalance, 'SOL')
-
+        const solBalance = lamports / 1_000_000_000 // Convert to SOL
+        
+        console.log('✅ Helius RPC balance:', solBalance, 'SOL')
         return solBalance
-      }
-
-      console.warn('⚠️ Connection.getBalance unavailable – falling back to manual RPC request')
-
-      const response = await fetch(heliusRpc, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 1,
-          method: 'getBalance',
-          params: [walletAddress]
+        
+      } catch (rpcError) {
+        console.error('❌ Helius RPC error:', rpcError.message)
+        
+        // Fallback to direct fetch if Connection fails
+        console.log('🔄 Trying direct Helius API call...')
+        
+        const response = await fetch(heliusRpc, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'getBalance',
+            params: [walletAddress]
+          })
         })
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        const lamports = data?.result?.value ?? 0
-        const solBalance = lamports / 1_000_000_000
-
-        console.log('✅ Real blockchain balance (fallback):', solBalance, 'SOL')
-
-        return solBalance
+        
+        if (response.ok) {
+          const data = await response.json()
+          const lamports = data?.result?.value ?? 0
+          const solBalance = lamports / 1_000_000_000
+          
+          console.log('✅ Helius API balance:', solBalance, 'SOL')
+          return solBalance
+        } else {
+          console.error('❌ Helius API error:', response.status)
+          return 0
+        }
       }
-
-      console.warn('⚠️ Fallback RPC balance request failed:', response.status, response.statusText)
-      return 0
-
+      
     } catch (error) {
-      console.error('❌ Error fetching real balance:', error)
+      console.error('❌ Error with Helius balance checking:', error.message)
       return 0
     }
   }, [])
@@ -2520,17 +2619,29 @@ export default function TurfLootTactical() {
 
   // STEP 4: Expose balance to the page - Real SOL balance only
   const fetchWalletBalance = useCallback(async (addressOverride = null) => {
-    console.log('💰 fetchWalletBalance called')
+    console.log('💰 fetchWalletBalance called - Auth:', authenticated, 'Ready:', walletsReady, 'Wallets:', wallets.length)
 
     const walletAddress = addressOverride || currentWalletAddress
 
     if (!walletAddress) {
-      console.log('👛 No wallet found - setting default balance')
+      console.log('👛 No wallet address - setting default balance')
       resetWalletBalance()
       return
     }
 
-    console.log('🚀 Fetching real SOL balance for:', walletAddress)
+    if (!authenticated) {
+      console.log('⚠️ User not authenticated yet - skipping balance check')
+      resetWalletBalance()
+      return
+    }
+
+    if (!walletsReady || wallets.length === 0) {
+      console.log('⚠️ Wallets not ready yet - skipping balance check')
+      resetWalletBalance()
+      return
+    }
+
+    console.log('🚀 Fetching real SOL balance for authenticated user:', walletAddress)
 
     // Set loading state
     setWalletBalance(prev => ({ ...prev, loading: true }))

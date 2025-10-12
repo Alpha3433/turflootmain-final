@@ -1,28 +1,33 @@
 #!/usr/bin/env python3
 """
-Comprehensive Privy Embedded Wallet Integration Fix Backend Testing
-Testing the complete Privy embedded wallet integration fix for paid room entry fees.
+TurfLoot Arena Privy Solana Wallet Integration Backend Testing
+Testing complete Privy Solana wallet integration and paid room entry functionality
 
 REVIEW REQUEST FOCUS:
-1. Test updated wallet resolution in deductRoomFees function - verify resolveSolanaWallet() detects embedded wallets from linkedAccounts
-2. Test dual-path transaction signing logic (embedded vs external wallets)
-3. Verify wallet detection correctly identifies embedded wallets and uses useSendTransaction
-4. Test external wallets use useSignAndSendTransaction
-5. Verify all Privy authentication and wallet balance APIs are operational
+- Just fixed Privy configuration by adding `toSolanaWalletConnectors()` to `externalWallets.solana.connectors`
+- Previous `TypeError: Cannot read properties of undefined (reading 'signAndSendTransaction')` error should be resolved
+- Room entry fees are $0.02, $0.05, $0.10 worth of SOL
+- Need to verify the complete transaction flow from wallet authentication to SOL transfer
 
-KEY CHANGES TO TEST:
-- Updated resolveSolanaWallet() to check privyUser.linkedAccounts first for embedded wallets
-- Added useSendTransaction hook for embedded wallet signing
-- Fixed isEmbeddedWallet detection logic in deductRoomFees
-- Dual-path signing: embedded wallets use privySendTransaction, external wallets use privySignAndSendTransaction
-- Enhanced logging for wallet type detection and signing process
+KEY COMPONENTS TO TEST:
+1. **Privy Authentication Integration** - `/api` endpoints working with Privy tokens
+2. **Wallet Balance API** - `/api/wallet/balance` returns proper Privy wallet balance
+3. **Server Browser API** - `/api/servers` returns correct room configurations with entry fees
+4. **Transaction Processing** - Verify SOL transaction logic (no need to actually send SOL, just verify the flow)
+5. **Arena Room API** - `/api/arena/room` room creation and management
 
-EXPECTED RESULTS:
-- Embedded Solana wallets should be detected from privyUser.linkedAccounts
-- System should correctly identify wallet type (embedded vs external)
-- Appropriate signing method should be used based on wallet type
-- Fee deduction should work for authenticated users with embedded wallets
-- All backend APIs should remain operational
+SPECIFIC TESTS NEEDED:
+- Test `/api/servers` returns rooms with correct entry fees ($0.02, $0.05, $0.10)
+- Test `/api/wallet/balance` authentication and response format
+- Test Privy token validation in protected endpoints
+- Test room creation/joining flow without breaking existing functionality
+- Verify no more "signAndSendTransaction undefined" errors in backend logic
+
+EXPECTED BEHAVIOR:
+- All APIs should work properly with Privy authentication
+- Room configurations should match the stake options in the UI ($0.02, $0.05, $0.10)
+- Backend should support the fixed Privy wallet integration
+- No server-side errors related to Privy or Solana transaction signing
 """
 
 import asyncio

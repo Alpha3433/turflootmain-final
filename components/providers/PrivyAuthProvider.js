@@ -1,7 +1,11 @@
 'use client'
 
 import { PrivyProvider } from '@privy-io/react-auth'
-import { useSolanaFundingPlugin } from '@privy-io/react-auth/solana'
+import { 
+  useSolanaFundingPlugin,
+  toSolanaWalletConnectors
+} from '@privy-io/react-auth/solana'
+import { createSolanaRpc, createSolanaRpcSubscriptions } from '@solana/kit'
 import { Component, useState, useEffect } from 'react'
 
 // Error boundary for Privy-related errors
@@ -16,7 +20,9 @@ class PrivyErrorBoundary extends Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('🚨 Privy Error Boundary:', error, errorInfo)
+    console.error('🚨 Privy Error Boundary - Full Error:', error)
+    console.error('🚨 Privy Error Boundary - Error Info:', errorInfo)
+    console.error('🚨 Privy Error Boundary - Stack:', error.stack)
   }
 
   render() {
@@ -94,7 +100,7 @@ function ClientOnlyPrivyProvider({ children, appId, config, debugInfo }) {
 
 export default function PrivyAuthProvider({ children }) {
   const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID
-  useSolanaFundingPlugin()
+  // useSolanaFundingPlugin() removed - causes React hook context issues when called outside PrivyProvider
 
   // Compute solanaChain directly without useMemo to avoid SSR issues
   const getSolanaChain = () => {
@@ -115,7 +121,7 @@ export default function PrivyAuthProvider({ children }) {
   const solanaWsUrl =
     process.env.NEXT_PUBLIC_SOLANA_WS ||
     process.env.NEXT_PUBLIC_HELIUS_WS ||
-    solanaRpcUrl.replace(/^http/, 'ws')
+    solanaRpcUrl.replace(/^https/, 'wss').replace(/^http/, 'ws')
 
   // Removed useMemo to avoid SSR issues
   const solanaFundingConfig = {
@@ -138,6 +144,9 @@ export default function PrivyAuthProvider({ children }) {
   }
 
   console.log('🔧 Initializing Privy with App ID:', appId.substring(0, 10) + '...')
+  console.log('🔧 Solana Chain:', solanaChain)
+  console.log('🔧 Solana RPC URL:', solanaRpcUrl)
+  console.log('🔧 Solana WS URL:', solanaWsUrl)
 
   // 🚀 Privy 3.0 Configuration - SOLANA ONLY
   // Removed useMemo to avoid SSR issues
@@ -157,32 +166,32 @@ export default function PrivyAuthProvider({ children }) {
       accentColor: '#14F195', // TurfLoot green
       logo: undefined,
       showWalletLoginFirst: false,
-      walletChainType: 'solana-only'
+      walletChainType: 'solana'
     },
 
     // Authentication methods
     loginMethods: ['google', 'email', 'wallet'],
 
-    // 🎯 PRIVY 3.0: Embedded Wallets configuration - ENABLED
-    // Users get embedded wallets and use real SOL balance
+    // 🎯 PRIVY 3.0: Embedded Wallets configuration - V3.0 FORMAT
+    // Solana-specific embedded wallet configuration
     embeddedWallets: {
-      createOnLogin: 'users-without-wallets', // Create embedded wallet for users
-      requireUserPasswordOnCreate: false,
-      priceDisplay: {
-        primary: 'native-token'
-      },
-      // Require the embedded wallet confirmation modal to resolve signature issues
-      noPromptOnSignature: false
-    },
-
-    // 🎯 PRIVY 3.0: Solana RPC configuration
-    solana: {
-      defaultChain: solanaChain,
-      chains: [solanaChain],
-      rpcs: {
-        [solanaChain]: solanaRpcUrl
+      solana: {
+        createOnLogin: 'all-users' // Ensure all users get Solana embedded wallets
       }
     },
+
+    // 🎯 PRIVY 3.0: Official Solana RPC configuration using @solana/kit
+    solana: {
+      rpcs: {
+        [solanaChain]: {
+          rpc: createSolanaRpc(solanaRpcUrl),
+          rpcSubscriptions: createSolanaRpcSubscriptions(solanaWsUrl)
+        }
+      }
+    },
+
+    // 🎯 PRIVY 3.0: Focus on embedded wallets only to avoid getBalance conflicts
+    // Removing external connectors to isolate embedded wallet functionality
 
     funding: {
       solana: solanaFundingConfig
