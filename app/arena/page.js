@@ -1424,7 +1424,9 @@ const MultiplayerArena = () => {
         roomName: roomId,
         playerName: playerName,
         privyUserId: privyUserId,
-        selectedSkin: skinPayload // Pass skin data to server for multiplayer visibility
+        selectedSkin: skinPayload, // Pass skin data to server for multiplayer visibility
+        isPaidArena: isPaidArena, // Pass paid arena flag
+        entryFee: entryFee // Pass entry fee amount
       })
       
       // Clear timeout if connection succeeds
