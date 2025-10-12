@@ -115,13 +115,35 @@ export class ArenaRoom extends Room<GameState> {
   
   onCreate(options: any = {}) {
     console.log("🌍 Arena room initialized");
+    console.log("📋 Room creation options:", JSON.stringify(options, null, 2));
     
-    // Check if this is a paid arena
-    this.isPaidArena = options.isPaidArena || false;
-    this.entryFee = options.entryFee || 0;
+    // Determine if this is a paid arena from roomName or options
+    const roomName = options.roomName || '';
+    
+    // Parse entry fee from room name (e.g., "colyseus-cash-050-au" -> $0.50)
+    // or from options
+    if (roomName.includes('cash-')) {
+      const match = roomName.match(/cash-(\d+)/);
+      if (match) {
+        const feeStr = match[1]; // e.g., "050", "002", "065"
+        this.entryFee = parseInt(feeStr) / 100; // Convert "050" to 0.50
+        this.isPaidArena = true;
+        console.log(`💰 Parsed from roomName: Entry fee $${this.entryFee.toFixed(2)}`);
+      }
+    } else if (options.entryFee > 0) {
+      // Fallback to options
+      this.isPaidArena = true;
+      this.entryFee = options.entryFee;
+      console.log(`💰 From options: Entry fee $${this.entryFee.toFixed(2)}`);
+    } else {
+      this.isPaidArena = false;
+      this.entryFee = 0;
+    }
     
     if (this.isPaidArena) {
-      console.log(`💰 Paid Arena: Entry fee $${this.entryFee.toFixed(2)}`);
+      console.log(`✅ Paid Arena Initialized: Entry fee $${this.entryFee.toFixed(2)}`);
+    } else {
+      console.log(`✅ Free Practice Arena Initialized`);
     }
 
     // Initialize game state
