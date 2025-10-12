@@ -287,7 +287,7 @@ export default function TurfLootTactical() {
   }
 
   // Removed SOLANA_RPC_ENDPOINTS - now handled by Helius in cleanFeeManager
-  const USD_PER_SOL_FALLBACK = parseFloat(process.env.NEXT_PUBLIC_USD_PER_SOL || '150')
+  const USD_PER_SOL_FALLBACK = parseFloat(process.env.NEXT_PUBLIC_USD_PER_SOL || '454.5')
   const SOLANA_CHAIN = useMemo(() => {
     const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta').toLowerCase()
     if (network.startsWith('solana:')) {
