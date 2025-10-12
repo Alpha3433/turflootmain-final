@@ -2679,9 +2679,9 @@ const MultiplayerArena = () => {
       }
       
       // Draw money indicator above player head in paid arenas
-      if (player.isPaidArena && player.currentValue > 0) {
+      if (player.isPaidArena && player.cashOutValue > 0) {
         const textY = player.y - playerRadius - 35 // Position above player
-        const displayValue = `$${player.currentValue.toFixed(2)}`
+        const displayValue = `$${player.cashOutValue.toFixed(2)}`
         
         // Draw background for better visibility
         this.ctx.font = 'bold 16px Arial'
