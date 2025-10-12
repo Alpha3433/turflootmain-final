@@ -288,6 +288,14 @@ export class ArenaRoom extends Room<GameState> {
     player.spawnProtectionStart = Date.now();
     player.spawnProtectionTime = 4000; // 4 seconds protection
     
+    // Set paid arena flag and initial value
+    player.isPaidArena = this.isPaidArena;
+    if (this.isPaidArena) {
+      // Initialize with entry fee value
+      player.currentValue = this.entryFee;
+      console.log(`💰 Player ${playerName} starts with $${player.currentValue.toFixed(2)} in paid arena`);
+    }
+    
     console.log(`🎨 Player ${playerName} joined with skin: ${player.skinName} (${player.skinColor})`);
     
     // Add player to game state
