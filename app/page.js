@@ -2555,7 +2555,7 @@ export default function TurfLootTactical() {
       console.log('🔍 Helius RPC balance check for:', walletAddress)
       
       // Use Helius RPC directly for reliable balance fetching
-      const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://mainnet.helius-rpc.com/?api-key=9ce7937c-f2a5-4759-8d79-dd8f9ca63fa5'
+      const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://mainnet.helius-rpc.com/?api-key=privy-game-hub'
       
       try {
         // Import Solana web3.js for balance checking
