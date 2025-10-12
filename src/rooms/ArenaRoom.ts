@@ -35,6 +35,7 @@ export class Player extends Schema {
   @type("boolean") isCashingOut: boolean = false; // Whether player is cashing out
   @type("number") cashOutProgress: number = 0; // Cash out progress (0-100)
   @type("number") cashOutStartTime: number = 0; // When cash out started
+  @type("boolean") cashOutComplete: boolean = false; // Whether cash out has been completed
   
   // Server-side skin properties for multiplayer visibility
   @type("string") skinId: string = "default";
