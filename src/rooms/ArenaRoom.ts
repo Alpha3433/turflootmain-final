@@ -912,6 +912,9 @@ export class ArenaRoom extends Room<GameState> {
           player.score += otherPlayer.score * 0.5;
           player.radius = Math.sqrt(player.mass) * 3; // Match agario radius formula
           
+          // Update player value in paid arenas
+          this.updatePlayerValue(player);
+          
           // Eliminate other player
           otherPlayer.alive = false;
           console.log(`💀 ${player.name} eliminated ${otherPlayer.name}`);
