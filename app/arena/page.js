@@ -2726,14 +2726,14 @@ const MultiplayerArena = () => {
         
         // Draw background ring (full circle)
         this.ctx.beginPath()
-        this.ctx.arc(player.x, player.y, ringRadius, 0, Math.PI * 2)
+        this.ctx.arc(drawX, drawY, ringRadius, 0, Math.PI * 2)
         this.ctx.strokeStyle = 'rgba(255, 193, 7, 0.3)' // Semi-transparent yellow background
         this.ctx.lineWidth = 6
         this.ctx.stroke()
         
         // Draw the main progress arc - bright yellow
         this.ctx.beginPath()
-        this.ctx.arc(player.x, player.y, ringRadius, -Math.PI / 2, -Math.PI / 2 + progressAngle)
+        this.ctx.arc(drawX, drawY, ringRadius, -Math.PI / 2, -Math.PI / 2 + progressAngle)
         this.ctx.strokeStyle = '#ffff00' // Bright yellow
         this.ctx.lineWidth = 6
         this.ctx.lineCap = 'round'
@@ -2741,7 +2741,7 @@ const MultiplayerArena = () => {
         
         // Add outer glow effect
         this.ctx.beginPath()
-        this.ctx.arc(player.x, player.y, ringRadius + 2, -Math.PI / 2, -Math.PI / 2 + progressAngle)
+        this.ctx.arc(drawX, drawY, ringRadius + 2, -Math.PI / 2, -Math.PI / 2 + progressAngle)
         this.ctx.strokeStyle = 'rgba(255, 255, 0, 0.6)' // Subtle yellow glow
         this.ctx.lineWidth = 3
         this.ctx.lineCap = 'round'
@@ -2754,7 +2754,7 @@ const MultiplayerArena = () => {
         
         // Draw inner glow for cash out
         this.ctx.beginPath()
-        this.ctx.arc(player.x, player.y, ringRadius - 2, -Math.PI / 2, -Math.PI / 2 + progressAngle)
+        this.ctx.arc(drawX, drawY, ringRadius - 2, -Math.PI / 2, -Math.PI / 2 + progressAngle)
         this.ctx.strokeStyle = '#ffff66' // Bright yellow inner glow
         this.ctx.lineWidth = 3
         this.ctx.lineCap = 'round'
