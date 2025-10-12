@@ -10237,6 +10237,13 @@ export default function TurfLootTactical() {
               title="User Profile"
               onClick={() => {
                 console.log('👤 Profile icon clicked!')
+                if (!authenticated) {
+                  console.log('⚠️ User not authenticated, opening Privy login')
+                  if (typeof login === 'function') {
+                    login()
+                  }
+                  return
+                }
                 console.log('🔍 Current authentication state:', isAuthenticated)
                 console.log('🔍 Current user:', user)
                 console.log('🔍 Current profile modal state:', isProfileModalOpen)
