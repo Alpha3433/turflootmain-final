@@ -376,7 +376,7 @@ export default function TurfLootTactical() {
 
       // Calculate SOL amount for payment
       const platformWallet = process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS || 'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
-      const USD_PER_SOL = 454.5 // Adjusted to give ~0.0011 SOL for $0.50 stake
+      const USD_PER_SOL = 18.18 // Adjusted to give ~0.0011 SOL for $0.02 stake
       const solAmount = roomCostUsd / USD_PER_SOL
       const lamports = Math.floor(solAmount * LAMPORTS_PER_SOL)
       
