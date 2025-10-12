@@ -2655,36 +2655,44 @@ export default function TurfLootTactical() {
 
   // STEP 4: Expose balance to the page - Real SOL balance only
   const fetchWalletBalance = useCallback(async (addressOverride = null) => {
-    console.log('💰 fetchWalletBalance called - Auth:', authenticated, 'Ready:', walletsReady, 'Wallets:', wallets.length)
+    console.log('💰 fetchWalletBalance called:', {
+      authenticated,
+      walletsReady,
+      walletsCount: wallets.length,
+      currentWalletAddress,
+      addressOverride
+    })
 
     const walletAddress = addressOverride || currentWalletAddress
 
     if (!walletAddress) {
-      console.log('👛 No wallet address - setting default balance')
+      console.log('👛 fetchWalletBalance: No wallet address - setting default balance')
       resetWalletBalance()
       return
     }
 
     if (!authenticated) {
-      console.log('⚠️ User not authenticated yet - skipping balance check')
+      console.log('⚠️ fetchWalletBalance: User not authenticated yet - skipping balance check')
       resetWalletBalance()
       return
     }
 
     if (!walletsReady || wallets.length === 0) {
-      console.log('⚠️ Wallets not ready yet - skipping balance check')
+      console.log('⚠️ fetchWalletBalance: Wallets not ready yet - skipping balance check')
       resetWalletBalance()
       return
     }
 
-    console.log('🚀 Fetching real SOL balance for authenticated user:', walletAddress)
+    console.log('🚀 fetchWalletBalance: Fetching real SOL balance for authenticated user:', walletAddress)
 
     // Set loading state
     setWalletBalance(prev => ({ ...prev, loading: true }))
 
     try {
       // Get real SOL balance from blockchain
+      console.log('📞 fetchWalletBalance: Calling checkSolanaBalance with address:', walletAddress)
       const solBalance = await checkSolanaBalance(walletAddress)
+      console.log('📞 fetchWalletBalance: checkSolanaBalance returned:', solBalance, 'SOL')
 
       // Convert to USD (rough estimate: $150 per SOL)
       const usdBalance = (solBalance * 150).toFixed(2)
@@ -2696,16 +2704,21 @@ export default function TurfLootTactical() {
         loading: false
       })
 
-      console.log('✅ Real balance updated:', { 
+      console.log('✅ fetchWalletBalance: Real balance updated successfully:', { 
         sol: solBalance, 
-        usd: usdBalance 
+        usd: usdBalance,
+        walletAddress: walletAddress
       })
 
     } catch (error) {
-      console.error('❌ Error in fetchWalletBalance:', error)
+      console.error('❌ fetchWalletBalance: Error caught:', {
+        message: error.message,
+        name: error.name,
+        stack: error.stack?.substring(0, 200)
+      })
       resetWalletBalance()
     }
-  }, [currentWalletAddress, checkSolanaBalance, resetWalletBalance])
+  }, [currentWalletAddress, checkSolanaBalance, resetWalletBalance, authenticated, walletsReady, wallets.length])
 
   // STEP 3: Watch authentication and wallet availability
   useEffect(() => {
