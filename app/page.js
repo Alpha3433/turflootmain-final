@@ -13,6 +13,7 @@ import {
 import bs58 from 'bs58'
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 import { executePrivyyArenaEntry } from '../lib/privyy/arenaEntry'
+import { buildSolanaRpcEndpointList } from '../lib/paid/feeManager'
 
 const getWalletAddress = (wallet) => {
   if (!wallet) {
@@ -286,8 +287,26 @@ export default function TurfLootTactical() {
     return calculatePaidRoomCosts(entryFee, feePercentage, options)
   }
 
-  // Removed SOLANA_RPC_ENDPOINTS - now handled by Helius in cleanFeeManager
-  const USD_PER_SOL_FALLBACK = parseFloat(process.env.NEXT_PUBLIC_USD_PER_SOL || '150') // Market rate for balance display
+  const SOLANA_RPC_ENDPOINTS = useMemo(
+    () =>
+      buildSolanaRpcEndpointList({
+        network: process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta',
+        privateRpc:
+          process.env.NEXT_PUBLIC_SOLANA_PRIVATE_RPC ||
+          process.env.NEXT_PUBLIC_SOLANA_HELIUS_RPC ||
+          process.env.NEXT_PUBLIC_SOLANA_RPC_PRIVATE ||
+          process.env.NEXT_PUBLIC_SOLANA_RPC_HELIUS ||
+          process.env.NEXT_PUBLIC_HELIUS_RPC ||
+          (process.env.NEXT_PUBLIC_HELIUS_API_KEY
+            ? `https://mainnet.helius-rpc.com/?api-key=${process.env.NEXT_PUBLIC_HELIUS_API_KEY}`
+            : undefined),
+        primary: process.env.NEXT_PUBLIC_SOLANA_RPC || process.env.NEXT_PUBLIC_SOLANA_RPC_URL,
+        list: process.env.NEXT_PUBLIC_SOLANA_RPC_LIST,
+        fallbacks: process.env.NEXT_PUBLIC_SOLANA_RPC_FALLBACKS
+      }),
+    []
+  )
+  const USD_PER_SOL_FALLBACK = parseFloat(process.env.NEXT_PUBLIC_USD_PER_SOL || '150')
   const SOLANA_CHAIN = useMemo(() => {
     const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta').toLowerCase()
     if (network.startsWith('solana:')) {
@@ -2590,54 +2609,76 @@ export default function TurfLootTactical() {
   }, [readMockBalanceFromStorage, setMockBalanceState])
 
   const checkSolanaBalance = useCallback(async (walletAddress = null) => {
-    try {
-      // Wallet address must be passed as parameter
-      if (!walletAddress) {
-        console.log('⚠️ No wallet address provided to checkSolanaBalance')
-        return 0
-      }
-      
-      console.log('🔍 checkSolanaBalance called with address:', walletAddress)
-      
-      // Use Helius RPC directly for reliable balance fetching
-      const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://mainnet.helius-rpc.com/?api-key=privy-game-hub'
-      console.log('🌐 Using Helius RPC:', heliusRpc.substring(0, 50) + '...')
-      
+    if (!walletAddress) {
+      console.log('⚠️ No wallet address provided')
+      return 0
+    }
+
+    if (!isSolanaAddress(walletAddress)) {
+      console.log('⚠️ Provided wallet address does not appear to be Solana compatible:', walletAddress)
+      return 0
+    }
+
+    const rpcCandidates = (SOLANA_RPC_ENDPOINTS || []).filter(Boolean)
+    const endpointsToTry = rpcCandidates.length > 0
+      ? rpcCandidates
+      : [
+          'https://mainnet.helius-rpc.com',
+          'https://api.mainnet-beta.solana.com',
+          'https://rpc.ankr.com/solana'
+        ]
+
+    const sanitiseForLog = (endpoint) => {
       try {
-        // Import Solana web3.js for balance checking
-        const { Connection, PublicKey } = await import('@solana/web3.js')
-        
-        // Validate the wallet address format
-        try {
-          const testKey = new PublicKey(walletAddress)
-          console.log('✅ Wallet address format valid:', testKey.toBase58())
-        } catch (validationError) {
-          console.error('❌ Invalid Solana address format:', walletAddress)
-          return 0
+        const url = new URL(endpoint)
+        if (url.searchParams.has('api-key')) {
+          url.searchParams.set('api-key', '***')
         }
-        
-        // Create connection to Helius RPC
-        const connection = new Connection(heliusRpc, 'confirmed')
-        const publicKey = new PublicKey(walletAddress)
-        
-        console.log('📡 Fetching balance from Helius RPC for:', publicKey.toBase58())
-        const lamports = await connection.getBalance(publicKey)
-        const solBalance = lamports / 1_000_000_000 // Convert to SOL
-        
-        console.log('✅ Helius RPC SUCCESS - Balance:', solBalance, 'SOL (', lamports, 'lamports)')
-        return solBalance
-        
-      } catch (rpcError) {
-        console.error('❌ Helius RPC Connection error:', {
-          message: rpcError.message,
-          name: rpcError.name,
-          stack: rpcError.stack?.substring(0, 200)
-        })
-        
-        // Fallback to direct fetch if Connection fails
-        console.log('🔄 Trying direct Helius API call as fallback...')
-        
-        const response = await fetch(heliusRpc, {
+        return url.toString()
+      } catch (error) {
+        return endpoint.split('?')[0]
+      }
+    }
+
+    let solanaWeb3
+    try {
+      solanaWeb3 = await import('@solana/web3.js')
+    } catch (importError) {
+      console.warn('⚠️ Unable to load @solana/web3.js, falling back to direct RPC fetch', importError)
+    }
+
+    for (const endpoint of endpointsToTry) {
+      const rpcUrl = typeof endpoint === 'string' ? endpoint.trim() : ''
+      if (!rpcUrl) {
+        continue
+      }
+
+      const logEndpoint = sanitiseForLog(rpcUrl)
+      console.log('🔍 Checking Solana balance via RPC:', logEndpoint)
+
+      if (solanaWeb3?.Connection && solanaWeb3?.PublicKey) {
+        try {
+          const connection = new solanaWeb3.Connection(rpcUrl, 'confirmed')
+          const publicKey = new solanaWeb3.PublicKey(walletAddress)
+          const lamports = await connection.getBalance(publicKey)
+          const solBalance = lamports / 1_000_000_000
+
+          console.log('✅ RPC balance fetched via @solana/web3.js:', {
+            rpc: logEndpoint,
+            sol: solBalance
+          })
+
+          return solBalance
+        } catch (rpcError) {
+          console.error('❌ RPC connection error:', {
+            rpc: logEndpoint,
+            message: rpcError?.message || rpcError
+          })
+        }
+      }
+
+      try {
+        const response = await fetch(rpcUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -2645,36 +2686,40 @@ export default function TurfLootTactical() {
             id: 1,
             method: 'getBalance',
             params: [walletAddress]
-          })
+          }),
+          signal: typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
         })
-        
-        console.log('📡 Helius API response status:', response.status)
-        
+
         if (response.ok) {
           const data = await response.json()
           console.log('📡 Helius API response data:', JSON.stringify(data).substring(0, 200))
           
           const lamports = data?.result?.value ?? 0
           const solBalance = lamports / 1_000_000_000
-          
-          console.log('✅ Helius API balance:', solBalance, 'SOL')
+
+          console.log('✅ RPC balance fetched via HTTP POST:', {
+            rpc: logEndpoint,
+            sol: solBalance
+          })
+
           return solBalance
-        } else {
-          const errorText = await response.text()
-          console.error('❌ Helius API HTTP error:', response.status, errorText.substring(0, 200))
-          return 0
         }
+
+        console.error('❌ RPC HTTP error:', {
+          rpc: logEndpoint,
+          status: response.status
+        })
+      } catch (httpError) {
+        console.error('❌ RPC fetch error:', {
+          rpc: logEndpoint,
+          message: httpError?.message || httpError
+        })
       }
-      
-    } catch (error) {
-      console.error('❌ Outer catch - Error with Helius balance checking:', {
-        message: error.message,
-        name: error.name,
-        stack: error.stack?.substring(0, 200)
-      })
-      return 0
     }
-  }, [])
+
+    console.log('📡 All Solana RPC endpoints failed, defaulting balance to 0')
+    return 0
+  }, [SOLANA_RPC_ENDPOINTS])
 
   // Balance check interval reference
   const balanceInterval = useRef(null)
