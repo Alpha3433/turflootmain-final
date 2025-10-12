@@ -5795,7 +5795,7 @@ export default function TurfLootTactical() {
               }}
               title="User Profile"
               onClick={() => {
-                console.log('🔍 Profile icon clicked!')
+                console.log('👤 Profile icon clicked!')
                 console.log('🔍 Current authentication state:', isAuthenticated)
                 console.log('🔍 Current user:', user)
                 console.log('🔍 Current profile modal state:', isProfileModalOpen)
@@ -10229,7 +10229,7 @@ export default function TurfLootTactical() {
               }}
               title="User Profile"
               onClick={() => {
-                console.log('🔍 Profile icon clicked!')
+                console.log('👤 Profile icon clicked!')
                 console.log('🔍 Current authentication state:', isAuthenticated)
                 console.log('🔍 Current user:', user)
                 console.log('🔍 Current profile modal state:', isProfileModalOpen)
