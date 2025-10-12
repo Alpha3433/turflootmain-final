@@ -2633,12 +2633,12 @@ const MultiplayerArena = () => {
       
       // Left eye
       this.ctx.beginPath()
-      this.ctx.arc(player.x - eyeOffsetX, player.y + eyeOffsetY, eyeSize, 0, Math.PI * 2)
+      this.ctx.arc(drawX - eyeOffsetX, drawY + eyeOffsetY, eyeSize, 0, Math.PI * 2)
       this.ctx.fill()
       
       // Right eye
       this.ctx.beginPath()
-      this.ctx.arc(player.x + eyeOffsetX, player.y + eyeOffsetY, eyeSize, 0, Math.PI * 2)
+      this.ctx.arc(drawX + eyeOffsetX, drawY + eyeOffsetY, eyeSize, 0, Math.PI * 2)
       this.ctx.fill()
       
       // Draw spawn protection ring with blue checkered pattern
