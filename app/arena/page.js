@@ -1408,6 +1408,12 @@ const MultiplayerArena = () => {
       console.log('🎯 Joining arena room:', roomId)
       console.log('🎯 Player details - Name:', playerName, 'PrivyID:', privyUserId)
       console.log('🎨 Selected skin payload:', skinPayload)
+      console.log('💰 Arena Details:', {
+        isPaidArena,
+        entryFee,
+        roomId,
+        userWalletAddress
+      })
       
       // Add timeout to connection attempt
       const connectionTimeout = setTimeout(() => {
