@@ -2710,8 +2710,8 @@ const MultiplayerArena = () => {
         if (isCurrentPlayer) {
           console.log('💰 Cash out ring rendering:', {
             playerName: player.name,
-            playerX: player.x,
-            playerY: player.y,
+            playerX: drawX,
+            playerY: drawY,
             playerRadius: playerRadius,
             serverIsCashingOut: player.isCashingOut,
             serverProgress: player.cashOutProgress,
