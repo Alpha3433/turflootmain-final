@@ -2776,7 +2776,6 @@ export default function TurfLootTactical() {
 
     if (!ready) {
       console.log('⏳ Privy not ready yet')
-      resetWalletBalance()
       if (currentWalletAddress !== null) {
         setCurrentWalletAddress(null)
       }
@@ -2784,8 +2783,7 @@ export default function TurfLootTactical() {
     }
 
     if (!authenticated || !privyUser) {
-      console.log('👛 User not authenticated - setting default balance')
-      resetWalletBalance()
+      console.log('👛 User not authenticated')
       if (currentWalletAddress !== null) {
         setCurrentWalletAddress(null)
       }
