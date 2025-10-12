@@ -2805,7 +2805,6 @@ export default function TurfLootTactical() {
     privyUser,
     walletAddressesSignature,
     currentWalletAddress,
-    resetWalletBalance,
     fetchWalletBalance
   ])
 
