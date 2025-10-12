@@ -2767,7 +2767,7 @@ const MultiplayerArena = () => {
       
       // Draw money indicator above player head in paid arenas
       if (player.isPaidArena && player.cashOutValue > 0) {
-        const textY = player.y - playerRadius - 35 // Position above player
+        const textY = drawY - playerRadius - 35 // Position above player
         const displayValue = `$${player.cashOutValue.toFixed(2)}`
         
         // Draw background for better visibility
@@ -2783,7 +2783,7 @@ const MultiplayerArena = () => {
         // Draw semi-transparent background
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'
         this.ctx.fillRect(
-          player.x - textWidth / 2 - padding,
+          drawX - textWidth / 2 - padding,
           textY - 12,
           textWidth + padding * 2,
           24
@@ -2793,7 +2793,7 @@ const MultiplayerArena = () => {
         this.ctx.strokeStyle = '#10b981'
         this.ctx.lineWidth = 2
         this.ctx.strokeRect(
-          player.x - textWidth / 2 - padding,
+          drawX - textWidth / 2 - padding,
           textY - 12,
           textWidth + padding * 2,
           24
@@ -2803,7 +2803,7 @@ const MultiplayerArena = () => {
         this.ctx.fillStyle = '#FFD700'
         this.ctx.shadowColor = '#000000'
         this.ctx.shadowBlur = 4
-        this.ctx.fillText(displayValue, player.x, textY)
+        this.ctx.fillText(displayValue, drawX, textY)
         this.ctx.shadowBlur = 0
       }
     }
