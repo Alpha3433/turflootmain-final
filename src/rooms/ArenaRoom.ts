@@ -55,7 +55,8 @@ export class Player extends Schema {
   @type("number") lastSplitTime: number = 0; // Last time this player split (for cooldown)
   
   // Money indicator for paid arenas
-  @type("number") currentValue: number = 0; // Current USD value based on mass
+  @type("number") currentValue: number = 0; // Current USD value based on mass (for display)
+  @type("number") cashOutValue: number = 0; // Accumulated cash-out value (entry fee + eliminated players)
   @type("boolean") isPaidArena: boolean = false; // Whether this is a paid arena
 }
 
