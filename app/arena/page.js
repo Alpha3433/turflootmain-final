@@ -2616,7 +2616,7 @@ const MultiplayerArena = () => {
       this.ctx.shadowColor = 'transparent'
       this.ctx.shadowBlur = 0
       this.ctx.beginPath()
-      this.ctx.arc(player.x, player.y, playerRadius, 0, Math.PI * 2)
+      this.ctx.arc(drawX, drawY, playerRadius, 0, Math.PI * 2)
       this.ctx.fill()
 
       // Enhanced border
