@@ -3650,12 +3650,12 @@ const MultiplayerArena = () => {
                     </span>
                   </div>
                   <span style={{ 
-                    color: '#fbbf24', 
+                    color: player.isPaid ? '#10b981' : '#fbbf24', 
                     fontSize: isMobile ? (leaderboardExpanded ? '8px' : '7px') : '12px', 
                     fontWeight: '700',
-                    textShadow: '0 0 4px rgba(251, 191, 36, 0.6)'
+                    textShadow: player.isPaid ? '0 0 4px rgba(16, 185, 129, 0.6)' : '0 0 4px rgba(251, 191, 36, 0.6)'
                   }}>
-                    {player.score}
+                    {player.isPaid ? `$${player.score.toFixed(2)}` : player.score}
                   </span>
                 </div>
               ))
