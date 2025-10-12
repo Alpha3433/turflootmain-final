@@ -10614,10 +10614,10 @@ export default function TurfLootTactical() {
                 marginBottom: '2px',
                 fontFamily: '"Rajdhani", sans-serif'
               }}>
-                {walletBalance.loading ? 'Loading...' : `$${walletBalance.usd}`}
+                {walletBalance.loading ? 'Loading...' : walletBalance.usd !== null ? `$${walletBalance.usd}` : '--'}
               </div>
               <div style={{ color: '#f6ad55', fontSize: '9px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>
-                {walletBalance.loading ? 'Loading...' : `${walletBalance.sol} SOL`}
+                {walletBalance.loading ? 'Loading...' : walletBalance.sol !== null ? `${walletBalance.sol} SOL` : '--'}
               </div>
             </div>
             
