@@ -2064,11 +2064,15 @@ const MultiplayerArena = () => {
         })
         
         // Update mass and score (server is always authoritative for these)
-        const currentScoreRounded = Math.max(0, Math.round(currentPlayer.score || 0))
+        // For paid arenas, use cashOutValue instead of score
+        const currentScoreRounded = isPaidArena 
+          ? (currentPlayer.cashOutValue || 0)
+          : Math.max(0, Math.round(currentPlayer.score || 0))
         const rawMass = Number.isFinite(currentPlayer.mass) ? currentPlayer.mass : 0
         const roundedMass = Math.max(0, Math.round(rawMass))
 
         console.log('🎯 Mass update from server:', currentPlayer.mass, '(rounded:', roundedMass || 25, ')')
+        console.log('💰 Cash-out value update:', isPaidArena ? `$${currentScoreRounded.toFixed(2)}` : currentScoreRounded)
         setMass(roundedMass || 25)
         setScore(currentScoreRounded)
 
