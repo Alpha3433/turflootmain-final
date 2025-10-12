@@ -2516,18 +2516,10 @@ export default function TurfLootTactical() {
   
   // State for wallet balance display
   const [walletBalance, setWalletBalance] = useState({
-    usd: '0.00',
-    sol: '0.0000',
+    usd: null,
+    sol: null,
     loading: false
   })
-  const resetWalletBalance = useCallback(() => {
-    setWalletBalance(prev => {
-      if (prev.usd === '0.00' && prev.sol === '0.0000' && prev.loading === false) {
-        return prev
-      }
-      return { usd: '0.00', sol: '0.0000', loading: false }
-    })
-  }, [setWalletBalance])
 
   const getMockBalanceStorageKey = useCallback(() => {
     if (typeof window === 'undefined') {
