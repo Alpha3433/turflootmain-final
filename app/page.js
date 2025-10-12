@@ -2548,35 +2548,49 @@ export default function TurfLootTactical() {
     try {
       // Wallet address must be passed as parameter
       if (!walletAddress) {
-        console.log('⚠️ No wallet address provided')
+        console.log('⚠️ No wallet address provided to checkSolanaBalance')
         return 0
       }
       
-      console.log('🔍 Helius RPC balance check for:', walletAddress)
+      console.log('🔍 checkSolanaBalance called with address:', walletAddress)
       
       // Use Helius RPC directly for reliable balance fetching
       const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://mainnet.helius-rpc.com/?api-key=privy-game-hub'
+      console.log('🌐 Using Helius RPC:', heliusRpc.substring(0, 50) + '...')
       
       try {
         // Import Solana web3.js for balance checking
         const { Connection, PublicKey } = await import('@solana/web3.js')
         
+        // Validate the wallet address format
+        try {
+          const testKey = new PublicKey(walletAddress)
+          console.log('✅ Wallet address format valid:', testKey.toBase58())
+        } catch (validationError) {
+          console.error('❌ Invalid Solana address format:', walletAddress)
+          return 0
+        }
+        
         // Create connection to Helius RPC
         const connection = new Connection(heliusRpc, 'confirmed')
         const publicKey = new PublicKey(walletAddress)
         
-        console.log('📡 Fetching balance from Helius RPC...')
+        console.log('📡 Fetching balance from Helius RPC for:', publicKey.toBase58())
         const lamports = await connection.getBalance(publicKey)
         const solBalance = lamports / 1_000_000_000 // Convert to SOL
         
-        console.log('✅ Helius RPC balance:', solBalance, 'SOL')
+        console.log('✅ Helius RPC SUCCESS - Balance:', solBalance, 'SOL (', lamports, 'lamports)')
         return solBalance
         
       } catch (rpcError) {
-        console.error('❌ Helius RPC error:', rpcError.message)
+        console.error('❌ Helius RPC Connection error:', {
+          message: rpcError.message,
+          name: rpcError.name,
+          stack: rpcError.stack?.substring(0, 200)
+        })
         
         // Fallback to direct fetch if Connection fails
-        console.log('🔄 Trying direct Helius API call...')
+        console.log('🔄 Trying direct Helius API call as fallback...')
         
         const response = await fetch(heliusRpc, {
           method: 'POST',
@@ -2589,21 +2603,30 @@ export default function TurfLootTactical() {
           })
         })
         
+        console.log('📡 Helius API response status:', response.status)
+        
         if (response.ok) {
           const data = await response.json()
+          console.log('📡 Helius API response data:', JSON.stringify(data).substring(0, 200))
+          
           const lamports = data?.result?.value ?? 0
           const solBalance = lamports / 1_000_000_000
           
           console.log('✅ Helius API balance:', solBalance, 'SOL')
           return solBalance
         } else {
-          console.error('❌ Helius API error:', response.status)
+          const errorText = await response.text()
+          console.error('❌ Helius API HTTP error:', response.status, errorText.substring(0, 200))
           return 0
         }
       }
       
     } catch (error) {
-      console.error('❌ Error with Helius balance checking:', error.message)
+      console.error('❌ Outer catch - Error with Helius balance checking:', {
+        message: error.message,
+        name: error.name,
+        stack: error.stack?.substring(0, 200)
+      })
       return 0
     }
   }, [])
