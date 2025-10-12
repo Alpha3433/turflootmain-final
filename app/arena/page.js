@@ -2593,10 +2593,14 @@ const MultiplayerArena = () => {
       // Use server-provided skin color for all players (enables multiplayer skin visibility)
       const playerSkinColor = player.skinColor || player.color || this.selectedSkin?.color || '#4A90E2'
       
+      // Use interpolated position for other players, direct position for current player
+      const drawX = isCurrentPlayer ? this.player.x : (player.clientX || player.x)
+      const drawY = isCurrentPlayer ? this.player.y : (player.clientY || player.y)
+      
       // Player circle with gradient using server-provided skin color
       const gradient = this.ctx.createRadialGradient(
-        player.x, player.y, 0,
-        player.x, player.y, playerRadius
+        drawX, drawY, 0,
+        drawX, drawY, playerRadius
       )
       
       // All players now use their server-side skin colors
