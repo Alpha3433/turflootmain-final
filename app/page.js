@@ -356,7 +356,25 @@ export default function TurfLootTactical() {
       const connection = new Connection(heliusRpc, 'confirmed')
       console.log('✅ Connected to Solana')
 
-      // Calculate SOL amount
+      // CRITICAL: Solana rent-exempt minimum (~0.00089088 SOL must remain in account)
+      const RENT_EXEMPT_MINIMUM = 890880 // lamports (~0.00089088 SOL)
+      const TRANSACTION_FEE_ESTIMATE = 5000 // lamports (~0.000005 SOL) - safety buffer
+      const MINIMUM_RESERVE = RENT_EXEMPT_MINIMUM + TRANSACTION_FEE_ESTIMATE // Total we must keep in account
+      
+      console.log('🔒 Solana Account Requirements:')
+      console.log('   Rent-Exempt Minimum:', (RENT_EXEMPT_MINIMUM / LAMPORTS_PER_SOL).toFixed(8), 'SOL')
+      console.log('   Transaction Fee Buffer:', (TRANSACTION_FEE_ESTIMATE / LAMPORTS_PER_SOL).toFixed(8), 'SOL')
+      console.log('   Total Reserve Required:', (MINIMUM_RESERVE / LAMPORTS_PER_SOL).toFixed(8), 'SOL')
+
+      // Check current balance
+      const fromPubkey = new PublicKey(userWalletAddress)
+      const currentBalanceLamports = await connection.getBalance(fromPubkey)
+      const currentBalanceSol = currentBalanceLamports / LAMPORTS_PER_SOL
+      
+      console.log('💰 Current Balance:', currentBalanceSol.toFixed(8), 'SOL')
+      console.log('   Available to spend:', ((currentBalanceLamports - MINIMUM_RESERVE) / LAMPORTS_PER_SOL).toFixed(8), 'SOL')
+
+      // Calculate SOL amount for payment
       const platformWallet = process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS || 'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
       const USD_PER_SOL = 150
       const solAmount = roomCostUsd / USD_PER_SOL
@@ -367,8 +385,30 @@ export default function TurfLootTactical() {
       console.log('   Lamports:', lamports)
       console.log('   To Platform:', platformWallet)
 
+      // CRITICAL CHECK: Ensure we're not violating rent-exempt minimum
+      const remainingBalance = currentBalanceLamports - lamports - TRANSACTION_FEE_ESTIMATE
+      
+      if (remainingBalance < RENT_EXEMPT_MINIMUM) {
+        const shortfall = (RENT_EXEMPT_MINIMUM - remainingBalance) / LAMPORTS_PER_SOL
+        const neededTotal = (lamports + MINIMUM_RESERVE) / LAMPORTS_PER_SOL
+        
+        console.error('❌ Transaction would violate rent-exempt minimum!')
+        console.error('   Current balance:', currentBalanceSol.toFixed(8), 'SOL')
+        console.error('   Trying to send:', solAmount.toFixed(8), 'SOL')
+        console.error('   Would remain:', (remainingBalance / LAMPORTS_PER_SOL).toFixed(8), 'SOL')
+        console.error('   Minimum required:', (RENT_EXEMPT_MINIMUM / LAMPORTS_PER_SOL).toFixed(8), 'SOL')
+        console.error('   Shortfall:', shortfall.toFixed(8), 'SOL')
+        
+        throw new Error(
+          `Insufficient balance. You need at least ${neededTotal.toFixed(6)} SOL total (${solAmount.toFixed(6)} SOL for room + ${(MINIMUM_RESERVE / LAMPORTS_PER_SOL).toFixed(6)} SOL minimum balance). ` +
+          `Current balance: ${currentBalanceSol.toFixed(6)} SOL. Please deposit at least ${shortfall.toFixed(6)} more SOL.`
+        )
+      }
+      
+      console.log('✅ Balance check passed - sufficient funds available')
+      console.log('   After transaction:', (remainingBalance / LAMPORTS_PER_SOL).toFixed(8), 'SOL will remain')
+
       // Build transaction
-      const fromPubkey = new PublicKey(userWalletAddress)
       const toPubkey = new PublicKey(platformWallet)
       
       const transferIx = SystemProgram.transfer({
