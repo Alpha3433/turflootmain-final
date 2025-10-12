@@ -2698,20 +2698,17 @@ export default function TurfLootTactical() {
     const walletAddress = addressOverride || currentWalletAddress
 
     if (!walletAddress) {
-      console.log('👛 fetchWalletBalance: No wallet address - setting default balance')
-      resetWalletBalance()
+      console.log('👛 fetchWalletBalance: No wallet address - skipping balance check')
       return
     }
 
     if (!authenticated) {
       console.log('⚠️ fetchWalletBalance: User not authenticated yet - skipping balance check')
-      resetWalletBalance()
       return
     }
 
     if (!walletsReady || wallets.length === 0) {
       console.log('⚠️ fetchWalletBalance: Wallets not ready yet - skipping balance check')
-      resetWalletBalance()
       return
     }
 
