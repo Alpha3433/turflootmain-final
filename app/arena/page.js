@@ -3582,24 +3582,29 @@ const MultiplayerArena = () => {
                     return
                   }
 
-                  const playerScore = Math.floor(player.score || 0)
+                  // Use cashOutValue for paid arenas, otherwise use score
+                  const playerValue = isPaidArena 
+                    ? (player.cashOutValue || 0)
+                    : Math.floor(player.score || 0)
                   const existingEntry = leaderboardMap.get(ownerId)
                   const isCurrentPlayer = !!player.isCurrentPlayer
 
                   if (existingEntry) {
-                    const useNewName = playerScore > existingEntry.score && player?.name
+                    const useNewName = playerValue > existingEntry.score && player?.name
                     leaderboardMap.set(ownerId, {
                       ownerId,
                       name: useNewName ? player.name : existingEntry.name,
-                      score: Math.max(existingEntry.score, playerScore),
-                      isPlayer: existingEntry.isPlayer || isCurrentPlayer
+                      score: Math.max(existingEntry.score, playerValue),
+                      isPlayer: existingEntry.isPlayer || isCurrentPlayer,
+                      isPaid: isPaidArena
                     })
                   } else {
                     leaderboardMap.set(ownerId, {
                       ownerId,
                       name: player.name || 'Anonymous',
-                      score: playerScore,
-                      isPlayer: isCurrentPlayer
+                      score: playerValue,
+                      isPlayer: isCurrentPlayer,
+                      isPaid: isPaidArena
                     })
                   }
                 })
