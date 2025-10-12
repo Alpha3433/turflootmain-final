@@ -917,6 +917,14 @@ export class ArenaRoom extends Room<GameState> {
           // Update player value in paid arenas
           this.updatePlayerValue(player);
           
+          // Transfer cash-out value in paid arenas
+          if (this.isPaidArena && player.isPaidArena && otherPlayer.isPaidArena) {
+            const eliminatedBalance = otherPlayer.cashOutValue;
+            player.cashOutValue += eliminatedBalance;
+            player.currentValue = player.cashOutValue; // Update display value to match cash-out value
+            console.log(`💰 ${player.name} gained $${eliminatedBalance.toFixed(2)} from ${otherPlayer.name}. New balance: $${player.cashOutValue.toFixed(2)}`);
+          }
+          
           // Eliminate other player
           otherPlayer.alive = false;
           console.log(`💀 ${player.name} eliminated ${otherPlayer.name}`);
