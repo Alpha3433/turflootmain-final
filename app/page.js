@@ -394,16 +394,15 @@ export default function TurfLootTactical() {
       
       console.log('📦 Transaction ready:', txBytes.length, 'bytes (Uint8Array)')
 
-      // Sign and send with Privy
-      console.log('🔐 Signing with Privy...')
-      console.log('   Hook type:', typeof signAndSendTransactionResponse)
-      console.log('   Hook keys:', Object.keys(signAndSendTransactionResponse))
+      // Sign and send with Privy v3.0 - Use hook method directly
+      console.log('🔐 Signing with Privy v3.0...')
+      console.log('   Hook available:', !!privySignAndSendTransaction)
       
-      // The hook returns an object with signAndSendTransaction method
-      const signAndSendFn = signAndSendTransactionResponse.signAndSendTransaction
-      console.log('   Method available:', typeof signAndSendFn)
+      if (!privySignAndSendTransaction) {
+        throw new Error('Privy signAndSendTransaction hook not available')
+      }
       
-      // Get the embedded wallet object from useWallets
+      // Get the embedded wallet object from useWallets  
       const embeddedWalletObj = wallets.find(w => {
         const addr = w.address || w.publicKey?.toString() || w.publicKey?.toBase58?.()
         return addr === userWalletAddress
@@ -415,12 +414,16 @@ export default function TurfLootTactical() {
         throw new Error('Embedded wallet not found for transaction signing')
       }
       
-      // Add a small delay to ensure wallet is fully initialized
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      console.log('🚀 Attempting Privy transaction signature...')
       
-      // Call with wallet context - Privy needs the wallet object
-      console.log('🚀 Attempting transaction signature...')
-      const signature = await embeddedWalletObj.signAndSendTransaction(txBytes)
+      // Use Privy v3.0 hook method with wallet context
+      const result = await privySignAndSendTransaction({
+        transaction: txBytes,
+        wallet: embeddedWalletObj
+      })
+      
+      const signature = result.signature || result
+      console.log('✅ Privy transaction result:', signature)
       
       console.log('✅ Transaction sent! Signature:', signature)
 
