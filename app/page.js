@@ -2549,94 +2549,61 @@ export default function TurfLootTactical() {
         return 0
       }
       
-      console.log('🔍 Privy balance check for:', walletAddress)
-      console.log('🔍 Available wallets:', wallets.map(w => ({ 
-        address: w.address, 
-        type: w.walletClientType, 
-        chainType: w.chainType 
-      })))
+      console.log('🔍 Helius RPC balance check for:', walletAddress)
       
-      // Find the Privy wallet object that matches this address  
-      const matchingWallet = wallets.find(wallet => 
-        wallet.address && wallet.address.toLowerCase() === walletAddress.toLowerCase()
-      )
-      
-      if (!matchingWallet) {
-        console.log('⚠️ No wallet found with matching address')
-        
-        // Try to find ANY Solana wallet if address matching fails
-        const anyPrivyWallet = wallets.find(w => 
-          w.chainType === 'solana' && w.walletClientType === 'privy'
-        )
-        
-        if (anyPrivyWallet && anyPrivyWallet.address !== walletAddress) {
-          console.log('🔄 Using fallback Privy Solana wallet:', anyPrivyWallet.address)
-          // Update the current wallet address instead of recursive call to avoid infinite loop
-          setCurrentWalletAddress(anyPrivyWallet.address)
-          walletAddress = anyPrivyWallet.address
-          // Continue with the same logic below instead of recursive call
-        } else {
-          return 0
-        }
-        
-        return 0
-      }
-      
-      console.log('✅ Found Privy embedded wallet:', matchingWallet.address)
-      
-      // Use Privy's embedded wallet balance - direct approach (no fallbacks)
-      console.log('✅ Found matching Privy wallet:', matchingWallet.address)
+      // Use Helius RPC directly for reliable balance fetching
+      const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://mainnet.helius-rpc.com/?api-key=9ce7937c-f2a5-4759-8d79-dd8f9ca63fa5'
       
       try {
-        // For Privy embedded wallets, try multiple approaches
-        console.log('🔄 Attempting to get balance from Privy wallet...')
-        console.log('🔍 Wallet details:', {
-          address: matchingWallet.address,
-          type: matchingWallet.walletClientType,
-          chainType: matchingWallet.chainType,
-          hasGetSolanaProvider: !!matchingWallet.getSolanaProvider
+        // Import Solana web3.js for balance checking
+        const { Connection, PublicKey } = await import('@solana/web3.js')
+        
+        // Create connection to Helius RPC
+        const connection = new Connection(heliusRpc, 'confirmed')
+        const publicKey = new PublicKey(walletAddress)
+        
+        console.log('📡 Fetching balance from Helius RPC...')
+        const lamports = await connection.getBalance(publicKey)
+        const solBalance = lamports / 1_000_000_000 // Convert to SOL
+        
+        console.log('✅ Helius RPC balance:', solBalance, 'SOL')
+        return solBalance
+        
+      } catch (rpcError) {
+        console.error('❌ Helius RPC error:', rpcError.message)
+        
+        // Fallback to direct fetch if Connection fails
+        console.log('🔄 Trying direct Helius API call...')
+        
+        const response = await fetch(heliusRpc, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'getBalance',
+            params: [walletAddress]
+          })
         })
         
-        if (matchingWallet.getSolanaProvider) {
-          console.log('🔄 Getting Solana provider from Privy wallet...')
-          const provider = await matchingWallet.getSolanaProvider()
+        if (response.ok) {
+          const data = await response.json()
+          const lamports = data?.result?.value ?? 0
+          const solBalance = lamports / 1_000_000_000
           
-          console.log('🔍 Provider details:', {
-            hasProvider: !!provider,
-            hasConnection: !!(provider?.connection),
-            providerMethods: provider ? Object.keys(provider) : []
-          })
-          
-          if (provider?.connection) {
-            console.log('✅ Using provider.connection for balance...')
-            const { PublicKey } = await import('@solana/web3.js')
-            const publicKey = new PublicKey(walletAddress)
-            const balance = await provider.connection.getBalance(publicKey)
-            const solBalance = balance / 1_000_000_000
-            
-            console.log('✅ Privy embedded wallet balance:', solBalance, 'SOL')
-            return solBalance
-          } else {
-            console.log('⚠️ Provider exists but no connection available')
-          }
+          console.log('✅ Helius API balance:', solBalance, 'SOL')
+          return solBalance
         } else {
-          console.log('⚠️ getSolanaProvider method not available on wallet')
+          console.error('❌ Helius API error:', response.status)
+          return 0
         }
-        
-        // If getSolanaProvider doesn't work, the wallet might not be ready
-        console.log('⚠️ Privy wallet not ready for balance checking yet')
-        return 0
-        
-      } catch (error) {
-        console.error('❌ Privy balance error:', error.message)
-        return 0
       }
       
     } catch (error) {
-      console.error('❌ Error with Privy balance checking:', error.message)
+      console.error('❌ Error with Helius balance checking:', error.message)
       return 0
     }
-  }, [wallets, walletsReady])
+  }, [])
 
   // Balance check interval reference
   const balanceInterval = useRef(null)
