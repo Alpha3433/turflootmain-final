@@ -5735,6 +5735,13 @@ export default function TurfLootTactical() {
               title="Friends"
               onClick={() => {
                 console.log('👥 Friends icon clicked!')
+                if (!authenticated) {
+                  console.log('⚠️ User not authenticated, opening Privy login')
+                  if (typeof login === 'function') {
+                    login()
+                  }
+                  return
+                }
                 setIsFriendsModalOpen(true)
               }}
               onMouseOver={(e) => {
@@ -10162,6 +10169,13 @@ export default function TurfLootTactical() {
               title="Friends"
               onClick={() => {
                 console.log('👥 Friends icon clicked!')
+                if (!authenticated) {
+                  console.log('⚠️ User not authenticated, opening Privy login')
+                  if (typeof login === 'function') {
+                    login()
+                  }
+                  return
+                }
                 setIsFriendsModalOpen(true)
               }}
               onMouseOver={(e) => {
