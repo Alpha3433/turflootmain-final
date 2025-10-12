@@ -53,6 +53,10 @@ export class Player extends Schema {
   @type("number") momentumY: number = 0; // Momentum velocity Y
   @type("number") noMergeUntil: number = 0; // Timestamp when merge is allowed
   @type("number") lastSplitTime: number = 0; // Last time this player split (for cooldown)
+  
+  // Money indicator for paid arenas
+  @type("number") currentValue: number = 0; // Current USD value based on mass
+  @type("boolean") isPaidArena: boolean = false; // Whether this is a paid arena
 }
 
 // Coin state schema
