@@ -2569,9 +2569,14 @@ export default function TurfLootTactical() {
           w.chainType === 'solana' && w.walletClientType === 'privy'
         )
         
-        if (anyPrivyWallet) {
+        if (anyPrivyWallet && anyPrivyWallet.address !== walletAddress) {
           console.log('🔄 Using fallback Privy Solana wallet:', anyPrivyWallet.address)
-          return await checkSolanaBalance(anyPrivyWallet.address) // Recursive call with correct address
+          // Update the current wallet address instead of recursive call to avoid infinite loop
+          setCurrentWalletAddress(anyPrivyWallet.address)
+          walletAddress = anyPrivyWallet.address
+          // Continue with the same logic below instead of recursive call
+        } else {
+          return 0
         }
         
         return 0
