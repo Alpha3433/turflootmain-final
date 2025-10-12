@@ -1060,6 +1060,75 @@ export class ArenaRoom extends Room<GameState> {
     return colors[Math.floor(Math.random() * colors.length)];
   }
 
+  async processCashOut(player: Player, sessionId: string) {
+    try {
+      console.log(`💰 Processing cash-out for ${player.name}...`);
+      console.log(`   Cash-out value: $${player.cashOutValue.toFixed(2)}`);
+      console.log(`   User wallet: ${player.userWalletAddress || 'NOT PROVIDED'}`);
+
+      // Validate wallet address
+      if (!player.userWalletAddress) {
+        throw new Error('User wallet address not available');
+      }
+
+      // Get Privy user ID from client
+      const client = this.clients.find(c => c.sessionId === sessionId);
+      const privyUserId = (client as any)?.userData?.privyUserId || 'unknown';
+
+      // Call cash-out API
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+      const cashOutUrl = `${baseUrl}/api/cashout`;
+
+      console.log(`📡 Calling cash-out API: ${cashOutUrl}`);
+
+      const response = await fetch(cashOutUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userWalletAddress: player.userWalletAddress,
+          cashOutValueUSD: player.cashOutValue,
+          privyUserId: privyUserId,
+          playerName: player.name
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Cash-out API request failed');
+      }
+
+      console.log(`✅ Cash-out successful for ${player.name}!`);
+      console.log(`   Transaction signature: ${result.signature}`);
+      console.log(`   Payout: $${result.payoutUSD} (${result.payoutSOL} SOL)`);
+      console.log(`   Platform fee: $${result.platformFeeUSD} (10%)`);
+
+      // Broadcast success message to client
+      if (client) {
+        this.broadcast('cashOutSuccess', {
+          playerName: player.name,
+          payoutUSD: result.payoutUSD,
+          payoutSOL: result.payoutSOL,
+          signature: result.signature
+        });
+      }
+
+    } catch (error) {
+      console.error(`❌ Cash-out failed for ${player.name}:`, error.message);
+      
+      // Broadcast error to client
+      const client = this.clients.find(c => c.sessionId === sessionId);
+      if (client) {
+        this.broadcast('cashOutError', {
+          playerName: player.name,
+          error: error.message
+        });
+      }
+    }
+  }
+
   onDispose() {
     console.log('🛑 Arena room disposed');
   }
