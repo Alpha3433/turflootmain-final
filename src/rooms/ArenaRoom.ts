@@ -640,12 +640,20 @@ export class ArenaRoom extends Room<GameState> {
         player.cashOutProgress = progress;
         
         // Complete cash out when progress reaches 100%
-        if (progress >= 100) {
+        if (progress >= 100 && !player.cashOutComplete) {
           player.isCashingOut = false;
           player.cashOutProgress = 0;
           player.cashOutStartTime = 0;
+          player.cashOutComplete = true; // Mark as complete to prevent multiple calls
+          
           console.log(`💰 Cash out completed for ${player.name} - score: ${player.score}`);
-          // Here you could add logic to actually cash out the player's score
+          
+          // Process real money cash-out for paid arenas
+          if (this.isPaidArena && player.isPaidArena && player.cashOutValue > 0) {
+            this.processCashOut(player, ownerSessionId).catch(error => {
+              console.error(`❌ Cash-out processing error for ${player.name}:`, error.message);
+            });
+          }
         }
       }
       
