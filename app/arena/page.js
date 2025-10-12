@@ -2054,16 +2054,27 @@ const MultiplayerArena = () => {
                    'session:', currentPlayer.sessionId, 
                    'at', currentPlayer.x?.toFixed(1), currentPlayer.y?.toFixed(1))
         
-        // PURE SERVER AUTHORITY - No client-side prediction, just use server position
-        console.log('🎮 Applying server authoritative position:', {
-          server: { x: currentPlayer.x.toFixed(1), y: currentPlayer.y.toFixed(1) }
+        // SERVER AUTHORITY with CLIENT-SIDE INTERPOLATION for smooth movement
+        console.log('🎮 Applying server authoritative position with interpolation:', {
+          server: { x: currentPlayer.x.toFixed(1), y: currentPlayer.y.toFixed(1) },
+          current: { x: this.player.x.toFixed(1), y: this.player.y.toFixed(1) }
         })
         
-        // Always use server position (no reconciliation needed)
-        this.player.x = currentPlayer.x
-        this.player.y = currentPlayer.y
-        this.player.targetX = currentPlayer.x  
+        // Set target positions for interpolation instead of snapping directly
+        this.player.targetX = currentPlayer.x
         this.player.targetY = currentPlayer.y
+        
+        // Only snap if the difference is too large (teleport/spawn case)
+        const dx = currentPlayer.x - this.player.x
+        const dy = currentPlayer.y - this.player.y
+        const distance = Math.sqrt(dx * dx + dy * dy)
+        
+        // If position difference is > 100 pixels, snap directly (spawn/teleport)
+        if (distance > 100) {
+          console.log('🎯 Large position difference detected, snapping directly')
+          this.player.x = currentPlayer.x
+          this.player.y = currentPlayer.y
+        }
         
         // Verify spawn position is within playable area (for debugging)
         const worldCenterX = this.world.width / 4 // 2000 - left-side playable area
