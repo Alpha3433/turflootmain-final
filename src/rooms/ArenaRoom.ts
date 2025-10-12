@@ -296,7 +296,12 @@ export class ArenaRoom extends Room<GameState> {
       // Initialize with entry fee value for both display and cash-out
       player.currentValue = this.entryFee;
       player.cashOutValue = this.entryFee; // Start with entry fee as cash-out balance
+      
+      // Store user's wallet address for cash-outs
+      player.userWalletAddress = options.userWalletAddress || "";
+      
       console.log(`💰 Player ${playerName} starts with $${player.cashOutValue.toFixed(2)} cash-out balance in paid arena`);
+      console.log(`👛 User wallet address: ${player.userWalletAddress || 'NOT PROVIDED'}`);
     }
     
     console.log(`🎨 Player ${playerName} joined with skin: ${player.skinName} (${player.skinColor})`);
