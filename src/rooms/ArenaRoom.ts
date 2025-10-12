@@ -110,8 +110,16 @@ export class ArenaRoom extends Room<GameState> {
   ];
   private nextSpawnIndex = 0;
   
-  onCreate() {
+  onCreate(options: any = {}) {
     console.log("🌍 Arena room initialized");
+    
+    // Check if this is a paid arena
+    this.isPaidArena = options.isPaidArena || false;
+    this.entryFee = options.entryFee || 0;
+    
+    if (this.isPaidArena) {
+      console.log(`💰 Paid Arena: Entry fee $${this.entryFee.toFixed(2)}`);
+    }
 
     // Initialize game state
     this.setState(new GameState());
