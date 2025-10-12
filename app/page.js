@@ -6330,8 +6330,8 @@ export default function TurfLootTactical() {
                         console.log(`🎯 ${message}`)
                         alert(`💰 Payment Confirmed!\n\n${message}`)
                         
-                        // Navigate to game with the Hathora room
-                        router.push(`/agario?roomId=${roomId}&mode=competitive&fee=${stakeAmount}&region=${selectedServer}&paid=true`)
+                        // Navigate to arena game with the paid room
+                        router.push(`/arena?roomId=${roomId}&mode=competitive&fee=${stakeAmount}&region=${selectedServer}&paid=true`)
                         
                       } else {
                         console.error('❌ Hathora room creation failed')
