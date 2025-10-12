@@ -2421,8 +2421,59 @@ const MultiplayerArena = () => {
       }
     }
     
+    interpolatePosition() {
+      // Smooth interpolation from current position to target position
+      const interpolationSpeed = 0.3 // Higher = faster catch-up (0.2-0.4 is good)
+      
+      if (this.player && this.player.targetX !== undefined && this.player.targetY !== undefined) {
+        // Calculate the difference
+        const dx = this.player.targetX - this.player.x
+        const dy = this.player.targetY - this.player.y
+        
+        // Interpolate towards target position
+        this.player.x += dx * interpolationSpeed
+        this.player.y += dy * interpolationSpeed
+      }
+      
+      // Interpolate other players' positions as well
+      if (this.serverState && this.serverState.players) {
+        this.serverState.players.forEach(serverPlayer => {
+          if (!serverPlayer.isCurrentPlayer && serverPlayer.alive) {
+            // Find or create client-side interpolation data for this player
+            if (!this.playerInterpolation) {
+              this.playerInterpolation = new Map()
+            }
+            
+            if (!this.playerInterpolation.has(serverPlayer.sessionId)) {
+              // Initialize interpolation data
+              this.playerInterpolation.set(serverPlayer.sessionId, {
+                x: serverPlayer.x,
+                y: serverPlayer.y
+              })
+            }
+            
+            const interpData = this.playerInterpolation.get(serverPlayer.sessionId)
+            
+            // Interpolate towards server position
+            const dx = serverPlayer.x - interpData.x
+            const dy = serverPlayer.y - interpData.y
+            
+            interpData.x += dx * interpolationSpeed
+            interpData.y += dy * interpolationSpeed
+            
+            // Update the visual position (not the authoritative server position)
+            serverPlayer.clientX = interpData.x
+            serverPlayer.clientY = interpData.y
+          }
+        })
+      }
+    }
+    
     render() {
       if (!this.ctx || !this.running) return
+      
+      // Interpolate positions before rendering for smooth movement
+      this.interpolatePosition()
       
       // Clear canvas with pure black background like local agario
       this.ctx.fillStyle = '#000000' // Pure black background to match local agario
