@@ -2731,22 +2731,38 @@ export default function TurfLootTactical() {
     try {
       // Get real SOL balance from blockchain
       console.log('📞 fetchWalletBalance: Calling checkSolanaBalance with address:', walletAddress)
-      const solBalance = await checkSolanaBalance(walletAddress)
-      console.log('📞 fetchWalletBalance: checkSolanaBalance returned:', solBalance, 'SOL')
+      const totalSolBalance = await checkSolanaBalance(walletAddress)
+      console.log('📞 fetchWalletBalance: checkSolanaBalance returned:', totalSolBalance, 'SOL')
 
-      // Convert to USD (rough estimate: $150 per SOL)
-      const usdBalance = (solBalance * 150).toFixed(2)
+      // CRITICAL: Calculate available balance (total - rent-exempt minimum)
+      // Solana requires ~0.00089088 SOL minimum + transaction fees
+      const RENT_EXEMPT_MINIMUM_SOL = 0.00089088
+      const TRANSACTION_FEE_BUFFER_SOL = 0.000005
+      const MINIMUM_RESERVE_SOL = RENT_EXEMPT_MINIMUM_SOL + TRANSACTION_FEE_BUFFER_SOL
+      
+      // Available balance = total balance - minimum reserve
+      const availableSolBalance = Math.max(0, totalSolBalance - MINIMUM_RESERVE_SOL)
+      
+      console.log('💰 Balance Breakdown:')
+      console.log('   Total SOL:', totalSolBalance.toFixed(8))
+      console.log('   Reserved (rent-exempt + fees):', MINIMUM_RESERVE_SOL.toFixed(8))
+      console.log('   Available to spend:', availableSolBalance.toFixed(8))
 
-      // Update UI state with REAL balance only
+      // Convert AVAILABLE balance to USD (rough estimate: $150 per SOL)
+      const USD_PER_SOL = 150
+      const availableUsdBalance = (availableSolBalance * USD_PER_SOL).toFixed(2)
+
+      // Update UI state with AVAILABLE balance (what user can actually spend)
       setWalletBalance({
-        sol: solBalance.toFixed(4),
-        usd: usdBalance,
+        sol: availableSolBalance.toFixed(4),
+        usd: availableUsdBalance,
         loading: false
       })
 
-      console.log('✅ fetchWalletBalance: Real balance updated successfully:', { 
-        sol: solBalance, 
-        usd: usdBalance,
+      console.log('✅ fetchWalletBalance: Available balance updated successfully:', { 
+        totalSol: totalSolBalance,
+        availableSol: availableSolBalance, 
+        availableUsd: availableUsdBalance,
         walletAddress: walletAddress
       })
 
