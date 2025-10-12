@@ -812,8 +812,7 @@ export class ArenaRoom extends Room<GameState> {
         player.score += coin.value;
         player.radius = Math.sqrt(player.mass) * 3; // Match agario radius formula
         
-        // Update player value in paid arenas
-        this.updatePlayerValue(player);
+        // Note: Cash-out value is NOT affected by coins, only by eliminating other players
         
         // Remove coin and spawn new one
         this.state.coins.delete(coinId);
