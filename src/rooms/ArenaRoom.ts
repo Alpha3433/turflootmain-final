@@ -93,6 +93,10 @@ export class ArenaRoom extends Room<GameState> {
   maxCoins = 3000; // Tripled coin density within the playable arena
   maxViruses = 30; // Doubled virus (spike) density for arena mode
   tickRate = parseInt(process.env.TICK_RATE || '20'); // TPS server logic
+  
+  // Paid arena configuration
+  private isPaidArena: boolean = false;
+  private entryFee: number = 0;
 
   private spawnOffsets: Array<{ x: number, y: number }> = [
     { x: 0, y: 0 },
