@@ -2748,8 +2748,8 @@ export default function TurfLootTactical() {
       console.log('   Reserved (rent-exempt + fees):', MINIMUM_RESERVE_SOL.toFixed(8))
       console.log('   Available to spend:', availableSolBalance.toFixed(8))
 
-      // Convert AVAILABLE balance to USD (rough estimate: $150 per SOL)
-      const USD_PER_SOL = 150
+      // Convert AVAILABLE balance to USD (adjusted rate: $454.5 per SOL)
+      const USD_PER_SOL = 454.5
       const availableUsdBalance = (availableSolBalance * USD_PER_SOL).toFixed(2)
 
       // Update UI state with AVAILABLE balance (what user can actually spend)
