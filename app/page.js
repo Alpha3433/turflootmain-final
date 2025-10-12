@@ -2761,9 +2761,9 @@ export default function TurfLootTactical() {
         name: error.name,
         stack: error.stack?.substring(0, 200)
       })
-      resetWalletBalance()
+      // Don't reset balance on error - keep previous value
     }
-  }, [currentWalletAddress, checkSolanaBalance, resetWalletBalance, authenticated, walletsReady, wallets.length])
+  }, [currentWalletAddress, checkSolanaBalance, authenticated, walletsReady, wallets.length])
 
   // STEP 3: Watch authentication and wallet availability
   useEffect(() => {
