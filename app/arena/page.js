@@ -2781,17 +2781,8 @@ const MultiplayerArena = () => {
       }
       
       // Draw money indicator above player head in paid arenas
-      // Debug: Log player properties to see what we're receiving
-      if (isCurrentPlayer && player) {
-        console.log('🎨 Drawing current player:', {
-          isPaidArena: player.isPaidArena,
-          cashOutValue: player.cashOutValue,
-          name: player.name,
-          condition: player.isPaidArena && player.cashOutValue > 0
-        })
-      }
-      
-      if (player.isPaidArena) {
+      // For paid arenas, always show the balance (even if 0, but skip if exactly 0)
+      if (player.isPaidArena && typeof player.cashOutValue !== 'undefined') {
         const cashOutValue = Number.isFinite(player.cashOutValue)
           ? player.cashOutValue
           : 0
