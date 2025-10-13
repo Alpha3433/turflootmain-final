@@ -2783,9 +2783,12 @@ const MultiplayerArena = () => {
         })
       }
       
-      if (player.isPaidArena && player.cashOutValue > 0) {
+      if (player.isPaidArena) {
+        const cashOutValue = Number.isFinite(player.cashOutValue)
+          ? player.cashOutValue
+          : 0
         const textY = drawY - playerRadius - 35 // Position above player
-        const displayValue = `$${player.cashOutValue.toFixed(2)}`
+        const displayValue = `$${cashOutValue.toFixed(2)}`
         
         // Draw background for better visibility
         this.ctx.font = 'bold 16px Arial'
