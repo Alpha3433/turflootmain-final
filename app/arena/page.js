@@ -1499,6 +1499,19 @@ const MultiplayerArena = () => {
       console.log(`✅ [${componentId}] Connected to dedicated arena:`, room.id)
       console.log('🎮 DEDICATED Session ID (should stay stable):', room.sessionId)
       
+      // Activate spawn protection for paid arenas
+      if (isPaidArena) {
+        setHasSpawnProtection(true)
+        spawnProtectionTimeRef.current = Date.now()
+        console.log('🛡️ Spawn protection activated for 5 seconds')
+        
+        // Disable spawn protection after 5 seconds
+        setTimeout(() => {
+          setHasSpawnProtection(false)
+          console.log('🛡️ Spawn protection expired')
+        }, SPAWN_PROTECTION_DURATION)
+      }
+      
       // Track game session for server browser player counts
       try {
         await fetch('/api/game-sessions', {
