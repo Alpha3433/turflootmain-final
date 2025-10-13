@@ -2781,8 +2781,8 @@ const MultiplayerArena = () => {
       }
       
       // Draw money indicator above player head in paid arenas
-      // For paid arenas, always show the balance (even if 0, but skip if exactly 0)
-      if (player.isPaidArena && typeof player.cashOutValue !== 'undefined') {
+      // Only show balance and username on main player, NOT on split pieces
+      if (player.isPaidArena && typeof player.cashOutValue !== 'undefined' && !player.isSplitPiece) {
         const cashOutValue = Number.isFinite(player.cashOutValue)
           ? player.cashOutValue
           : 0
