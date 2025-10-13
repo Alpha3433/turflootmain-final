@@ -7761,7 +7761,7 @@ export default function TurfLootTactical() {
                 e.target.style.transform = 'scale(1)'
               }}
             >
-              {/* Smooth Interactive Black Eyes */}
+              {/* Smooth Interactive Black Eyes with Enhanced Responsiveness */}
               <div style={{
                 position: 'absolute',
                 width: '8px',
@@ -7770,7 +7770,8 @@ export default function TurfLootTactical() {
                 borderRadius: '50%',
                 left: `${eyePositions.leftEye.x}px`,
                 top: `${eyePositions.leftEye.y}px`,
-                transform: 'translate(-50%, -50%)'
+                transform: 'translate(-50%, -50%)',
+                transition: 'left 0.1s ease-out, top 0.1s ease-out'
               }} />
               <div style={{
                 position: 'absolute', 
@@ -7780,7 +7781,8 @@ export default function TurfLootTactical() {
                 borderRadius: '50%',
                 left: `${eyePositions.rightEye.x}px`,
                 top: `${eyePositions.rightEye.y}px`,
-                transform: 'translate(-50%, -50%)'
+                transform: 'translate(-50%, -50%)',
+                transition: 'left 0.1s ease-out, top 0.1s ease-out'
               }} />
             </div>
           </div>
