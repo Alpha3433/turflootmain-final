@@ -316,14 +316,19 @@ export class ArenaRoom extends Room<GameState> {
     // Set paid arena flag and initial value
     player.isPaidArena = this.isPaidArena;
     if (this.isPaidArena) {
-      // Initialize with entry fee value for both display and cash-out
-      player.currentValue = this.entryFee;
-      player.cashOutValue = this.entryFee; // Start with entry fee as cash-out balance
+      // Calculate starting balance: entry fee minus 10% platform fee (user gets 90%)
+      const PLATFORM_FEE_PERCENTAGE = 0.10; // 10% platform fee
+      const startingBalance = this.entryFee * (1 - PLATFORM_FEE_PERCENTAGE);
+      
+      // Initialize with net balance after platform fee
+      player.currentValue = startingBalance;
+      player.cashOutValue = startingBalance; // Start with entry fee minus platform fee
       
       // Store user's wallet address for cash-outs
       player.userWalletAddress = options.userWalletAddress || "";
       
-      console.log(`💰 Player ${playerName} starts with $${player.cashOutValue.toFixed(2)} cash-out balance in paid arena`);
+      console.log(`💰 Player ${playerName} paid $${this.entryFee.toFixed(2)} entry fee`);
+      console.log(`💰 After 10% platform fee, starting balance: $${player.cashOutValue.toFixed(2)}`);
       console.log(`👛 User wallet address: ${player.userWalletAddress || 'NOT PROVIDED'}`);
     }
     
