@@ -6392,6 +6392,11 @@ export default function TurfLootTactical() {
               console.log(`💰 Selected stake: ${selectedStake}`)
               console.log(`🌍 Selected server: ${selectedServer}`)
               
+              // Validate username before proceeding
+              if (!validateUsername('PLAY NOW')) {
+                return
+              }
+              
               const authenticated = await requireAuthentication('PLAY NOW')
               if (authenticated) {
                 console.log('🎮 User authenticated, starting smart matchmaking...')
