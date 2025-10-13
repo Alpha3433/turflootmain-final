@@ -7985,146 +7985,259 @@ export default function TurfLootTactical() {
           </button>
         </div>
 
-        {/* Cash Out Notifications - Bottom Right - Tactical HUD Style */}
-        <div style={{
-          position: 'absolute',
-          bottom: '20px',
-          right: '20px',
-          zIndex: 30,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '12px',
-          alignItems: 'flex-end'
-        }}>
-          {cashOutNotifications.map((notification, index) => (
-            <div
-              key={notification.id}
+        {/* Feature Request Button - Bottom Right */}
+        <button
+          onClick={() => setShowFeatureRequestModal(true)}
+          style={{
+            position: 'absolute',
+            bottom: '20px',
+            right: '20px',
+            zIndex: 30,
+            backgroundColor: 'rgba(99, 102, 241, 0.95)',
+            border: '2px solid #818cf8',
+            borderRadius: '8px',
+            padding: '12px 20px',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '600',
+            boxShadow: '0 0 20px rgba(99, 102, 241, 0.4)',
+            backdropFilter: 'blur(10px)',
+            cursor: 'pointer',
+            fontFamily: '"Rajdhani", sans-serif',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.transform = 'translateY(-2px)'
+            e.target.style.boxShadow = '0 0 30px rgba(99, 102, 241, 0.6)'
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = 'translateY(0)'
+            e.target.style.boxShadow = '0 0 20px rgba(99, 102, 241, 0.4)'
+          }}
+        >
+          <span style={{ fontSize: '18px' }}>💡</span>
+          Request a Feature
+        </button>
+
+        {/* Feature Request Modal */}
+        {showFeatureRequestModal && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            backdropFilter: 'blur(5px)',
+            zIndex: 10000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px'
+          }}
+          onClick={() => setShowFeatureRequestModal(false)}
+          >
+            <div 
               style={{
-                position: 'relative',
-                backgroundColor: 'rgba(26, 32, 44, 0.95)',
-                border: '2px solid #10b981',
-                borderRadius: '4px',
-                padding: '12px 16px',
+                backgroundColor: '#1a202c',
+                border: '2px solid #4c51bf',
+                borderRadius: '12px',
+                padding: '32px',
+                maxWidth: '500px',
+                width: '100%',
+                boxShadow: '0 0 40px rgba(99, 102, 241, 0.3)',
                 color: 'white',
-                fontSize: '12px',
-                fontWeight: '600',
-                boxShadow: '0 0 25px rgba(16, 185, 129, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(15px)',
-                minWidth: '240px',
-                maxWidth: '260px',
-                fontFamily: '"Rajdhani", sans-serif',
-                animation: `slideInRight 0.5s ease-out ${index * 0.1}s both`,
-                opacity: 1 - (index * 0.15), // Fade older notifications
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
+                fontFamily: '"Rajdhani", sans-serif'
               }}
+              onClick={(e) => e.stopPropagation()}
             >
-              {/* Status Indicator */}
-              <div style={{
-                position: 'absolute',
-                top: '6px',
-                right: '6px',
-                width: '8px',
-                height: '8px',
-                background: '#10b981',
-                borderRadius: '50%',
-                boxShadow: '0 0 10px #10b981',
-                animation: 'statusBlink 2s ease-in-out infinite'
-              }} />
-              
-              {/* Header with Player and Amount */}
+              {/* Header */}
               <div style={{
                 display: 'flex',
-                alignItems: 'center',
                 justifyContent: 'space-between',
-                marginBottom: '8px',
-                borderBottom: '1px solid rgba(16, 185, 129, 0.3)',
-                paddingBottom: '8px'
+                alignItems: 'center',
+                marginBottom: '24px',
+                borderBottom: '2px solid rgba(99, 102, 241, 0.3)',
+                paddingBottom: '16px'
               }}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}>
-                  <div style={{
-                    width: '6px',
-                    height: '6px',
-                    background: '#10b981',
-                    transform: 'rotate(45deg)'
-                  }} />
-                  <span style={{ 
-                    fontSize: '11px',
-                    fontWeight: '800',
-                    color: '#10b981'
-                  }}>
-                    CASH OUT
-                  </span>
-                </div>
-                <span style={{ 
-                  fontSize: '14px', 
+                <h2 style={{
+                  fontSize: '24px',
                   fontWeight: '700',
-                  color: '#ffd700',
-                  textShadow: '0 0 10px rgba(255, 215, 0, 0.5)'
-                }}>
-                  ${notification.amount}
-                </span>
-              </div>
-              
-              {/* Player Info */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                fontSize: '12px'
-              }}>
-                <div style={{
+                  color: '#818cf8',
+                  margin: 0,
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px'
+                  gap: '12px'
                 }}>
-                  <div style={{
-                    width: '4px',
-                    height: '4px',
-                    background: '#68d391',
-                    borderRadius: '50%'
-                  }} />
-                  <span style={{ 
-                    fontWeight: '700',
-                    color: 'white'
-                  }}>
-                    {notification.player}
-                  </span>
-                </div>
-                <span style={{ 
-                  color: 'rgba(255, 255, 255, 0.7)',
-                  fontSize: '11px'
-                }}>
-                  {notification.country}
-                </span>
+                  <span style={{ fontSize: '28px' }}>💡</span>
+                  Request a Feature
+                </h2>
+                <button
+                  onClick={() => setShowFeatureRequestModal(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#cbd5e0',
+                    fontSize: '24px',
+                    cursor: 'pointer',
+                    padding: '4px 8px',
+                    transition: 'color 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.target.style.color = '#f56565'}
+                  onMouseLeave={(e) => e.target.style.color = '#cbd5e0'}
+                >
+                  ×
+                </button>
               </div>
-              
-              {/* Corner Accents */}
-              <div style={{
-                position: 'absolute',
-                top: '-1px',
-                left: '-1px',
-                width: '12px',
-                height: '12px',
-                borderTop: '2px solid #10b981',
-                borderLeft: '2px solid #10b981'
-              }} />
-              <div style={{
-                position: 'absolute',
-                bottom: '-1px',
-                right: '-1px',
-                width: '12px',
-                height: '12px',
-                borderBottom: '2px solid #10b981',
-                borderRight: '2px solid #10b981'
-              }} />
+
+              {/* Category Selection */}
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#cbd5e0',
+                  marginBottom: '8px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Category
+                </label>
+                <select
+                  value={featureCategory}
+                  onChange={(e) => setFeatureCategory(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#2d3748',
+                    border: '2px solid #4c51bf',
+                    borderRadius: '6px',
+                    color: 'white',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    fontFamily: '"Rajdhani", sans-serif',
+                    outline: 'none'
+                  }}
+                >
+                  <option value="Gameplay">Gameplay</option>
+                  <option value="Wallet">Wallet</option>
+                  <option value="UI">UI</option>
+                  <option value="New Feature">New Feature</option>
+                </select>
+              </div>
+
+              {/* Request Text Area */}
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#cbd5e0',
+                  marginBottom: '8px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Your Request
+                </label>
+                <textarea
+                  value={featureRequest}
+                  onChange={(e) => setFeatureRequest(e.target.value)}
+                  placeholder="Describe your feature request or suggestion..."
+                  style={{
+                    width: '100%',
+                    minHeight: '150px',
+                    padding: '12px',
+                    backgroundColor: '#2d3748',
+                    border: '2px solid #4c51bf',
+                    borderRadius: '6px',
+                    color: 'white',
+                    fontSize: '14px',
+                    fontFamily: '"Rajdhani", sans-serif',
+                    resize: 'vertical',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              {/* Submit Button */}
+              <button
+                onClick={async () => {
+                  if (!featureRequest.trim()) {
+                    alert('Please enter your feature request!')
+                    return
+                  }
+                  
+                  setFeatureSubmitting(true)
+                  
+                  try {
+                    const response = await fetch('/api/feature-requests', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        category: featureCategory,
+                        request: featureRequest,
+                        userIdentifier: user?.id || 'anonymous',
+                        userName: customUsername || userName || 'Anonymous',
+                        timestamp: new Date().toISOString()
+                      })
+                    })
+                    
+                    if (response.ok) {
+                      alert('✅ Feature request submitted successfully! Thank you for your feedback.')
+                      setFeatureRequest('')
+                      setFeatureCategory('Gameplay')
+                      setShowFeatureRequestModal(false)
+                    } else {
+                      alert('❌ Failed to submit request. Please try again.')
+                    }
+                  } catch (error) {
+                    console.error('Error submitting feature request:', error)
+                    alert('❌ Error submitting request. Please try again.')
+                  }
+                  
+                  setFeatureSubmitting(false)
+                }}
+                disabled={featureSubmitting}
+                style={{
+                  width: '100%',
+                  padding: '14px',
+                  backgroundColor: featureSubmitting ? '#4c51bf' : '#6366f1',
+                  border: 'none',
+                  borderRadius: '6px',
+                  color: 'white',
+                  fontSize: '16px',
+                  fontWeight: '700',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
+                  cursor: featureSubmitting ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.3s ease',
+                  fontFamily: '"Rajdhani", sans-serif',
+                  opacity: featureSubmitting ? 0.7 : 1
+                }}
+                onMouseEnter={(e) => {
+                  if (!featureSubmitting) {
+                    e.target.style.backgroundColor = '#818cf8'
+                    e.target.style.transform = 'translateY(-2px)'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!featureSubmitting) {
+                    e.target.style.backgroundColor = '#6366f1'
+                    e.target.style.transform = 'translateY(0)'
+                  }
+                }}
+              >
+                {featureSubmitting ? 'Submitting...' : 'Submit Request'}
+              </button>
             </div>
-          ))}
-        </div>
+          </div>
+        )}
 
         {/* Enhanced CSS Animations */}
         <style jsx global>{`
