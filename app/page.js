@@ -7993,19 +7993,19 @@ export default function TurfLootTactical() {
             bottom: '20px',
             right: '20px',
             zIndex: 30,
-            backgroundColor: 'rgba(99, 102, 241, 0.95)',
-            border: '2px solid #818cf8',
+            backgroundColor: 'rgba(20, 184, 166, 0.95)',
+            border: '2px solid #14b8a6',
             borderRadius: '8px',
             padding: '12px 20px',
             color: 'white',
-            fontSize: '14px',
-            fontWeight: '600',
-            boxShadow: '0 0 20px rgba(99, 102, 241, 0.4)',
+            fontSize: '13px',
+            fontWeight: '700',
+            boxShadow: '0 0 20px rgba(20, 184, 166, 0.4)',
             backdropFilter: 'blur(10px)',
             cursor: 'pointer',
             fontFamily: '"Rajdhani", sans-serif',
             textTransform: 'uppercase',
-            letterSpacing: '0.5px',
+            letterSpacing: '1px',
             transition: 'all 0.3s ease',
             display: 'flex',
             alignItems: 'center',
@@ -8013,15 +8013,17 @@ export default function TurfLootTactical() {
           }}
           onMouseEnter={(e) => {
             e.target.style.transform = 'translateY(-2px)'
-            e.target.style.boxShadow = '0 0 30px rgba(99, 102, 241, 0.6)'
+            e.target.style.boxShadow = '0 0 30px rgba(20, 184, 166, 0.6)'
+            e.target.style.backgroundColor = 'rgba(20, 184, 166, 1)'
           }}
           onMouseLeave={(e) => {
             e.target.style.transform = 'translateY(0)'
-            e.target.style.boxShadow = '0 0 20px rgba(99, 102, 241, 0.4)'
+            e.target.style.boxShadow = '0 0 20px rgba(20, 184, 166, 0.4)'
+            e.target.style.backgroundColor = 'rgba(20, 184, 166, 0.95)'
           }}
         >
           <span style={{ fontSize: '18px' }}>💡</span>
-          Request a Feature
+          REQUEST A FEATURE
         </button>
 
         {/* Feature Request Modal */}
