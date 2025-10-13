@@ -1405,6 +1405,16 @@ const MultiplayerArena = () => {
       
       const skinPayload = { ...normalizedSelectedSkin }
 
+      // Get user's wallet address for paid arenas (MUST be before console.log)
+      let userWalletAddress = ""
+      if (isPaidArena && user) {
+        const embeddedWallet = user.linkedAccounts?.find(
+          account => account.type === 'wallet' && account.chainType === 'solana'
+        )
+        userWalletAddress = embeddedWallet?.address || ""
+        console.log('👛 User wallet for paid arena:', userWalletAddress)
+      }
+
       console.log('🎯 Joining arena room:', roomId)
       console.log('🎯 Player details - Name:', playerName, 'PrivyID:', privyUserId)
       console.log('🎨 Selected skin payload:', skinPayload)
@@ -1425,16 +1435,6 @@ const MultiplayerArena = () => {
         // Hide loading modal on timeout
         setShowLoadingModal(false)
       }, 15000)
-      
-      // Get user's wallet address for paid arenas
-      let userWalletAddress = ""
-      if (isPaidArena && user) {
-        const embeddedWallet = user.linkedAccounts?.find(
-          account => account.type === 'wallet' && account.chainType === 'solana'
-        )
-        userWalletAddress = embeddedWallet?.address || ""
-        console.log('👛 User wallet for paid arena:', userWalletAddress)
-      }
 
       const room = await client.joinOrCreate("arena", {
         roomName: roomId,
