@@ -4675,58 +4675,109 @@ const MultiplayerArena = () => {
           left: 0,
           width: '100vw',
           height: '100vh',
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          zIndex: 10000,
-          fontFamily: '"Rajdhani", sans-serif'
+          zIndex: 999999999,
+          pointerEvents: 'auto'
         }}>
           <div style={{
-            backgroundColor: '#1f1f1f',
-            border: '3px solid #ffff00',
-            borderRadius: '12px',
-            padding: '40px',
-            maxWidth: '500px',
+            backgroundColor: '#1a202c',
+            border: '3px solid #68d391',
+            borderRadius: isMobile ? '8px' : '12px',
+            maxWidth: isMobile ? '300px' : '500px',
             width: '90%',
-            textAlign: 'center',
-            boxShadow: '0 0 30px rgba(255, 255, 0, 0.5)',
-            animation: 'pulse 2s ease-in-out infinite'
+            padding: '0',
+            color: 'white',
+            boxShadow: '0 0 50px rgba(104, 211, 145, 0.5)',
+            fontFamily: '"Rajdhani", sans-serif'
           }}>
-            {/* Trophy Icon */}
-            <div style={{ fontSize: '48px', marginBottom: '20px' }}>🏆</div>
-            
-            {/* Main Title */}
-            <h1 style={{
-              color: '#ffff00',
-              fontSize: '32px',
-              fontWeight: 'bold',
-              margin: '0 0 16px 0',
-              textTransform: 'uppercase',
-              letterSpacing: '2px'
+            {/* Header */}
+            <div style={{
+              padding: isMobile ? '12px' : '24px',
+              borderBottom: '2px solid #68d391',
+              background: 'linear-gradient(45deg, rgba(104, 211, 145, 0.1) 0%, rgba(104, 211, 145, 0.05) 100%)',
+              textAlign: 'center'
             }}>
-              CASHOUT SUCCESSFUL!
-            </h1>
-            
-            {/* Subtitle */}
-            <p style={{
-              color: '#ffffff',
-              fontSize: '16px',
-              margin: '0 0 16px 0',
-              opacity: 0.9
-            }}>
-              Congratulations! You've successfully cashed out!
-            </p>
-            
-            {/* Auto-redirect countdown */}
-            <p style={{
-              color: '#ffff00',
-              fontSize: '14px',
-              margin: '0 0 32px 0',
-              opacity: 0.8
-            }}>
-              Returning to main menu in {autoRedirectCountdown} seconds...
-            </p>
+              <div style={{
+                width: isMobile ? '40px' : '60px',
+                height: isMobile ? '40px' : '60px',
+                background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)',
+                borderRadius: isMobile ? '8px' : '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: isMobile ? '20px' : '30px',
+                margin: isMobile ? '0 auto 8px' : '0 auto 16px'
+              }}>
+                💰
+              </div>
+              <h2 style={{
+                color: '#68d391',
+                fontSize: isMobile ? '20px' : '32px',
+                fontWeight: '700',
+                margin: isMobile ? '0 0 4px' : '0 0 8px',
+                textTransform: 'uppercase',
+                textShadow: '0 0 10px rgba(104, 211, 145, 0.6)'
+              }}>
+                CASHOUT SUCCESSFUL!
+              </h2>
+              <p style={{
+                color: '#e2e8f0',
+                fontSize: isMobile ? '12px' : '16px',
+                margin: '0',
+                opacity: '0.8'
+              }}>
+                Your earnings have been sent!
+              </p>
+            </div>
+
+            {/* Stats */}
+            <div style={{ padding: isMobile ? '12px' : '24px' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: isMobile ? '8px' : '16px',
+                marginBottom: isMobile ? '12px' : '24px'
+              }}>
+                <div style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  padding: isMobile ? '8px' : '16px',
+                  borderRadius: '8px',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ 
+                    color: '#ffd700', 
+                    fontSize: isMobile ? '16px' : '24px', 
+                    fontWeight: '700' 
+                  }}>
+                    ${score.toFixed(2)}
+                  </div>
+                  <div style={{ 
+                    color: '#a0aec0', 
+                    fontSize: isMobile ? '10px' : '14px' 
+                  }}>Cashed Out</div>
+                </div>
+                <div style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  padding: isMobile ? '8px' : '16px',
+                  borderRadius: '8px',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ 
+                    color: '#60a5fa', 
+                    fontSize: isMobile ? '16px' : '24px', 
+                    fontWeight: '700' 
+                  }}>
+                    {loadingWalletBalance ? '...' : `${(walletBalance || 0).toFixed(4)} SOL`}
+                  </div>
+                  <div style={{ 
+                    color: '#a0aec0', 
+                    fontSize: isMobile ? '10px' : '14px' 
+                  }}>Wallet Balance</div>
+                </div>
+              </div>
             
             {/* Stats Cards */}
             <div style={{
