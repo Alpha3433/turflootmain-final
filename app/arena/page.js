@@ -928,6 +928,23 @@ const MultiplayerArena = () => {
       console.log('🚀 Sending split message to server')
       wsRef.current.send("split", { targetX, targetY })
       console.log('✅ Split message sent to server successfully')
+      
+      // Start cooldown timer for UI
+      lastSplitTimeRef.current = Date.now()
+      setSplitCooldownRemaining(SPLIT_COOLDOWN)
+      
+      // Update cooldown timer every 100ms
+      const cooldownInterval = setInterval(() => {
+        const elapsed = Date.now() - lastSplitTimeRef.current
+        const remaining = Math.max(0, SPLIT_COOLDOWN - elapsed)
+        
+        setSplitCooldownRemaining(remaining)
+        
+        if (remaining <= 0) {
+          clearInterval(cooldownInterval)
+        }
+      }, 100)
+      
     } catch (error) {
       console.error('❌ Error sending split message:', error)
       
