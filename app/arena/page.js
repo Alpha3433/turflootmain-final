@@ -2766,6 +2766,16 @@ const MultiplayerArena = () => {
       }
       
       // Draw money indicator above player head in paid arenas
+      // Debug: Log player properties to see what we're receiving
+      if (isCurrentPlayer && player) {
+        console.log('🎨 Drawing current player:', {
+          isPaidArena: player.isPaidArena,
+          cashOutValue: player.cashOutValue,
+          name: player.name,
+          condition: player.isPaidArena && player.cashOutValue > 0
+        })
+      }
+      
       if (player.isPaidArena && player.cashOutValue > 0) {
         const textY = drawY - playerRadius - 35 // Position above player
         const displayValue = `$${player.cashOutValue.toFixed(2)}`
