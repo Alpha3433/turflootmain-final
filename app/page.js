@@ -10627,6 +10627,12 @@ export default function TurfLootTactical() {
                 
                 console.log('🤖 MOBILE LOCAL PRACTICE button clicked!')
                 
+                // Validate username before proceeding
+                if (!validateUsername('MOBILE LOCAL PRACTICE')) {
+                  e.preventDefault()
+                  return
+                }
+                
                 // Create completely local room with bots - no Hathora charges
                 const localRoomId = 'local-bots-' + Math.random().toString(36).substring(2, 10)
                 const gameUrl = `/agario?roomId=${localRoomId}&mode=local&fee=0&region=local&multiplayer=offline&server=local&bots=true`
