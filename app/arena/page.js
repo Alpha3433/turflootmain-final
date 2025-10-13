@@ -977,6 +977,11 @@ const MultiplayerArena = () => {
   const SPLIT_COOLDOWN = 5000 // 5000ms (5 seconds) cooldown between splits
   const [splitCooldownRemaining, setSplitCooldownRemaining] = useState(0)
   
+  // Spawn protection for paid arenas
+  const [hasSpawnProtection, setHasSpawnProtection] = useState(false)
+  const spawnProtectionTimeRef = useRef(0)
+  const SPAWN_PROTECTION_DURATION = 5000 // 5 seconds
+  
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (gameOver) {
