@@ -732,6 +732,12 @@ export default function TurfLootTactical() {
   const [serverOptions, setServerOptions] = useState([])
   const [serverDataLoading, setServerDataLoading] = useState(false)
   
+  // Feature request modal state
+  const [showFeatureRequestModal, setShowFeatureRequestModal] = useState(false)
+  const [featureCategory, setFeatureCategory] = useState('Gameplay')
+  const [featureRequest, setFeatureRequest] = useState('')
+  const [featureSubmitting, setFeatureSubmitting] = useState(false)
+  
   // Fetch real-time server data
   const fetchServerData = async () => {
     setServerDataLoading(true)
