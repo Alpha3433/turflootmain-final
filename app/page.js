@@ -1874,10 +1874,10 @@ export default function TurfLootTactical() {
     }
   }, [showOrientationModal, pendingGameUrl, isMobile])
 
-  // Calculate eye positions based on mouse position
+  // Calculate eye positions based on mouse position with more responsive tracking
   const getEyePositions = () => {
     if (typeof window === 'undefined' || !circleRef.current) {
-      return { leftEye: { x: 18, y: 22 }, rightEye: { x: 54, y: 22 } }
+      return { leftEye: { x: 24, y: 28 }, rightEye: { x: 48, y: 28 } }
     }
 
     try {
@@ -1888,24 +1888,34 @@ export default function TurfLootTactical() {
       // Calculate angle from circle center to mouse
       const angle = Math.atan2(mousePosition.y - centerY, mousePosition.x - centerX)
       
-      // Limit eye movement within the circle (max 4px from default position for subtle movement)
-      const maxDistance = 4
+      // Calculate distance from circle center to mouse (normalized)
+      const dx = mousePosition.x - centerX
+      const dy = mousePosition.y - centerY
+      const distance = Math.sqrt(dx * dx + dy * dy)
+      
+      // More responsive eye movement - increases with distance from circle
+      const maxDistance = Math.min(8, distance / 20) // Increased from 4 to 8, scales with cursor distance
       const eyeOffsetX = Math.cos(angle) * maxDistance
       const eyeOffsetY = Math.sin(angle) * maxDistance
       
+      // Base positions for eyes (centered better)
+      const leftEyeBaseX = 24
+      const rightEyeBaseX = 48
+      const eyeBaseY = 28
+      
       return {
         leftEye: { 
-          x: 25 + eyeOffsetX, // Moved closer to center (was 18)
-          y: 22 + eyeOffsetY 
+          x: leftEyeBaseX + eyeOffsetX,
+          y: eyeBaseY + eyeOffsetY 
         },
         rightEye: { 
-          x: 47 + eyeOffsetX, // Moved closer to center (was 54)
-          y: 22 + eyeOffsetY 
+          x: rightEyeBaseX + eyeOffsetX,
+          y: eyeBaseY + eyeOffsetY 
         }
       }
     } catch (error) {
       // Fallback to default positions
-      return { leftEye: { x: 18, y: 22 }, rightEye: { x: 54, y: 22 } }
+      return { leftEye: { x: 24, y: 28 }, rightEye: { x: 48, y: 28 } }
     }
   }
 
