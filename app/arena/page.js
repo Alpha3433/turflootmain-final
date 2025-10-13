@@ -957,7 +957,8 @@ const MultiplayerArena = () => {
 
   // Cash out key event handlers - ported from agario with split spam prevention
   const lastSplitTimeRef = useRef(0)
-  const SPLIT_COOLDOWN = 500 // 500ms cooldown between splits
+  const SPLIT_COOLDOWN = 5000 // 5000ms (5 seconds) cooldown between splits
+  const [splitCooldownRemaining, setSplitCooldownRemaining] = useState(0)
   
   useEffect(() => {
     const handleKeyDown = (e) => {
