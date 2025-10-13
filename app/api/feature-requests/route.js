@@ -13,6 +13,56 @@ export async function POST(request) {
     
     console.log(`💡 New feature request: [${category}] from ${userName}`)
     
+    // Send to Airtable
+    const airtableApiKey = process.env.AIRTABLE_API_KEY
+    const airtableBaseId = process.env.AIRTABLE_BASE_ID
+    const airtableTableName = process.env.AIRTABLE_TABLE_NAME || 'Feature Requests'
+    
+    let airtableRecordId = null
+    
+    if (airtableApiKey && airtableBaseId) {
+      try {
+        console.log('📊 Sending feature request to Airtable...')
+        
+        const airtableResponse = await fetch(
+          `https://api.airtable.com/v0/${airtableBaseId}/${encodeURIComponent(airtableTableName)}`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${airtableApiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              fields: {
+                'Category': category,
+                'Request': featureRequest.trim(),
+                'User Name': userName || 'Anonymous',
+                'User ID': userIdentifier || 'anonymous',
+                'Status': 'Pending',
+                'Submitted At': new Date(timestamp || Date.now()).toISOString(),
+                'Upvotes': 0
+              }
+            })
+          }
+        )
+        
+        if (airtableResponse.ok) {
+          const airtableData = await airtableResponse.json()
+          airtableRecordId = airtableData.id
+          console.log(`✅ Feature request saved to Airtable: ${airtableRecordId}`)
+        } else {
+          const errorText = await airtableResponse.text()
+          console.error('❌ Airtable API error:', errorText)
+        }
+      } catch (airtableError) {
+        console.error('❌ Error sending to Airtable:', airtableError)
+        // Continue to save to MongoDB even if Airtable fails
+      }
+    } else {
+      console.warn('⚠️ Airtable credentials not configured, skipping Airtable sync')
+    }
+    
+    // Also save to MongoDB as backup
     const { db } = await connectToDatabase()
     const featureRequestsCollection = db.collection('feature_requests')
     
@@ -25,17 +75,19 @@ export async function POST(request) {
       status: 'pending',
       submittedAt: new Date(timestamp || Date.now()),
       upvotes: 0,
-      comments: []
+      comments: [],
+      airtableRecordId: airtableRecordId
     }
     
     await featureRequestsCollection.insertOne(requestDoc)
     
-    console.log(`✅ Feature request saved: ${requestDoc._id}`)
+    console.log(`✅ Feature request saved to MongoDB: ${requestDoc._id}`)
     
     return NextResponse.json({
       success: true,
       message: 'Feature request submitted successfully',
-      requestId: requestDoc._id
+      requestId: requestDoc._id,
+      airtableRecordId: airtableRecordId
     })
     
   } catch (error) {
