@@ -12,7 +12,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://privy-game-hub.preview.emergentagent.com"
+BASE_URL = "https://turfloot-fix-1.preview.emergentagent.com"
 COLYSEUS_ENDPOINT = "wss://au-syd-ab3eaf4e.colyseus.cloud"
 
 def log_test(message, status="INFO"):

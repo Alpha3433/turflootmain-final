@@ -16,7 +16,7 @@ from datetime import datetime
 
 # Configuration - Use localhost for testing as per environment
 LOCALHOST_URL = "http://localhost:3000"
-PRODUCTION_URL = "https://privy-game-hub.preview.emergentagent.com"
+PRODUCTION_URL = "https://turfloot-fix-1.preview.emergentagent.com"
 
 # Test configuration
 TEST_TIMEOUT = 10

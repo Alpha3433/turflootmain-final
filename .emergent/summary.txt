@@ -1,54 +1,75 @@
 <analysis>
-The trajectory details an iterative development process for TurfLoot Arena, focusing on Solana-based paid room entries via Privy's embedded wallets. The AI engineer has consistently grappled with Privy 3.0 configuration,  errors, and  issues. Repeatedly, the AI attempted to integrate Helius RPC for balance fetching, then removed it for Privy-native methods, often re-introducing the same or similar errors. A core challenge was correctly configuring Privy wallet connectors and RPC endpoints, leading to frequent modifications in  and . The AI fixed an infinite re-rendering loop and the Privy transaction UI appearing. The immediate, recurring problem is the landing page displaying a /bin/bash SOL balance, even when the Privy modal shows a correct, authenticated user balance. The AI is currently investigating balance fetching logic and dependencies in .
+The AI engineer has significantly advanced the TurfLoot Arena application, primarily focusing on its Solana-based paid room entry system via Privy embedded wallets. Initial efforts concentrated on resolving a persistent /bin/bash.00 SOL balance display on the landing page, which involved debugging Helius RPC integration and environment variable caching. Following this, a crucial Solana rent-exempt minimum issue, causing transaction failures, was identified and fixed by adjusting transaction logic and balance calculations. The project then expanded to implement user-requested features: dynamic cash-out value based on eliminations, a server-side cash-out mechanism with a 10% platform fee, and a visual money indicator/leaderboard displaying real USD values in paid arenas. The AI also addressed UI issues, such as hardcoded stake amounts and preventing unwanted popups for unauthenticated users. The current task involves diagnosing and fixing stuttering player movement in the paid arena mode, marking the transition from core monetization mechanics to gameplay experience refinement.
 </analysis>
 
 <product_requirements>
-The TurfLoot Arena application provides a multiplayer gaming experience with a key monetization feature: paid room entry fees.
-1.  **Split Mechanic**: Server-authoritative player character splitting is implemented.
-2.  **Game-Over Screen**: A custom game-over screen is displayed upon player elimination.
-3.  **Paid Room Entry Fee (Privy/Solana Integration)**: Players entering paid arena rooms must be charged in Solana, exclusively using Privy's embedded wallets with Solana via Helius RPC and Privy 3.0 standards for signing.
-    *   **Previous State**: A mock transaction ledger system with server-side balance () and Helius webhooks for real SOL/USDC deposits, converting to mock USD. Frontend displayed mock balance.
-    *   **Latest Requirement**: Display *only* the real Privy embedded wallet SOL balance on the frontend, removing the mock balance. Room costs are fixed at /bin/bash.02, /bin/bash.05, /bin/bash.10 worth of Solana. Transactions should automatically send to the platform wallet upon joining a room. The latest user feedback indicates that the landing page balance is /bin/bash while the Privy modal shows the correct balance for an authenticated user, and no fallbacks should be used.
+The TurfLoot Arena application aims to provide a multiplayer gaming experience with a key monetization feature: paid room entry fees using Solana and Privy's embedded wallets, integrated with Helius RPC. Players enter rooms by paying a SOL fee, which is automatically transferred to a platform wallet. Initially, room costs were /bin/bash.02, /bin/bash.05, /bin/bash.10, later updated to /bin/bash.02, /bin/bash.50, /bin/bash.65.
+
+The core problem addressed was the landing page incorrectly displaying /bin/bash.00 SOL even when authenticated users had funds in their Privy wallet. A Solana-specific issue where transactions failed due to insufficient funds for rent (leaving below the rent-exempt minimum) was also a critical fix.
+
+New feature requests included:
+1.  Displaying a money indicator above players' heads in paid arenas, showing their initial SOL entry fee in USD, incrementally increasing as they eliminate other players (adding the eliminated player's cash-out value).
+2.  Implementing a server-side cash-out mechanic where 10% of a user's accumulated cash-out value is taken as a platform fee, and the remaining 90% is sent from the server wallet to the user's Privy embedded wallet.
+3.  Ensuring the in-game leaderboard and cash-out button reflect these real USD money values (derived from the SOL entry fee), rather than in-game coin scores.
+4.  Preventing any popup modals from appearing for unauthenticated users on the landing page, except for the Privy login modal.
+5.  Addressing and fixing stuttery and choppy player movement in the paid arena mode.
 </product_requirements>
 
 <key_technical_concepts>
--   **Privy**: User authentication, embedded/connected Solana wallet management (version 3.0), including its  and  hooks.
--   **Solana Blockchain**: Distributed ledger for transactions, leveraging  and .
+-   **Privy**: User authentication, embedded/connected Solana wallet management (v3.0), including  and transaction signing hooks.
+-   **Solana Blockchain**: Distributed ledger, utilizing  and  for transactions.
 -   **Helius RPC**: Solana RPC endpoint for direct balance fetching and transactions.
--   **Next.js**: React framework for both frontend components and backend API routes.
+-   **Next.js**: React framework for frontend and backend API routes.
 -   **Colyseus**: Real-time server-authoritative multiplayer game server.
+-   **bs58**: Base58 encoding/decoding for Solana keys.
 </key_technical_concepts>
 
 <code_architecture>
 
--   ****: This is the main application page handling user interface, authentication, and core transaction logic for paid room entry.
-    -   **Summary of Changes**: Numerous modifications to  for Solana transaction signing with Privy 3.0 hooks. Refactored  to serialize  objects. Updated stake button options and . Corrected  for embedded wallet addresses. Debugged and refined usage of  and  hooks. Introduced and removed Helius RPC-based balance fetching multiple times. Re-implemented and then removed . Fixed an infinite rendering loop in balance fetching logic. The current state reflects the re-integration of Helius RPC for balance display (as of message 462) and a fix for the Privy transaction UI. The balance display on the landing page for authenticated users is still a core issue being addressed.
+-   ****: Main application landing page.
+    -   *Summary*: Handles UI, authentication, core transaction logic. Numerous modifications for Privy 3.0, , , and balance display.
+    -   *Changes*: Implemented Solana rent-exempt minimum checks in . Adjusted  conversion rates for transaction calculation while maintaining real market rate for balance display. Removed wallet fallback values, displaying  for unauthenticated balances. Updated stake button UI to reflect new /bin/bash.50 and /bin/bash.65 options. Added authentication checks to profile/friends modal triggers.
 -   ****: Configures Privy authentication, wallet connections, and Solana RPC.
-    -   **Summary of Changes**: Extensive refactoring to correctly configure Solana wallet connectors using  and later specific  RPCs via 's  and . Involved debugging and removing  hooks, and ensuring proper .  was added, removed, and added again due to various React hook and  errors. The RPC configuration has been updated to use the user-provided Helius API key with the correct  format.
+    -   *Summary*: Critical for Privy integration and Solana RPC setup.
+    -   *Changes*: Configuration depends on  . Correct Helius API key was loaded after initial debugging of cached values.
 -   ****: Manages project dependencies.
-    -   **Summary of Changes**: Fixed  and  versions. Added , , , and .
+    -   *Summary*: Keeps track of all installed packages.
+    -   *Changes*: Added .
 -   ****: Stores environment variables.
-    -   **Summary of Changes**: Added , , , , , , , and . The  was updated with the user-provided API key.
+    -   *Summary*: Holds sensitive keys and configurations.
+    -   *Changes*: Updated  with the correct Helius API key. Added  and .
 -   ****: Provides game server configurations.
-    -   **Summary of Changes**:  define room entry fees matching UI stake options (/bin/bash.02, /bin/bash.05, /bin/bash.10).
+    -   *Summary*: Defines available game rooms and their properties.
+    -   *Changes*: Updated  to change entry fees for specific rooms to /bin/bash.50 and /bin/bash.65.
+-   ****: **(New File)** Handles server-side cash-out transactions.
+    -   *Summary*: Processes player cash-out requests, deducts a 10% platform fee, and sends the remaining 90% from the platform wallet to the user's Privy embedded wallet via Solana transaction.
+-   ****: Colyseus game room logic.
+    -   *Summary*: Manages game state, player interactions, and core game mechanics.
+    -   *Changes*:
+        -    schema: Added , , .
+        -    schema: Added , .
+        -   : Parses  and  from  to correctly initialize room metadata.
+        -   : Initializes  with  and stores .
+        -   Player collision logic: When a player eliminates another, the eliminated player's  is added to the eliminator's.
+        -   Removed  from coin collision.
+        -   Added  method to trigger server-side cash-out via  endpoint.
+-   ****: Client-side game logic for the arena.
+    -   *Summary*: Renders the game, handles player input, connects to .
+    -   *Changes*:
+        -   Added display for  above player heads with a gold  symbol.
+        -   Updated  options to pass  and  parameters from the URL.
+        -   Updated navigation for paid rooms to  instead of .
+        -   Updated leaderboard and cash-out button to display  in USD format instead of .
 </code_architecture>
 
 <pending_tasks>
--   Ensure the landing page wallet displays the *actual* Privy embedded wallet SOL balance for authenticated users, not /bin/bash.00.
--   Resolve any underlying  errors that may still occur during the balance update process despite the latest Helius RPC integration for balance display.
--   Verify the end-to-end functionality of joining a paid arena room, ensuring the Privy transaction confirmation UI appears correctly and the SOL transfer to the platform wallet is successful.
+-   Investigate and fix the stuttery and choppy player movement observed in the  paid arena mode.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was addressing the persistent issue of the landing page displaying /bin/bash.00 and 0.0000 SOL despite the user being authenticated and their Privy modal showing a correct balance (e.g., 0.1 SOL). This problem resurfaced after a fix for the Privy transaction UI not appearing was implemented.
-
-The  function has been updated to use the correct Privy v3.0  hook:
-
-This change aimed to resolve the Something went wrong error during transaction attempts.
-
-For balance display, the AI previously (Message 460-482) re-integrated direct Helius RPC calls to fetch user balances using the user-provided API key (). This involved using  and . The AI believed this would resolve the discrepancy. However, the user's latest feedback (Message 499) indicates the problem persists, suggesting a conflict or incorrect implementation of this balance fetching. The AI's last action in the trajectory (Message 504) is investigating the  function's dependency array, indicating an active debug of the balance display logic.
+Immediately before this summary, the AI engineer was addressing the user's explicit request to review and fix the stuttery and choppy movement in the  paid arena game mode. The AI had just begun its investigation by searching  for patterns related to client-side movement and state updates, specifically , , , , and . The goal is to identify and resolve the underlying cause of the jerky movement for players within the paid game environment. All previous tasks related to balance display, transaction errors, room fee updates, cash-out mechanics, and UI rendering of money values have been addressed and are presumed to be in a functional state based on the trajectory.
 </current_work>
 
 <optional_next_step>
-Investigate and fix why the landing page displays /bin/bash.00 SOL for authenticated users, ensuring it reflects the real Privy wallet balance as per user request.
+Investigate the client and server movement logic in  to fix the stuttery/choppy movement.
 </optional_next_step>

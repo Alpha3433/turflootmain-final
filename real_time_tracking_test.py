@@ -22,7 +22,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://privy-game-hub.preview.emergentagent.com"
+BASE_URL = "https://turfloot-fix-1.preview.emergentagent.com"
 LOCAL_URL = "http://localhost:3000"
 
 # Test configuration
