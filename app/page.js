@@ -6247,18 +6247,22 @@ export default function TurfLootTactical() {
             ))}
           </div>
 
-          {/* Loyalty Progress Bar - Minimalistic Design */}
-          {isAuthenticated && loyaltyData && (
-            <div style={{ 
-              marginBottom: '12px',
-              padding: '8px 12px',
-              backgroundColor: 'rgba(16, 185, 129, 0.1)',
-              border: '1px solid rgba(16, 185, 129, 0.2)',
-              borderRadius: '6px',
-              fontSize: '12px',
-              color: '#10b981'
-            }}>
-              {!loyaltyData.progress?.isMaxTier ? (
+          {/* Loyalty Progress Bar - Always Visible */}
+          <div style={{ 
+            marginBottom: '12px',
+            padding: isAuthenticated && loyaltyData ? '8px 12px' : '6px 12px',
+            backgroundColor: isAuthenticated && loyaltyData ? 'rgba(16, 185, 129, 0.1)' : 'rgba(107, 114, 128, 0.1)',
+            border: isAuthenticated && loyaltyData ? '1px solid rgba(16, 185, 129, 0.2)' : '1px solid rgba(107, 114, 128, 0.2)',
+            borderRadius: '6px',
+            fontSize: isAuthenticated && loyaltyData ? '12px' : '11px',
+            color: isAuthenticated && loyaltyData ? '#10b981' : '#9ca3af',
+            textAlign: isAuthenticated && loyaltyData ? 'left' : 'center',
+            minHeight: '32px',
+            transition: 'all 0.3s ease'
+          }}>
+            {isAuthenticated && loyaltyData ? (
+              // Show loyalty progress when authenticated and data loaded
+              !loyaltyData.progress?.isMaxTier ? (
                 <div style={{ 
                   display: 'flex', 
                   justifyContent: 'space-between', 
@@ -6278,25 +6282,19 @@ export default function TurfLootTactical() {
                 <div style={{ textAlign: 'center' }}>
                   🏆 {loyaltyData.tierInfo?.name} ({loyaltyData.feePercentage}% fees)
                 </div>
-              )}
-            </div>
-          )}
-          
-          {/* Minimalistic login prompt */}
-          {!isAuthenticated && (
-            <div style={{ 
-              marginBottom: '12px',
-              padding: '6px 12px',
-              backgroundColor: 'rgba(107, 114, 128, 0.1)',
-              border: '1px solid rgba(107, 114, 128, 0.2)',
-              borderRadius: '6px',
-              fontSize: '11px',
-              color: '#9ca3af',
-              textAlign: 'center'
-            }}>
-              Login to reduce fees with loyalty tiers
-            </div>
-          )}
+              )
+            ) : isAuthenticated && !loyaltyData ? (
+              // Loading state when authenticated but data not loaded yet
+              <span style={{ opacity: 0.7 }}>
+                Loading loyalty data...
+              </span>
+            ) : (
+              // Not authenticated - show login prompt
+              <span>
+                Login to reduce fees with loyalty tiers
+              </span>
+            )}
+          </div>
           
           {/* Main Deploy Button - UPDATED with Paid Rooms Validation */}
           <button 
