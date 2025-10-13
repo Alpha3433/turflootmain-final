@@ -2834,6 +2834,35 @@ const MultiplayerArena = () => {
       this.ctx.lineWidth = isCurrentPlayer ? 4 : 3
       this.ctx.stroke()
       
+      // Spawn protection border for current player in paid arenas
+      if (isCurrentPlayer && hasSpawnProtection && isPaidArena) {
+        const elapsed = Date.now() - spawnProtectionTimeRef.current
+        const remaining = SPAWN_PROTECTION_DURATION - elapsed
+        
+        if (remaining > 0) {
+          // Animated dashed blue border
+          const dashOffset = (Date.now() / 50) % 20 // Animate dash offset
+          
+          this.ctx.save()
+          this.ctx.strokeStyle = '#0099ff'
+          this.ctx.lineWidth = 5
+          this.ctx.setLineDash([10, 10]) // Dashed pattern
+          this.ctx.lineDashOffset = -dashOffset // Animate the dashes
+          this.ctx.shadowColor = '#0099ff'
+          this.ctx.shadowBlur = 10
+          
+          // Draw outer protection ring
+          this.ctx.beginPath()
+          this.ctx.arc(drawX, drawY, playerRadius + 8, 0, Math.PI * 2)
+          this.ctx.stroke()
+          
+          // Reset context
+          this.ctx.setLineDash([])
+          this.ctx.shadowBlur = 0
+          this.ctx.restore()
+        }
+      }
+      
       // Black eyes (classic Agar.io style)
       const eyeSize = Math.max(3, playerRadius * 0.15)
       const eyeOffsetX = playerRadius * 0.3
