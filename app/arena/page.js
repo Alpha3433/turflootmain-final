@@ -4626,7 +4626,48 @@ const MultiplayerArena = () => {
         </div>
       )}
 
-      {/* Cashout Success Modal */}
+      {/* Cashout Success Modal - Redesigned to match practice modal */}
+      {showCashOutSuccessModal && (() => {
+        // Fetch wallet balance when modal opens
+        if (!loadingWalletBalance && walletBalance === null) {
+          setLoadingWalletBalance(true)
+          
+          const fetchBalance = async () => {
+            try {
+              if (user && wallets && wallets.length > 0) {
+                const embeddedWallet = wallets.find(w => w.walletClientType === 'privy')
+                if (embeddedWallet && embeddedWallet.address) {
+                  const rpcUrl = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://api.mainnet-beta.solana.com'
+                  const response = await fetch(rpcUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      jsonrpc: '2.0',
+                      id: 1,
+                      method: 'getBalance',
+                      params: [embeddedWallet.address]
+                    })
+                  })
+                  
+                  const data = await response.json()
+                  const lamports = data.result?.value || 0
+                  const sol = lamports / 1_000_000_000
+                  setWalletBalance(sol)
+                }
+              }
+            } catch (error) {
+              console.error('Error fetching wallet balance:', error)
+              setWalletBalance(0)
+            }
+            setLoadingWalletBalance(false)
+          }
+          
+          fetchBalance()
+        }
+        
+        return null
+      })()}
+      
       {showCashOutSuccessModal && (
         <div style={{
           position: 'fixed',
