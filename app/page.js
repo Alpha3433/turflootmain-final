@@ -1750,15 +1750,31 @@ export default function TurfLootTactical() {
     }
   }, [])
 
-  // Track mouse movement for interactive eyes
+  // Track mouse movement for interactive eyes with smooth continuous updates
   useEffect(() => {
     const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY })
+      // Update ref immediately (no state batching)
+      mousePositionRef.current = { x: e.clientX, y: e.clientY }
+      
+      // Cancel any pending animation frame
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+      
+      // Schedule state update on next frame for smooth animation
+      animationFrameRef.current = requestAnimationFrame(() => {
+        setMousePosition({ x: e.clientX, y: e.clientY })
+      })
     }
 
     if (typeof window !== 'undefined') {
-      window.addEventListener('mousemove', handleMouseMove)
-      return () => window.removeEventListener('mousemove', handleMouseMove)
+      window.addEventListener('mousemove', handleMouseMove, { passive: true })
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove)
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current)
+        }
+      }
     }
   }, [])
 
