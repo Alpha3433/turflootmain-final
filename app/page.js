@@ -1312,6 +1312,32 @@ export default function TurfLootTactical() {
     }
   }
 
+  // Validate that user has set a custom username before entering game
+  const validateUsername = (action = 'play') => {
+    const currentUsername = customUsername?.trim()
+    
+    if (!currentUsername) {
+      alert('⚠️ Please set a username before entering the game!\n\nEnter your desired username in the input field and click the checkmark (✓) to confirm.')
+      console.log('❌ Username validation failed - no custom username set')
+      return false
+    }
+    
+    if (currentUsername.length < 3) {
+      alert('⚠️ Username must be at least 3 characters long!')
+      console.log('❌ Username validation failed - too short')
+      return false
+    }
+    
+    if (currentUsername.length > 20) {
+      alert('⚠️ Username must be 20 characters or less!')
+      console.log('❌ Username validation failed - too long')
+      return false
+    }
+    
+    console.log(`✅ Username validated: ${currentUsername}`)
+    return true
+  }
+
   // Load username when authentication state changes and register Privy user
   useEffect(() => {
     console.log('🔄 Auth state changed:', { isAuthenticated, hasUser: !!user })
