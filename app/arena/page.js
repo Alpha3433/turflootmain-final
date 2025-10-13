@@ -1476,6 +1476,31 @@ const MultiplayerArena = () => {
       console.log(`✅ [${componentId}] Connected to dedicated arena:`, room.id)
       console.log('🎮 DEDICATED Session ID (should stay stable):', room.sessionId)
       
+      // Track game session for server browser player counts
+      try {
+        await fetch('/api/game-sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'join',
+            session: {
+              roomId: 'colyseus-arena-global',
+              sessionId: room.sessionId,
+              userId: user?.id || room.sessionId,
+              playerName: playerName,
+              joinedAt: new Date().toISOString(),
+              lastActivity: new Date().toISOString(),
+              entryFee: entryFee,
+              mode: isPaidArena ? 'paid' : 'free',
+              region: 'au-syd'
+            }
+          })
+        })
+        console.log('✅ Game session tracked for player count')
+      } catch (err) {
+        console.warn('⚠️ Failed to track game session:', err)
+      }
+      
       // Set expected session ID in game engine for camera stability
       if (gameRef.current) {
         gameRef.current.expectedSessionId = room.sessionId
