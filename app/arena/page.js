@@ -4779,133 +4779,74 @@ const MultiplayerArena = () => {
                 </div>
               </div>
             
-            {/* Stats Cards */}
-            <div style={{
-              display: 'flex',
-              gap: '20px',
-              marginBottom: '32px',
-              justifyContent: 'center'
-            }}>
-              {/* Time Survived Card */}
+              {/* Action Buttons */}
               <div style={{
-                backgroundColor: '#2a2a2a',
-                borderRadius: '8px',
-                padding: '20px',
-                minWidth: '120px',
-                border: '1px solid #404040'
+                display: 'flex',
+                gap: isMobile ? '8px' : '12px',
+                flexDirection: 'column'
               }}>
-                <div style={{ fontSize: '24px', marginBottom: '8px' }}>⏱️</div>
-                <div style={{
-                  color: '#ffffff',
-                  fontSize: '24px',
-                  fontWeight: 'bold',
-                  marginBottom: '4px'
-                }}>
-                  {Math.floor((Date.now() - gameStats.timeStarted) / 60000)}m {Math.floor(((Date.now() - gameStats.timeStarted) % 60000) / 1000)}s
-                </div>
-                <div style={{
-                  color: '#9ca3af',
-                  fontSize: '12px',
-                  textTransform: 'uppercase'
-                }}>
-                  TIME SURVIVED
-                </div>
+                <button
+                  onClick={() => {
+                    setShowCashOutSuccessModal(false)
+                    setCashOutComplete(false)
+                    setWalletBalance(null)
+                    window.location.reload()
+                  }}
+                  style={{
+                    backgroundColor: '#68d391',
+                    border: '2px solid #48bb78',
+                    borderRadius: '8px',
+                    color: '#1a202c',
+                    fontSize: isMobile ? '14px' : '18px',
+                    fontWeight: '700',
+                    padding: isMobile ? '8px 16px' : '12px 24px',
+                    cursor: 'pointer',
+                    transition: 'all 150ms',
+                    fontFamily: '"Rajdhani", sans-serif',
+                    textTransform: 'uppercase',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.backgroundColor = '#48bb78'
+                    e.target.style.transform = 'translateY(-2px)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.backgroundColor = '#68d391'
+                    e.target.style.transform = 'translateY(0)'
+                  }}
+                >
+                  PLAY AGAIN
+                </button>
+                <button
+                  onClick={() => window.location.href = '/'}
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: '2px solid #a0aec0',
+                    borderRadius: '8px',
+                    color: '#a0aec0',
+                    fontSize: isMobile ? '12px' : '16px',
+                    fontWeight: '600',
+                    padding: isMobile ? '8px 16px' : '12px 24px',
+                    cursor: 'pointer',
+                    transition: 'all 150ms',
+                    fontFamily: '"Rajdhani", sans-serif',
+                    textTransform: 'uppercase'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.borderColor = '#cbd5e0'
+                    e.target.style.color = '#cbd5e0'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.borderColor = '#a0aec0'
+                    e.target.style.color = '#a0aec0'
+                  }}
+                >
+                  RETURN TO MENU
+                </button>
               </div>
-              
-              {/* Eliminations Card */}
-              <div style={{
-                backgroundColor: '#2a2a2a',
-                borderRadius: '8px',
-                padding: '20px',
-                minWidth: '120px',
-                border: '1px solid #404040'
-              }}>
-                <div style={{ fontSize: '24px', marginBottom: '8px' }}>⚔️</div>
-                <div style={{
-                  color: '#ffffff',
-                  fontSize: '24px',
-                  fontWeight: 'bold',
-                  marginBottom: '4px'
-                }}>
-                  {gameStats.eliminations}
-                </div>
-                <div style={{
-                  color: '#9ca3af',
-                  fontSize: '12px',
-                  textTransform: 'uppercase'
-                }}>
-                  ELIMINATIONS
-                </div>
-              </div>
-            </div>
-            
-            {/* Buttons */}
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '12px'
-            }}>
-              <button
-                onClick={() => {
-                  setShowCashOutSuccessModal(false)
-                  setCashOutComplete(false)
-                  setGameStats({ timeStarted: Date.now(), eliminations: 0 })
-                  // Reset game state but stay in arena
-                  window.location.reload()
-                }}
-                style={{
-                  backgroundColor: '#ffff00',
-                  color: '#1f1f1f',
-                  border: 'none',
-                  borderRadius: '8px',
-                  padding: '16px 32px',
-                  fontSize: '16px',
-                  fontWeight: 'bold',
-                  textTransform: 'uppercase',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  fontFamily: '"Rajdhani", sans-serif'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#ffff66'
-                  e.target.style.transform = 'scale(1.05)'
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#ffff00'
-                  e.target.style.transform = 'scale(1)'
-                }}
-              >
-                PLAY AGAIN
-              </button>
-              
-              <button
-                onClick={() => {
-                  window.location.href = '/'
-                }}
-                style={{
-                  backgroundColor: '#404040',
-                  color: '#ffffff',
-                  border: 'none',
-                  borderRadius: '8px',
-                  padding: '16px 32px',
-                  fontSize: '16px',
-                  fontWeight: 'bold',
-                  textTransform: 'uppercase',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  fontFamily: '"Rajdhani", sans-serif'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#505050'
-                  e.target.style.transform = 'scale(1.05)'
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#404040'
-                  e.target.style.transform = 'scale(1)'
-                }}
-              >
-                BACK TO MAIN MENU
-              </button>
             </div>
           </div>
         </div>
