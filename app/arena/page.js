@@ -2105,7 +2105,8 @@ const MultiplayerArena = () => {
           isPaidArena: currentPlayer.isPaidArena,
           cashOutValue: currentPlayer.cashOutValue,
           score: currentPlayer.score,
-          name: currentPlayer.name
+          name: currentPlayer.name,
+          allKeys: Object.keys(currentPlayer)
         })
         setMass(roundedMass || 25)
         setScore(currentScoreRounded)
