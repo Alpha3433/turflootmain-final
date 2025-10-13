@@ -1655,6 +1655,8 @@ export default function TurfLootTactical() {
   
   // Mouse tracking for interactive eyes
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const mousePositionRef = useRef({ x: 0, y: 0 })
+  const animationFrameRef = useRef(null)
   const circleRef = useRef(null)
 
   // Currency system for skin store (matches the game page)
