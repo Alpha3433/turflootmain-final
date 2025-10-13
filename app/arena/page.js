@@ -2786,42 +2786,18 @@ const MultiplayerArena = () => {
         const cashOutValue = Number.isFinite(player.cashOutValue)
           ? player.cashOutValue
           : 0
-        const textY = drawY - playerRadius - 35 // Position above player
+        const textY = drawY - playerRadius - 25 // Position above player (closer than before)
         const displayValue = `$${cashOutValue.toFixed(2)}`
         
-        // Draw background for better visibility
+        // Clean display like local game - just text with shadow, no boxes
         this.ctx.font = 'bold 16px Arial'
         this.ctx.textAlign = 'center'
         this.ctx.textBaseline = 'middle'
         
-        // Measure text for background
-        const textMetrics = this.ctx.measureText(displayValue)
-        const textWidth = textMetrics.width
-        const padding = 8
-        
-        // Draw semi-transparent background
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'
-        this.ctx.fillRect(
-          drawX - textWidth / 2 - padding,
-          textY - 12,
-          textWidth + padding * 2,
-          24
-        )
-        
-        // Draw green border
-        this.ctx.strokeStyle = '#10b981'
-        this.ctx.lineWidth = 2
-        this.ctx.strokeRect(
-          drawX - textWidth / 2 - padding,
-          textY - 12,
-          textWidth + padding * 2,
-          24
-        )
-        
-        // Draw $ symbol in gold
+        // Draw balance in gold with strong shadow for visibility
         this.ctx.fillStyle = '#FFD700'
         this.ctx.shadowColor = '#000000'
-        this.ctx.shadowBlur = 4
+        this.ctx.shadowBlur = 5
         this.ctx.fillText(displayValue, drawX, textY)
         this.ctx.shadowBlur = 0
         
