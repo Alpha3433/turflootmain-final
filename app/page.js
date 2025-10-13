@@ -2304,44 +2304,6 @@ export default function TurfLootTactical() {
         serverData.paidRoom = true
 
         console.log('✅ Paid room fee processed successfully:', feeResult)
-        
-        // Update loyalty stats (games played + amount wagered)
-        try {
-          console.log('📊 Updating loyalty stats for paid room entry...')
-          const loyaltyResponse = await fetch('/api/loyalty', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              userIdentifier: user?.id || 'unknown',
-              gameData: {
-                wagered: paidRoomConfig.entryFee, // Entry fee amount
-                gameType: 'paid_arena'
-              }
-            })
-          })
-          
-          if (loyaltyResponse.ok) {
-            const loyaltyResult = await loyaltyResponse.json()
-            console.log('✅ Loyalty stats updated:', loyaltyResult.message)
-            
-            // Update local loyalty data to reflect changes immediately
-            setLoyaltyData(prev => ({
-              ...prev,
-              userStats: loyaltyResult.userStats,
-              currentTier: loyaltyResult.newTier,
-              feePercentage: loyaltyResult.feePercentage,
-              progress: loyaltyResult.progress
-            }))
-            
-            // Show tier upgrade notification if applicable
-            if (loyaltyResult.tierUpgrade?.isUpgrade) {
-              console.log(`🎉 TIER UPGRADE! ${loyaltyResult.oldTier} → ${loyaltyResult.newTier}`)
-            }
-          }
-        } catch (loyaltyError) {
-          console.warn('⚠️ Failed to update loyalty stats:', loyaltyError)
-          // Don't block game entry if loyalty update fails
-        }
       }
       
       // Get Privy user info for proper identification in game
