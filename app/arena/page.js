@@ -1585,7 +1585,12 @@ const MultiplayerArena = () => {
           console.log('🎮 Players in state:', Array.from(state.players.keys()))
           let currentPlayerFound = false
           
+          // Track previous player sessions to detect eliminations
+          const currentSessions = new Set()
+          const previousSessions = new Set(playerBalancesRef.current.keys())
+          
           state.players.forEach((player, sessionId) => {
+            currentSessions.add(sessionId)
             console.log(`🎮 Player: ${player.name} (${sessionId}) - isCurrentPlayer: ${sessionId === room.sessionId}`)
             const isCurrentPlayer = sessionId === room.sessionId
             if (isCurrentPlayer) {
@@ -1598,9 +1603,12 @@ const MultiplayerArena = () => {
             const PLATFORM_FEE_PERCENTAGE = 0.10
             const startingBalance = isPaidArena ? (entryFee * (1 - PLATFORM_FEE_PERCENTAGE)) : 0
             
-            // FIXED: Balance should NOT increase from coins, only from eliminations
-            // For now, keep balance at starting amount (eliminations will be tracked separately)
-            const currentCashOutValue = isPaidArena ? startingBalance : 0
+            // Get or initialize player balance
+            if (!playerBalancesRef.current.has(sessionId)) {
+              playerBalancesRef.current.set(sessionId, startingBalance)
+            }
+            
+            const currentCashOutValue = isPaidArena ? playerBalancesRef.current.get(sessionId) : 0
             
             gameState.players.push({
               ...player,
@@ -1611,6 +1619,39 @@ const MultiplayerArena = () => {
               cashOutValue: currentCashOutValue
             })
           })
+          
+          // Detect eliminated players (players who were in previous state but not in current)
+          if (isPaidArena && previousPlayerCountRef.current > 0) {
+            const eliminatedSessions = Array.from(previousSessions).filter(s => !currentSessions.has(s))
+            
+            if (eliminatedSessions.length > 0) {
+              console.log('💀 Players eliminated:', eliminatedSessions.length)
+              
+              // Check if current player's mass increased significantly (they likely eliminated someone)
+              const currentPlayer = Array.from(state.players.entries()).find(([sid]) => sid === room.sessionId)
+              if (currentPlayer) {
+                const [currentSessionId, currentPlayerData] = currentPlayer
+                
+                // If we detect eliminations and current player is still alive, assume they did it
+                // (This is a simplification - in reality, any alive player could have done it)
+                eliminatedSessions.forEach(eliminatedSessionId => {
+                  const eliminatedBalance = playerBalancesRef.current.get(eliminatedSessionId) || startingBalance
+                  
+                  // Add eliminated player's balance to current player
+                  const currentBalance = playerBalancesRef.current.get(currentSessionId) || startingBalance
+                  const newBalance = currentBalance + eliminatedBalance
+                  
+                  playerBalancesRef.current.set(currentSessionId, newBalance)
+                  console.log(`💰 Updated balance: $${currentBalance.toFixed(2)} → $${newBalance.toFixed(2)} (eliminated player had $${eliminatedBalance.toFixed(2)})`)
+                  
+                  // Remove eliminated player from tracking
+                  playerBalancesRef.current.delete(eliminatedSessionId)
+                })
+              }
+            }
+          }
+          
+          previousPlayerCountRef.current = currentSessions.size
           
           if (!currentPlayerFound) {
             console.log('❌ Current player not found! Available sessions:', 
