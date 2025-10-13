@@ -1593,7 +1593,10 @@ const MultiplayerArena = () => {
             // Calculate starting balance: entry fee minus 10% platform fee
             const PLATFORM_FEE_PERCENTAGE = 0.10
             const startingBalance = isPaidArena ? (entryFee * (1 - PLATFORM_FEE_PERCENTAGE)) : 0
-            const currentCashOutValue = isPaidArena ? (player.score || startingBalance) : 0
+            
+            // FIXED: Balance should NOT increase from coins, only from eliminations
+            // For now, keep balance at starting amount (eliminations will be tracked separately)
+            const currentCashOutValue = isPaidArena ? startingBalance : 0
             
             gameState.players.push({
               ...player,
