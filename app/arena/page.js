@@ -1539,6 +1539,32 @@ const MultiplayerArena = () => {
           clearInterval(cashOutIntervalRef.current)
           cashOutIntervalRef.current = null
         }
+        
+        // Update loyalty stats after game completion (only for paid arenas)
+        if (isPaidArena && user?.id && entryFee > 0) {
+          console.log('📊 Game completed - updating loyalty stats...')
+          fetch('/api/loyalty', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userIdentifier: user.id,
+              gameData: {
+                wagered: entryFee,
+                gameType: 'paid_arena_completed'
+              }
+            })
+          })
+          .then(res => res.json())
+          .then(result => {
+            console.log('✅ Loyalty stats updated after game completion:', result.message)
+            if (result.tierUpgrade?.isUpgrade) {
+              console.log(`🎉 TIER UPGRADE! ${result.oldTier} → ${result.newTier}`)
+            }
+          })
+          .catch(err => {
+            console.warn('⚠️ Failed to update loyalty stats:', err)
+          })
+        }
         setJoystickActive(false)
         setJoystickPosition({ x: 0, y: 0 })
         if (gameRef.current) {
