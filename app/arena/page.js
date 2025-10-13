@@ -982,6 +982,10 @@ const MultiplayerArena = () => {
   const spawnProtectionTimeRef = useRef(0)
   const SPAWN_PROTECTION_DURATION = 5000 // 5 seconds
   
+  // Wallet balance for cashout modal
+  const [walletBalance, setWalletBalance] = useState(null)
+  const [loadingWalletBalance, setLoadingWalletBalance] = useState(false)
+  
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (gameOver) {
