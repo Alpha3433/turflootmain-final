@@ -57,6 +57,10 @@ const MultiplayerArena = () => {
   const [autoRedirectCountdown, setAutoRedirectCountdown] = useState(10)
   const [showLoadingModal, setShowLoadingModal] = useState(false)
   const cashOutIntervalRef = useRef(null)
+  
+  // Track player balances for paid arenas (to handle eliminations)
+  const playerBalancesRef = useRef(new Map()) // sessionId -> cashOutValue
+  const previousPlayerCountRef = useRef(0)
 
   const gameStatsRef = useRef(gameStats)
 
