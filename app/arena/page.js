@@ -1627,26 +1627,28 @@ const MultiplayerArena = () => {
             if (eliminatedSessions.length > 0) {
               console.log('💀 Players eliminated:', eliminatedSessions.length)
               
-              // Check if current player's mass increased significantly (they likely eliminated someone)
+              // Sum up all eliminated players' balances
+              let totalEliminatedBalance = 0
+              eliminatedSessions.forEach(eliminatedSessionId => {
+                const eliminatedBalance = playerBalancesRef.current.get(eliminatedSessionId) || startingBalance
+                totalEliminatedBalance += eliminatedBalance
+                // Remove eliminated player from tracking
+                playerBalancesRef.current.delete(eliminatedSessionId)
+              })
+              
+              // Find current player and check if they should get the balance
               const currentPlayer = Array.from(state.players.entries()).find(([sid]) => sid === room.sessionId)
-              if (currentPlayer) {
+              if (currentPlayer && totalEliminatedBalance > 0) {
                 const [currentSessionId, currentPlayerData] = currentPlayer
                 
-                // If we detect eliminations and current player is still alive, assume they did it
-                // (This is a simplification - in reality, any alive player could have done it)
-                eliminatedSessions.forEach(eliminatedSessionId => {
-                  const eliminatedBalance = playerBalancesRef.current.get(eliminatedSessionId) || startingBalance
-                  
-                  // Add eliminated player's balance to current player
-                  const currentBalance = playerBalancesRef.current.get(currentSessionId) || startingBalance
-                  const newBalance = currentBalance + eliminatedBalance
-                  
-                  playerBalancesRef.current.set(currentSessionId, newBalance)
-                  console.log(`💰 Updated balance: $${currentBalance.toFixed(2)} → $${newBalance.toFixed(2)} (eliminated player had $${eliminatedBalance.toFixed(2)})`)
-                  
-                  // Remove eliminated player from tracking
-                  playerBalancesRef.current.delete(eliminatedSessionId)
-                })
+                // Award the eliminated balance to current player
+                // Note: This assumes current player did the elimination. In a real scenario,
+                // the server should track this, but since we can't update the server, this is our workaround.
+                const currentBalance = playerBalancesRef.current.get(currentSessionId) || startingBalance
+                const newBalance = currentBalance + totalEliminatedBalance
+                
+                playerBalancesRef.current.set(currentSessionId, newBalance)
+                console.log(`💰 Elimination reward! Balance updated: $${currentBalance.toFixed(2)} → $${newBalance.toFixed(2)} (+$${totalEliminatedBalance.toFixed(2)} from eliminations)`)
               }
             }
           }
