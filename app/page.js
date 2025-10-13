@@ -2441,14 +2441,19 @@ export default function TurfLootTactical() {
     const existing = document.getElementById('desktop-leaderboard-popup')
     if (existing) existing.remove()
 
-    // Fetch leaderboard data
+    // Fetch leaderboard data from new paid arena earnings API
     let leaderboardData = []
     try {
-      console.log('🏆 Fetching leaderboard data...')
-      const response = await fetch('/api/users/leaderboard')
+      console.log('🏆 Fetching leaderboard data from paid arenas...')
+      const response = await fetch('/api/leaderboard?limit=10')
       if (response.ok) {
         const data = await response.json()
-        leaderboardData = data.users?.slice(0, 10) || [] // Top 10 players
+        leaderboardData = data.leaderboard?.map(user => ({
+          name: user.name,
+          cashout: user.totalEarnings,
+          eliminations: user.totalEliminations,
+          gamesPlayed: user.gamesPlayed
+        })) || []
       }
     } catch (error) {
       console.error('Error fetching leaderboard:', error)
