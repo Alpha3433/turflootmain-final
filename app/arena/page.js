@@ -1497,6 +1497,27 @@ const MultiplayerArena = () => {
           })
         })
         console.log('✅ Game session tracked for player count')
+        
+        // Send heartbeat every 30 seconds to keep session active
+        const sessionHeartbeat = setInterval(() => {
+          fetch('/api/game-sessions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'update',
+              roomId: 'colyseus-arena-global',
+              sessionId: room.sessionId,
+              userId: user?.id || room.sessionId,
+              lastActivity: new Date().toISOString()
+            })
+          }).catch(err => console.warn('⚠️ Heartbeat failed:', err))
+        }, 30000)
+        
+        // Clear heartbeat on disconnect
+        room.onLeave(() => {
+          clearInterval(sessionHeartbeat)
+        })
+        
       } catch (err) {
         console.warn('⚠️ Failed to track game session:', err)
       }
