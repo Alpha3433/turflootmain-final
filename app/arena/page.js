@@ -4433,17 +4433,21 @@ const MultiplayerArena = () => {
           </span>
         </div>
 
-        {/* Split Button - centered bottom right position */}
+        {/* Split Button - centered bottom right position with cooldown timer */}
         <div 
-          onClick={(e) => handleSplit(e)}
+          onClick={(e) => {
+            if (splitCooldownRemaining <= 0) {
+              handleSplit(e)
+            }
+          }}
           style={{
-            backgroundColor: 'rgba(0, 100, 255, 0.9)',
-            border: '3px solid #0064ff',
+            backgroundColor: splitCooldownRemaining > 0 ? 'rgba(100, 100, 100, 0.6)' : 'rgba(0, 100, 255, 0.9)',
+            border: splitCooldownRemaining > 0 ? '3px solid #666666' : '3px solid #0064ff',
             borderRadius: '8px',
-            color: '#ffffff',
+            color: splitCooldownRemaining > 0 ? '#aaaaaa' : '#ffffff',
             fontSize: isMobile ? '12px' : '14px',
             fontWeight: '700',
-            cursor: 'pointer',
+            cursor: splitCooldownRemaining > 0 ? 'not-allowed' : 'pointer',
             padding: isMobile ? '8px 12px' : '10px 16px',
             display: 'flex',
             alignItems: 'center',
@@ -4458,16 +4462,21 @@ const MultiplayerArena = () => {
             userSelect: 'none',
             minWidth: isMobile ? '120px' : '160px',
             textAlign: 'center',
-            boxShadow: '0 4px 12px rgba(0, 100, 255, 0.4)',
-            transition: 'all 0.2s ease'
+            boxShadow: splitCooldownRemaining > 0 ? '0 2px 6px rgba(0, 0, 0, 0.3)' : '0 4px 12px rgba(0, 100, 255, 0.4)',
+            transition: 'all 0.2s ease',
+            opacity: splitCooldownRemaining > 0 ? 0.6 : 1
           }}
           onMouseOver={(e) => {
-            e.target.style.backgroundColor = 'rgba(0, 80, 200, 1)'
-            e.target.style.boxShadow = '0 0 20px rgba(0, 100, 255, 0.8)'
+            if (splitCooldownRemaining <= 0) {
+              e.target.style.backgroundColor = 'rgba(0, 80, 200, 1)'
+              e.target.style.boxShadow = '0 0 20px rgba(0, 100, 255, 0.8)'
+            }
           }}
           onMouseOut={(e) => {
-            e.target.style.backgroundColor = 'rgba(0, 100, 255, 0.9)'
-            e.target.style.boxShadow = '0 4px 12px rgba(0, 100, 255, 0.4)'
+            if (splitCooldownRemaining <= 0) {
+              e.target.style.backgroundColor = 'rgba(0, 100, 255, 0.9)'
+              e.target.style.boxShadow = '0 4px 12px rgba(0, 100, 255, 0.4)'
+            }
           }}
           onTouchStart={(e) => {
             if (!isMobile) return
@@ -4482,7 +4491,10 @@ const MultiplayerArena = () => {
             textAlign: 'center',
             textShadow: '0 1px 2px rgba(0, 0, 0, 0.8)'
           }}>
-            {isMobile ? '✂️ Split' : '✂️ Split (Space)'}
+            {splitCooldownRemaining > 0 
+              ? `⏱️ ${(splitCooldownRemaining / 1000).toFixed(1)}s`
+              : (isMobile ? '✂️ Split' : '✂️ Split (Space)')
+            }
           </span>
         </div>
 
