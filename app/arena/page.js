@@ -2805,6 +2805,46 @@ const MultiplayerArena = () => {
         this.ctx.shadowBlur = 4
         this.ctx.fillText(displayValue, drawX, textY)
         this.ctx.shadowBlur = 0
+        
+        // Draw username below player avatar in paid arenas
+        const nameY = drawY + playerRadius + 30 // Position below player
+        const playerName = player.name || 'Anonymous'
+        
+        // Style for username
+        this.ctx.font = 'bold 14px Arial'
+        this.ctx.textAlign = 'center'
+        this.ctx.textBaseline = 'middle'
+        
+        // Measure username for background
+        const nameMetrics = this.ctx.measureText(playerName)
+        const nameWidth = nameMetrics.width
+        const namePadding = 6
+        
+        // Draw semi-transparent background
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'
+        this.ctx.fillRect(
+          drawX - nameWidth / 2 - namePadding,
+          nameY - 10,
+          nameWidth + namePadding * 2,
+          20
+        )
+        
+        // Draw white border
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'
+        this.ctx.lineWidth = 1
+        this.ctx.strokeRect(
+          drawX - nameWidth / 2 - namePadding,
+          nameY - 10,
+          nameWidth + namePadding * 2,
+          20
+        )
+        
+        // Draw username in white
+        this.ctx.fillStyle = '#FFFFFF'
+        this.ctx.shadowColor = '#000000'
+        this.ctx.shadowBlur = 3
+        this.ctx.fillText(playerName, drawX, nameY)
+        this.ctx.shadowBlur = 0
       }
     }
     
