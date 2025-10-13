@@ -917,6 +917,36 @@ export default function TurfLootTactical() {
     }
   }, [isAuthenticated, privyUser])
   
+  // Fetch leaderboard data for paid arena top earners
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        console.log('🏆 Fetching leaderboard data...')
+        const response = await fetch('/api/leaderboard?limit=5')
+        
+        if (response.ok) {
+          const data = await response.json()
+          const formattedLeaderboard = data.leaderboard.map(user => ({
+            name: user.name,
+            cashout: user.totalEarnings
+          }))
+          
+          setLeaderboard(formattedLeaderboard)
+          console.log(`✅ Leaderboard loaded: ${formattedLeaderboard.length} players`)
+        }
+      } catch (error) {
+        console.error('❌ Error fetching leaderboard:', error)
+      }
+    }
+    
+    fetchLeaderboard()
+    
+    // Refresh leaderboard every 30 seconds
+    const interval = setInterval(fetchLeaderboard, 30000)
+    
+    return () => clearInterval(interval)
+  }, [])
+  
   // Update loyalty stats after a PAID game only (not practice games)
   const updateLoyaltyStats = async (gameData) => {
     if (!isAuthenticated || !privyUser) return
