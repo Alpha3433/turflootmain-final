@@ -1538,6 +1538,18 @@ const MultiplayerArena = () => {
         }
         lastInputRef.current = { dx: 0, dy: 0 }
         setConnectionStatus(prevStatus => (prevStatus === 'eliminated' ? prevStatus : 'disconnected'))
+        
+        // Track session leave for server browser player counts
+        fetch('/api/game-sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'leave',
+            roomId: 'colyseus-arena-global',
+            sessionId: room.sessionId,
+            userId: user?.id || room.sessionId
+          })
+        }).catch(err => console.warn('⚠️ Failed to track session leave:', err))
       })
 
       room.onMessage('gameOver', (payload) => {
