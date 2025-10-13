@@ -6546,6 +6546,12 @@ export default function TurfLootTactical() {
                 
                 console.log('🤖 LOCAL PRACTICE button clicked!')
                 
+                // Validate username before proceeding
+                if (!validateUsername('LOCAL PRACTICE')) {
+                  e.preventDefault()
+                  return
+                }
+                
                 // Show loading popup on desktop only
                 console.log('📏 Window width:', window.innerWidth)
                 if (window.innerWidth >= 768) {
