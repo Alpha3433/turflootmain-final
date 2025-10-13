@@ -69,22 +69,28 @@ export async function GET(request) {
       const db = client.db('turfloot')
       const gameSessions = db.collection('game_sessions')
       
-      // Count ALL active players across ALL rooms (active within last 2 minutes)
+      // Count active players in Colyseus arena (active within last 2 minutes)
       const activeSessionsCount = await gameSessions.countDocuments({
+        roomId: 'colyseus-arena-global',
         status: 'active',
         lastActivity: { $gte: new Date(Date.now() - 2 * 60 * 1000) }
       })
       
       realPlayers = activeSessionsCount
-      console.log(`📊 Total Active Players: ${realPlayers} real players across all rooms`)
+      console.log(`📊 Colyseus Arena: ${realPlayers} real players from database`)
       
       await client.close()
     } catch (error) {
-      console.warn(`⚠️ Could not query database for active players:`, error.message)
+      console.warn(`⚠️ Could not query database for Colyseus arena:`, error.message)
       realPlayers = 0
     }
 
-    console.log(`✅ Real-time player count: ${realPlayers} active players`)
+    // TEMPORARY: Simulate an active room for testing JOIN functionality
+    // Set this to 1 to test the JOIN button, set to 0 to test CREATE functionality
+    const simulatedPlayers = 1
+    realPlayers = Math.max(realPlayers, simulatedPlayers)
+    
+    console.log(`🧪 TESTING MODE: Using ${realPlayers} players (${simulatedPlayers} simulated + ${realPlayers - simulatedPlayers} real)`)
 
     // Update server with real player count
     arenaServer.currentPlayers = realPlayers
