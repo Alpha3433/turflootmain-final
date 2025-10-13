@@ -1540,9 +1540,11 @@ const MultiplayerArena = () => {
           cashOutIntervalRef.current = null
         }
         
-        // Update loyalty stats after game completion (only for paid arenas)
+        // Update loyalty stats and leaderboard after game completion (only for paid arenas)
         if (isPaidArena && user?.id && entryFee > 0) {
-          console.log('📊 Game completed - updating loyalty stats...')
+          console.log('📊 Game completed - updating loyalty stats and leaderboard...')
+          
+          // Update loyalty stats
           fetch('/api/loyalty', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1563,6 +1565,29 @@ const MultiplayerArena = () => {
           })
           .catch(err => {
             console.warn('⚠️ Failed to update loyalty stats:', err)
+          })
+          
+          // Update leaderboard with elimination earnings
+          // In paid arenas, score represents cash-out value (earnings from eliminations)
+          const earningsFromEliminations = Math.max(0, safeScore - (entryFee * 0.9)) // Subtract starting balance
+          
+          fetch('/api/leaderboard', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userIdentifier: user.id,
+              playerName: user.name || 'Anonymous',
+              earningsAdded: earningsFromEliminations,
+              eliminationsAdded: 1 // Track number of games with eliminations
+            })
+          })
+          .then(res => res.json())
+          .then(result => {
+            console.log(`✅ Leaderboard updated: +$${earningsFromEliminations.toFixed(2)} earnings`)
+            console.log(`🏆 Total earnings: $${result.user?.totalEarnings?.toFixed(2)}`)
+          })
+          .catch(err => {
+            console.warn('⚠️ Failed to update leaderboard:', err)
           })
         }
         setJoystickActive(false)
