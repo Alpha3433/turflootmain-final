@@ -5968,8 +5968,8 @@ export default function TurfLootTactical() {
           </div>
 
           {/* Player Name Input */}
-          <div style={{ marginBottom: '32px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px', marginBottom: '24px' }}>
+          <div style={{ marginBottom: '32px', minHeight: '56px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px', marginBottom: '24px', transition: 'opacity 0.2s ease', opacity: 1 }}>
               <div style={{ position: 'relative' }}>
                 <div 
                   onClick={() => setServerSelectorOpen(!serverSelectorOpen)}
