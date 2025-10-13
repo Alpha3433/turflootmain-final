@@ -2101,6 +2101,12 @@ const MultiplayerArena = () => {
 
         console.log('🎯 Mass update from server:', currentPlayer.mass, '(rounded:', roundedMass || 25, ')')
         console.log('💰 Cash-out value update:', isPaidArena ? `$${currentScoreRounded.toFixed(2)}` : currentScoreRounded)
+        console.log('💰 Server player props:', {
+          isPaidArena: currentPlayer.isPaidArena,
+          cashOutValue: currentPlayer.cashOutValue,
+          score: currentPlayer.score,
+          name: currentPlayer.name
+        })
         setMass(roundedMass || 25)
         setScore(currentScoreRounded)
 
