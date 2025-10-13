@@ -2786,36 +2786,47 @@ const MultiplayerArena = () => {
         const cashOutValue = Number.isFinite(player.cashOutValue)
           ? player.cashOutValue
           : 0
-        const textY = drawY - playerRadius - 25 // Position above player (closer than before)
+        const textY = drawY - playerRadius - 25 // Position above player
         const displayValue = `$${cashOutValue.toFixed(2)}`
         
-        // Smaller font and circular border design
-        this.ctx.font = 'bold 13px Arial' // Reduced from 16px to 13px
+        // Match local practice mode styling - compact rounded rectangle
+        this.ctx.font = 'bold 11px Arial'
         this.ctx.textAlign = 'center'
         this.ctx.textBaseline = 'middle'
         
-        // Measure text for circular border
+        // Measure text for compact box
         const textMetrics = this.ctx.measureText(displayValue)
         const textWidth = textMetrics.width
-        const circleRadius = Math.max(textWidth / 2 + 8, 20) // Circular radius based on text width
+        const boxWidth = textWidth + 12 // Compact padding
+        const boxHeight = 18 // Compact height
+        const boxX = drawX - boxWidth / 2
+        const boxY = textY - boxHeight / 2
+        const borderRadius = 9 // Rounded corners
         
-        // Draw circular background
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'
+        // Draw rounded rectangle background (dark)
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.75)'
         this.ctx.beginPath()
-        this.ctx.arc(drawX, textY, circleRadius, 0, Math.PI * 2)
+        this.ctx.moveTo(boxX + borderRadius, boxY)
+        this.ctx.lineTo(boxX + boxWidth - borderRadius, boxY)
+        this.ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + borderRadius)
+        this.ctx.lineTo(boxX + boxWidth, boxY + boxHeight - borderRadius)
+        this.ctx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - borderRadius, boxY + boxHeight)
+        this.ctx.lineTo(boxX + borderRadius, boxY + boxHeight)
+        this.ctx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - borderRadius)
+        this.ctx.lineTo(boxX, boxY + borderRadius)
+        this.ctx.quadraticCurveTo(boxX, boxY, boxX + borderRadius, boxY)
+        this.ctx.closePath()
         this.ctx.fill()
         
-        // Draw circular border in gold
+        // Draw rounded rectangle border (gold)
         this.ctx.strokeStyle = '#FFD700'
-        this.ctx.lineWidth = 2
-        this.ctx.beginPath()
-        this.ctx.arc(drawX, textY, circleRadius, 0, Math.PI * 2)
+        this.ctx.lineWidth = 1.5
         this.ctx.stroke()
         
-        // Draw balance text in gold with shadow
+        // Draw balance text in gold
         this.ctx.fillStyle = '#FFD700'
         this.ctx.shadowColor = '#000000'
-        this.ctx.shadowBlur = 3
+        this.ctx.shadowBlur = 2
         this.ctx.fillText(displayValue, drawX, textY)
         this.ctx.shadowBlur = 0
         
