@@ -2101,6 +2101,13 @@ const MultiplayerArena = () => {
 
         console.log('🎯 Mass update from server:', currentPlayer.mass, '(rounded:', roundedMass || 25, ')')
         console.log('💰 Cash-out value update:', isPaidArena ? `$${currentScoreRounded.toFixed(2)}` : currentScoreRounded)
+        console.log('💰 Server player props:', {
+          isPaidArena: currentPlayer.isPaidArena,
+          cashOutValue: currentPlayer.cashOutValue,
+          score: currentPlayer.score,
+          name: currentPlayer.name,
+          allKeys: Object.keys(currentPlayer)
+        })
         setMass(roundedMass || 25)
         setScore(currentScoreRounded)
 
@@ -2766,6 +2773,16 @@ const MultiplayerArena = () => {
       }
       
       // Draw money indicator above player head in paid arenas
+      // Debug: Log player properties to see what we're receiving
+      if (isCurrentPlayer && player) {
+        console.log('🎨 Drawing current player:', {
+          isPaidArena: player.isPaidArena,
+          cashOutValue: player.cashOutValue,
+          name: player.name,
+          condition: player.isPaidArena && player.cashOutValue > 0
+        })
+      }
+      
       if (player.isPaidArena && player.cashOutValue > 0) {
         const textY = drawY - playerRadius - 35 // Position above player
         const displayValue = `$${player.cashOutValue.toFixed(2)}`
@@ -2804,6 +2821,46 @@ const MultiplayerArena = () => {
         this.ctx.shadowColor = '#000000'
         this.ctx.shadowBlur = 4
         this.ctx.fillText(displayValue, drawX, textY)
+        this.ctx.shadowBlur = 0
+        
+        // Draw username below player avatar in paid arenas
+        const nameY = drawY + playerRadius + 30 // Position below player
+        const playerName = player.name || 'Anonymous'
+        
+        // Style for username
+        this.ctx.font = 'bold 14px Arial'
+        this.ctx.textAlign = 'center'
+        this.ctx.textBaseline = 'middle'
+        
+        // Measure username for background
+        const nameMetrics = this.ctx.measureText(playerName)
+        const nameWidth = nameMetrics.width
+        const namePadding = 6
+        
+        // Draw semi-transparent background
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'
+        this.ctx.fillRect(
+          drawX - nameWidth / 2 - namePadding,
+          nameY - 10,
+          nameWidth + namePadding * 2,
+          20
+        )
+        
+        // Draw white border
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'
+        this.ctx.lineWidth = 1
+        this.ctx.strokeRect(
+          drawX - nameWidth / 2 - namePadding,
+          nameY - 10,
+          nameWidth + namePadding * 2,
+          20
+        )
+        
+        // Draw username in white
+        this.ctx.fillStyle = '#FFFFFF'
+        this.ctx.shadowColor = '#000000'
+        this.ctx.shadowBlur = 3
+        this.ctx.fillText(playerName, drawX, nameY)
         this.ctx.shadowBlur = 0
       }
     }
@@ -3755,13 +3812,14 @@ const MultiplayerArena = () => {
           style={{
             position: 'fixed',
             bottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 8px)' : '10px',
-            left: '10px',
+            left: '5px',
             zIndex: 1000,
             background: 'rgba(0, 0, 0, 0.82)',
             border: '1px solid rgba(255, 255, 255, 0.08)',
             borderRadius: '8px',
             padding: isMobile ? '6px 10px' : '8px 12px',
-            minWidth: '140px',
+            minWidth: '110px',
+            maxWidth: '110px',
             color: '#e5e7eb',
             fontFamily: '"Rajdhani", sans-serif',
             boxShadow: '0 8px 20px rgba(0, 0, 0, 0.35)',
