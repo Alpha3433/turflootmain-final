@@ -2789,15 +2789,33 @@ const MultiplayerArena = () => {
         const textY = drawY - playerRadius - 25 // Position above player (closer than before)
         const displayValue = `$${cashOutValue.toFixed(2)}`
         
-        // Clean display like local game - just text with shadow, no boxes
-        this.ctx.font = 'bold 16px Arial'
+        // Smaller font and circular border design
+        this.ctx.font = 'bold 13px Arial' // Reduced from 16px to 13px
         this.ctx.textAlign = 'center'
         this.ctx.textBaseline = 'middle'
         
-        // Draw balance in gold with strong shadow for visibility
+        // Measure text for circular border
+        const textMetrics = this.ctx.measureText(displayValue)
+        const textWidth = textMetrics.width
+        const circleRadius = Math.max(textWidth / 2 + 8, 20) // Circular radius based on text width
+        
+        // Draw circular background
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'
+        this.ctx.beginPath()
+        this.ctx.arc(drawX, textY, circleRadius, 0, Math.PI * 2)
+        this.ctx.fill()
+        
+        // Draw circular border in gold
+        this.ctx.strokeStyle = '#FFD700'
+        this.ctx.lineWidth = 2
+        this.ctx.beginPath()
+        this.ctx.arc(drawX, textY, circleRadius, 0, Math.PI * 2)
+        this.ctx.stroke()
+        
+        // Draw balance text in gold with shadow
         this.ctx.fillStyle = '#FFD700'
         this.ctx.shadowColor = '#000000'
-        this.ctx.shadowBlur = 5
+        this.ctx.shadowBlur = 3
         this.ctx.fillText(displayValue, drawX, textY)
         this.ctx.shadowBlur = 0
         
