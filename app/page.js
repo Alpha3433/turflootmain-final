@@ -3793,29 +3793,84 @@ export default function TurfLootTactical() {
                   return
                 }
                 
-                // Trigger Privy wallet modal for authenticated users
-                console.log('💰 Cash out initiated for authenticated user...')
-                console.log(`💸 Cash out details: $${withdrawalAmount} to ${destinationAddress}`)
+                console.log('💰 Cash out initiated - Creating Solana transaction...')
+                console.log(`💸 Amount: $${withdrawalAmount} | Destination: ${destinationAddress}`)
                 
                 try {
-                  // Open Privy's embedded wallet to show transaction
-                  // This creates a transaction that Privy will prompt user to confirm
-                  alert(`✅ Opening Privy wallet to confirm transaction:\n\nAmount: $${withdrawalAmount}\nTo: ${destinationAddress}\n\nPlease confirm in the Privy wallet modal.`)
+                  // Import Solana web3
+                  const { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } = await import('@solana/web3.js')
                   
-                  // Trigger Privy login flow which will show the wallet UI for authenticated users
-                  login().catch(err => {
-                    // Expected behavior - user is already logged in
-                    console.log('User already authenticated, showing wallet UI')
+                  // Get embedded wallet
+                  const embeddedWallet = wallets.find(w => w.walletClientType === 'privy')
+                  if (!embeddedWallet || !embeddedWallet.address) {
+                    alert('❌ Embedded wallet not found. Please try logging in again.')
+                    return
+                  }
+                  
+                  const fromPubkey = new PublicKey(embeddedWallet.address)
+                  const toPubkey = new PublicKey(destinationAddress)
+                  
+                  // Convert USD to SOL (using current SOL balance to calculate rate)
+                  const usdAmount = parseFloat(withdrawalAmount)
+                  const currentSolBalance = parseFloat(walletBalance.sol || 0)
+                  const currentUsdBalance = parseFloat(walletBalance.usd || 0)
+                  const solPerUsd = currentSolBalance / currentUsdBalance
+                  const solAmount = usdAmount * solPerUsd
+                  const lamports = Math.floor(solAmount * LAMPORTS_PER_SOL)
+                  
+                  console.log(`💱 Converting: $${usdAmount} → ${solAmount.toFixed(6)} SOL (${lamports} lamports)`)
+                  
+                  // Create Solana connection
+                  const rpcUrl = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://api.mainnet-beta.solana.com'
+                  const connection = new Connection(rpcUrl, 'confirmed')
+                  
+                  // Get recent blockhash
+                  const { blockhash } = await connection.getLatestBlockhash()
+                  
+                  // Create transfer instruction
+                  const transferInstruction = SystemProgram.transfer({
+                    fromPubkey,
+                    toPubkey,
+                    lamports
                   })
                   
-                  // Note: Actual Solana transaction would be implemented here
-                  // This would use Privy's sendTransaction or similar method
+                  // Create transaction
+                  const transaction = new Transaction().add(transferInstruction)
+                  transaction.recentBlockhash = blockhash
+                  transaction.feePayer = fromPubkey
                   
+                  console.log('📝 Transaction created, opening Privy modal for signature...')
+                  
+                  // Send transaction using Privy - this will open the native Privy UI
+                  const result = await privySignAndSendTransaction({
+                    transaction,
+                    connection,
+                    sendOptions: { skipPreflight: false }
+                  })
+                  
+                  console.log('✅ Transaction sent:', result)
+                  alert(`✅ Cash out successful!\n\nTransaction: ${result?.signature || 'Confirmed'}\n\nAmount: $${withdrawalAmount} sent to ${destinationAddress}`)
+                  
+                  // Close modal and refresh balance
                   setDesktopWithdrawalModalVisible(false)
+                  setWithdrawalAmount('')
+                  setDestinationAddress('')
+                  
+                  // Refresh wallet balance after transaction
+                  setTimeout(() => {
+                    fetchWalletBalance()
+                  }, 2000)
                   
                 } catch (error) {
-                  console.error('❌ Error during cash out:', error)
-                  alert('Cash out failed. Please try again.')
+                  console.error('❌ Cash out transaction failed:', error)
+                  
+                  if (error.message && error.message.includes('User rejected')) {
+                    alert('❌ Transaction cancelled by user.')
+                  } else if (error.message && error.message.includes('Insufficient funds')) {
+                    alert('❌ Insufficient funds for transaction (including fees).')
+                  } else {
+                    alert(`❌ Cash out failed: ${error.message || 'Unknown error'}`)
+                  }
                 }
               }}
               disabled={parseFloat(walletBalance.usd || 0) < 0.21}
