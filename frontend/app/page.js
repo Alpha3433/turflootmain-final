@@ -894,6 +894,9 @@ export default function TurfLootTactical() {
   const [desktopWithdrawalModalVisible, setDesktopWithdrawalModalVisible] = useState(false)
   const [withdrawalAmount, setWithdrawalAmount] = useState('')
   const [destinationAddress, setDestinationAddress] = useState('')
+  const [showPrivyWithdrawalModal, setShowPrivyWithdrawalModal] = useState(false)
+  const [privyWithdrawalDetails, setPrivyWithdrawalDetails] = useState(null)
+  const [lastWithdrawalSource, setLastWithdrawalSource] = useState(null)
   const [activeFriends, setActiveFriends] = useState(0)
   const [leaderboard, setLeaderboard] = useState([])
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -903,7 +906,95 @@ export default function TurfLootTactical() {
   const [selectedServer, setSelectedServer] = useState('') // Start empty, will be set by API
   const [serverOptions, setServerOptions] = useState([])
   const [serverDataLoading, setServerDataLoading] = useState(false)
-  
+
+  const formatWithdrawalDisplay = (value, currency = 'USD') => {
+    if (Number.isNaN(value)) {
+      return currency === 'SOL' ? '0.0000 SOL' : '$0.00 USD'
+    }
+
+    if (currency === 'SOL') {
+      return `${value.toFixed(4)} SOL`
+    }
+
+    return `$${value.toFixed(2)} USD`
+  }
+
+  const closePrivyWithdrawalModal = (reopenSource = true) => {
+    setShowPrivyWithdrawalModal(false)
+    setPrivyWithdrawalDetails(null)
+
+    if (reopenSource && lastWithdrawalSource === 'mobile') {
+      setWithdrawalModalVisible(true)
+    } else if (reopenSource && lastWithdrawalSource === 'desktop') {
+      setDesktopWithdrawalModalVisible(true)
+    }
+    setLastWithdrawalSource(null)
+  }
+
+  const openPrivyWithdrawalModal = (source) => {
+    const amountValue = parseFloat(withdrawalAmount)
+    const availableUsd = parseFloat(walletBalance.usd || 0)
+    const trimmedAddress = (destinationAddress || '').trim()
+    const fallbackAddress = trimmedAddress || privyUser?.wallet?.address || ''
+
+    if (!withdrawalAmount || Number.isNaN(amountValue) || amountValue <= 0) {
+      alert('Please enter a valid amount to cash out.')
+      return
+    }
+
+    if (amountValue > availableUsd) {
+      alert('Amount exceeds available balance.')
+      return
+    }
+
+    if (!fallbackAddress) {
+      alert('Please enter a destination wallet address or connect a wallet before cashing out.')
+      return
+    }
+
+    const networkFee = amountValue >= 0.21 ? 0.01 : 0
+    const netAmount = Math.max(amountValue - networkFee, 0)
+    const feePercent = amountValue > 0 ? (networkFee / amountValue) * 100 : 0
+    const addressPreview = fallbackAddress.length > 8
+      ? `${fallbackAddress.slice(0, 4)}...${fallbackAddress.slice(-4)}`
+      : fallbackAddress
+
+    setPrivyWithdrawalDetails({
+      amount: amountValue,
+      currency: 'USD',
+      network: 'Solana',
+      method: trimmedAddress ? 'Manual Address' : 'Connected Wallet',
+      feeAmount: networkFee,
+      feePercent,
+      netAmount,
+      address: fallbackAddress,
+      addressPreview,
+      formattedAmount: formatWithdrawalDisplay(amountValue, 'USD'),
+      formattedNet: formatWithdrawalDisplay(netAmount, 'USD'),
+      formattedFee: `$${networkFee.toFixed(2)}`
+    })
+
+    setLastWithdrawalSource(source)
+    setShowPrivyWithdrawalModal(true)
+
+    if (source === 'mobile') {
+      setWithdrawalModalVisible(false)
+    } else if (source === 'desktop') {
+      setDesktopWithdrawalModalVisible(false)
+    }
+  }
+
+  const confirmPrivyWithdrawal = () => {
+    if (!privyWithdrawalDetails) return
+
+    alert(`Cash out of ${privyWithdrawalDetails.formattedAmount} to ${privyWithdrawalDetails.addressPreview} will be implemented here!`)
+    setShowPrivyWithdrawalModal(false)
+    setPrivyWithdrawalDetails(null)
+    setLastWithdrawalSource(null)
+    setWithdrawalAmount('')
+    setDestinationAddress('')
+  }
+
   // Fetch real-time server data
   const fetchServerData = async () => {
     setServerDataLoading(true)
@@ -12094,8 +12185,7 @@ export default function TurfLootTactical() {
                       alert('Amount exceeds available balance.')
                       return
                     }
-                    // TODO: Implement actual cash out functionality
-                    alert(`Cash out of $${withdrawalAmount} will be implemented here!`)
+                    openPrivyWithdrawalModal('mobile')
                   }}
                   disabled={parseFloat(walletBalance.usd || 0) < 0.21}
                   style={{
@@ -12483,13 +12573,7 @@ export default function TurfLootTactical() {
                       alert('Amount exceeds available balance.')
                       return
                     }
-                    if (!destinationAddress || destinationAddress.trim() === '') {
-                      alert('Please enter a destination wallet address.')
-                      return
-                    }
-                    // TODO: Implement actual cash out functionality
-                    alert(`Cash out of $${withdrawalAmount} to ${destinationAddress} will be implemented here!`)
-                    setDesktopWithdrawalModalVisible(false)
+                    openPrivyWithdrawalModal('desktop')
                   }}
                   disabled={parseFloat(walletBalance.usd || 0) < 0.21}
                   style={{
@@ -12526,7 +12610,209 @@ export default function TurfLootTactical() {
           </div>
         </div>
       )}
-      
+
+      {showPrivyWithdrawalModal && privyWithdrawalDetails && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10000000001,
+            backdropFilter: 'blur(12px)',
+            fontFamily: '"Rajdhani", sans-serif'
+          }}
+        >
+          <div
+            style={{
+              position: 'relative',
+              width: isMobile ? '90%' : '420px',
+              background: 'linear-gradient(135deg, rgba(23, 25, 41, 0.95) 0%, rgba(15, 18, 32, 0.98) 100%)',
+              border: '1px solid rgba(64, 64, 78, 0.6)',
+              borderRadius: '20px',
+              boxShadow: '0 35px 60px rgba(0, 0, 0, 0.65), inset 0 0 0 1px rgba(255, 255, 255, 0.04)',
+              color: '#f8fafc'
+            }}
+          >
+            <button
+              onClick={() => closePrivyWithdrawalModal(false)}
+              style={{
+                position: 'absolute',
+                top: '14px',
+                right: '14px',
+                width: '32px',
+                height: '32px',
+                borderRadius: '9999px',
+                border: '1px solid rgba(148, 163, 184, 0.4)',
+                backgroundColor: 'rgba(30, 41, 59, 0.7)',
+                color: '#cbd5f5',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                fontSize: '16px',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.backgroundColor = 'rgba(51, 65, 85, 0.9)'
+                e.target.style.color = '#ffffff'
+              }}
+              onMouseOut={(e) => {
+                e.target.style.backgroundColor = 'rgba(30, 41, 59, 0.7)'
+                e.target.style.color = '#cbd5f5'
+              }}
+            >
+              ✕
+            </button>
+
+            <div style={{ padding: isMobile ? '28px 20px 24px' : '32px 32px 28px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <span style={{
+                  fontSize: '12px',
+                  letterSpacing: '0.3em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(148, 163, 184, 0.8)'
+                }}>
+                  Cashout Transaction
+                </span>
+                <h2 style={{
+                  margin: 0,
+                  fontSize: isMobile ? '24px' : '28px',
+                  fontWeight: 700,
+                  color: '#f8fafc',
+                  textShadow: '0 0 20px rgba(59, 130, 246, 0.25)'
+                }}>
+                  Cash out {privyWithdrawalDetails.formattedAmount}
+                </h2>
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '12px',
+                padding: '18px',
+                borderRadius: '16px',
+                background: 'rgba(30, 41, 59, 0.65)',
+                border: '1px solid rgba(51, 65, 85, 0.6)'
+              }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <span style={{ fontSize: '12px', color: 'rgba(148, 163, 184, 0.8)' }}>Network</span>
+                  <span style={{ fontSize: '14px', fontWeight: 600 }}>{privyWithdrawalDetails.network}</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <span style={{ fontSize: '12px', color: 'rgba(148, 163, 184, 0.8)' }}>Method</span>
+                  <span style={{ fontSize: '14px', fontWeight: 600 }}>{privyWithdrawalDetails.method}</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <span style={{ fontSize: '12px', color: 'rgba(148, 163, 184, 0.8)' }}>Estimated fee</span>
+                  <span style={{ fontSize: '14px', fontWeight: 600 }}>{
+                    privyWithdrawalDetails.feeAmount > 0
+                      ? `${privyWithdrawalDetails.formattedFee} (${privyWithdrawalDetails.feePercent.toFixed(2)}%)`
+                      : 'Fee waived'
+                  }</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <span style={{ fontSize: '12px', color: 'rgba(148, 163, 184, 0.8)' }}>You&apos;ll receive</span>
+                  <span style={{ fontSize: '14px', fontWeight: 700, color: '#34d399' }}>{privyWithdrawalDetails.formattedNet}</span>
+                </div>
+              </div>
+
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+                padding: '18px',
+                borderRadius: '16px',
+                background: 'rgba(15, 118, 110, 0.12)',
+                border: '1px solid rgba(13, 148, 136, 0.4)'
+              }}>
+                <span style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(45, 212, 191, 0.8)' }}>
+                  Your wallet
+                </span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
+                  <span style={{ fontFamily: '"Space Mono", monospace', fontSize: '14px', color: '#ecfeff' }}>
+                    {privyWithdrawalDetails.addressPreview}
+                  </span>
+                  <span style={{
+                    padding: '6px 12px',
+                    borderRadius: '9999px',
+                    background: 'rgba(59, 130, 246, 0.15)',
+                    border: '1px solid rgba(59, 130, 246, 0.35)',
+                    color: '#93c5fd',
+                    fontSize: '12px',
+                    fontWeight: 600
+                  }}>
+                    {privyWithdrawalDetails.currency}
+                  </span>
+                </div>
+                <span style={{ fontSize: '12px', color: 'rgba(148, 163, 184, 0.85)' }}>{privyWithdrawalDetails.address}</span>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <button
+                  onClick={confirmPrivyWithdrawal}
+                  style={{
+                    width: '100%',
+                    padding: '14px',
+                    borderRadius: '12px',
+                    border: 'none',
+                    background: 'linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%)',
+                    color: '#1f2937',
+                    fontWeight: 700,
+                    fontSize: '15px',
+                    cursor: 'pointer',
+                    boxShadow: '0 18px 30px rgba(251, 191, 36, 0.25)',
+                    transition: 'transform 0.2s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.transform = 'translateY(-1px)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.transform = 'translateY(0)'
+                  }}
+                >
+                  Confirm Withdrawal
+                </button>
+                <button
+                  onClick={() => closePrivyWithdrawalModal(true)}
+                  style={{
+                    width: '100%',
+                    padding: '14px',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(100, 116, 139, 0.5)',
+                    backgroundColor: 'rgba(15, 23, 42, 0.6)',
+                    color: '#cbd5f5',
+                    fontWeight: 600,
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s ease, color 0.2s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.backgroundColor = 'rgba(30, 41, 59, 0.8)'
+                    e.target.style.color = '#ffffff'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.backgroundColor = 'rgba(15, 23, 42, 0.6)'
+                    e.target.style.color = '#cbd5f5'
+                  }}
+                >
+                  Go Back
+                </button>
+              </div>
+
+              <div style={{ textAlign: 'center', fontSize: '11px', color: 'rgba(148, 163, 184, 0.7)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                Protected by <span style={{ color: '#f1f5f9', fontWeight: 700 }}>Privy</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Tier Upgrade Notifications - Simplified for demo */}
       {tierUpgradeNotification && (
         <div style={{
