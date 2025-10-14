@@ -184,6 +184,7 @@ const AgarIOGame = () => {
   const [missionTime, setMissionTime] = useState(60)
   const [score, setScore] = useState(0)
   const [mass, setMass] = useState(20)
+  const [playerFunds, setPlayerFunds] = useState(0)
   const [splitCooldownRemaining, setSplitCooldownRemaining] = useState(0)
   const [canSplit, setCanSplit] = useState(false)
   const [eliminations, setEliminations] = useState(0)
@@ -1195,6 +1196,20 @@ const AgarIOGame = () => {
 
   const stakeAmount = parseFloat(searchParams?.get('fee') || '0')
   const isPaidGame = stakeAmount > 0
+
+  useEffect(() => {
+    if (!isPaidGame) {
+      setPlayerFunds(0)
+      return
+    }
+
+    setPlayerFunds(prev => {
+      if (!Number.isFinite(prev) || prev <= 0) {
+        return Math.max(0, stakeAmount)
+      }
+      return prev
+    })
+  }, [isPaidGame, stakeAmount])
 
   // REAL PLAYER SESSION TRACKING - Track when real Privy users join/leave games
   useEffect(() => {
@@ -4094,10 +4109,41 @@ const AgarIOGame = () => {
             coins: game.coins.map(coin => ({ x: coin.x, y: coin.y })),
             viruses: game.viruses.map(virus => ({ x: virus.x, y: virus.y }))
           })
-          
+
           // Update other game stats
           setScore(Math.floor(game.player.mass - 20))
           setMass(Math.floor(game.player.mass))
+
+          if (isPaidGame) {
+            const player = game.player || {}
+            const hasStake = typeof player.stake === 'number' && Number.isFinite(player.stake)
+            const hasWallet = typeof player.walletEarnings === 'number' && Number.isFinite(player.walletEarnings)
+            const hasScore = typeof player.score === 'number' && Number.isFinite(player.score)
+
+            const stakeValue = hasStake ? Math.max(0, player.stake) : Math.max(0, stakeAmount)
+            const walletValue = hasWallet ? Math.max(0, player.walletEarnings) : 0
+
+            let computedFunds = 0
+
+            if (hasStake || hasWallet) {
+              computedFunds = stakeValue + walletValue
+            } else if (hasScore) {
+              computedFunds = Math.max(0, player.score)
+            } else {
+              const derivedMassFunds = Number.isFinite(player.mass)
+                ? Math.max(0, Math.floor(player.mass - 20))
+                : 0
+              computedFunds = derivedMassFunds
+            }
+
+            if (!Number.isFinite(computedFunds) || computedFunds < 0) {
+              computedFunds = 0
+            }
+
+            setPlayerFunds(prevFunds => {
+              return Math.abs(prevFunds - computedFunds) > 0.5 ? computedFunds : prevFunds
+            })
+          }
         }
       }
       requestAnimationFrame(gameLoop)
@@ -4386,6 +4432,14 @@ const AgarIOGame = () => {
   const currentPlayerMass = gameRef.current?.player?.mass ?? mass
   const meetsMassRequirement = currentPlayerMass >= MIN_SPLIT_MASS
   const splitButtonDisabled = !canSplit
+
+  const safeMassDisplay = Math.max(0, Math.floor(Number.isFinite(mass) ? mass : 0))
+  const massDisplay = safeMassDisplay.toLocaleString('en-US')
+  const safeFundsValue = Number.isFinite(playerFunds) ? Math.max(0, playerFunds) : 0
+  const fundsDisplay = `$${safeFundsValue.toLocaleString('en-US', {
+    minimumFractionDigits: safeFundsValue < 1000 ? 2 : 0,
+    maximumFractionDigits: safeFundsValue < 1000 ? 2 : 0
+  })}`
 
   return (
     <div className="w-screen h-screen bg-black overflow-hidden m-0 p-0" style={{ position: 'relative', margin: 0, padding: 0 }}>
@@ -5197,7 +5251,10 @@ const AgarIOGame = () => {
           right: '10px',
           zIndex: 1000,
           width: isMobile ? '121px' : '220px',
-          height: isMobile ? '121px' : '220px'
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'stretch',
+          gap: isMobile ? '8px' : '12px'
         }}>
           {/* Minimap Container */}
           <div style={{
@@ -5290,6 +5347,116 @@ const AgarIOGame = () => {
               zIndex: 3
             }} />
           </div>
+          {isPaidGame && !isMobile && (
+            <div
+              style={{
+                background: 'rgba(2, 6, 23, 0.92)',
+                border: '1px solid rgba(34, 197, 94, 0.35)',
+                borderRadius: '12px',
+                padding: '12px 14px',
+                color: '#e2e8f0',
+                fontFamily: '"Rajdhani", sans-serif',
+                boxShadow: '0 12px 24px rgba(0, 0, 0, 0.45), inset 0 0 18px rgba(16, 185, 129, 0.12)',
+                backdropFilter: 'blur(12px)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px'
+              }}
+            >
+              <div
+                style={{
+                  fontSize: '11px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1.4px',
+                  color: 'rgba(148, 163, 184, 0.85)'
+                }}
+              >
+                Player Status
+              </div>
+
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '12px'
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    color: '#22d3ee',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    letterSpacing: '0.4px'
+                  }}
+                >
+                  <span role="img" aria-label="Mass">
+                    ⚖️
+                  </span>
+                  <span>Mass</span>
+                </div>
+                <div
+                  style={{
+                    fontSize: '20px',
+                    fontWeight: 700,
+                    color: '#f8fafc',
+                    textShadow: '0 0 12px rgba(56, 189, 248, 0.45)'
+                  }}
+                >
+                  {massDisplay}
+                </div>
+              </div>
+
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '12px'
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    color: '#34d399',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    letterSpacing: '0.4px'
+                  }}
+                >
+                  <span role="img" aria-label="Funds">
+                    💰
+                  </span>
+                  <span>Funds</span>
+                </div>
+                <div
+                  style={{
+                    fontSize: '20px',
+                    fontWeight: 700,
+                    color: '#34d399',
+                    textShadow: '0 0 12px rgba(34, 197, 94, 0.45)'
+                  }}
+                >
+                  {fundsDisplay}
+                </div>
+              </div>
+
+              <div
+                style={{
+                  fontSize: '10px',
+                  color: 'rgba(148, 163, 184, 0.75)',
+                  letterSpacing: '0.6px'
+                }}
+              >
+                Live paid arena metrics update in real time.
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Ping Latency Meter - Bottom Left */}
