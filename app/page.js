@@ -3859,10 +3859,6 @@ export default function TurfLootTactical() {
                   transaction.feePayer = fromPubkey
                   
                   console.log('📝 Transaction created, opening Privy modal for signature...')
-                  console.log('🔍 Checking Privy transaction method:', {
-                    hasPrivyMethod: !!privySignAndSendTransaction,
-                    methodType: typeof privySignAndSendTransaction
-                  })
                   
                   // Check if Privy transaction method is available
                   if (!privySignAndSendTransaction) {
@@ -3871,27 +3867,40 @@ export default function TurfLootTactical() {
                     return
                   }
                   
-                  // Send transaction using Privy - this will open the native Privy UI
-                  let result
-                  try {
-                    // Serialize transaction to base64 for Privy
-                    const serializedTx = transaction.serialize({
-                      requireAllSignatures: false,
-                      verifySignatures: false
-                    }).toString('base64')
-                    
-                    console.log('📤 Sending serialized transaction to Privy...')
-                    
-                    result = await privySignAndSendTransaction({
-                      transaction: serializedTx,
-                      chain: 'solana:mainnet'
-                    })
-                    
-                    console.log('✅ Transaction sent:', result)
-                  } catch (txError) {
-                    console.error('❌ Transaction error details:', txError)
-                    throw txError
+                  // Serialize transaction to Uint8Array for Privy
+                  const serializedTx = transaction.serialize({
+                    requireAllSignatures: false,
+                    verifySignatures: false
+                  })
+                  
+                  // Force convert to proper Uint8Array (not Buffer)
+                  const txBytes = Uint8Array.from(serializedTx)
+                  console.log('📦 Transaction ready:', txBytes.length, 'bytes')
+                  
+                  // Get the embedded wallet object from wallets array
+                  const embeddedWalletObj = wallets.find(w => {
+                    const addr = w.address || w.publicKey?.toString() || w.publicKey?.toBase58?.()
+                    return addr === embeddedWallet.address
+                  })
+                  
+                  console.log('🔍 Wallet for signing:', embeddedWalletObj ? 'Found' : 'Not found')
+                  
+                  if (!embeddedWalletObj) {
+                    console.error('❌ Wallet object not found in wallets array')
+                    alert('❌ Wallet not ready for signing. Please try again.')
+                    return
                   }
+                  
+                  console.log('🚀 Opening Privy modal for transaction signature...')
+                  
+                  // Send transaction using Privy - this will open the native Privy UI
+                  const result = await privySignAndSendTransaction({
+                    transaction: txBytes,
+                    wallet: embeddedWalletObj
+                  })
+                  
+                  const signature = result.signature || result
+                  console.log('✅ Transaction sent! Signature:', signature)
                   alert(`✅ Cash out successful!\n\nTransaction: ${result?.signature || 'Confirmed'}\n\nAmount: $${withdrawalAmount} sent to ${destinationAddress}`)
                   
                   // Close modal and refresh balance
