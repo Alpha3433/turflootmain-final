@@ -3770,7 +3770,8 @@ export default function TurfLootTactical() {
               Cancel
             </button>
             <button
-              onClick={() => {
+              onClick={async () => {
+                // Validate inputs
                 if (!withdrawalAmount || parseFloat(withdrawalAmount) <= 0) {
                   alert('Please enter a valid amount to cash out.')
                   return
@@ -3783,8 +3784,24 @@ export default function TurfLootTactical() {
                   alert('Please enter a destination wallet address.')
                   return
                 }
-                alert(`Cash out of $${withdrawalAmount} to ${destinationAddress} will be implemented here!`)
-                setDesktopWithdrawalModalVisible(false)
+                
+                // Trigger Privy authentication modal
+                console.log('💰 Cash out initiated - Opening Privy authentication...')
+                try {
+                  if (!authenticated) {
+                    // User not authenticated - trigger Privy login modal
+                    console.log('🔐 User not authenticated, triggering Privy login modal...')
+                    await login()
+                  } else {
+                    // User already authenticated - proceed with cash out
+                    console.log('✅ User authenticated, processing cash out...')
+                    alert(`Cash out of $${withdrawalAmount} to ${destinationAddress} will be implemented here!`)
+                    setDesktopWithdrawalModalVisible(false)
+                  }
+                } catch (error) {
+                  console.error('❌ Error during Privy authentication:', error)
+                  alert('Failed to authenticate. Please try again.')
+                }
               }}
               disabled={parseFloat(walletBalance.usd || 0) < 0.21}
               style={{
