@@ -3915,12 +3915,25 @@ export default function TurfLootTactical() {
                 } catch (error) {
                   console.error('❌ Cash out transaction failed:', error)
                   
-                  if (error.message && error.message.includes('User rejected')) {
-                    alert('❌ Transaction cancelled by user.')
-                  } else if (error.message && error.message.includes('Insufficient funds')) {
+                  // Check if user cancelled/closed the modal
+                  const errorMsg = error.message || error.toString()
+                  const isCancellation = 
+                    errorMsg.includes('User rejected') ||
+                    errorMsg.includes('Failed to connect to wallet') ||
+                    errorMsg.includes('User cancelled') ||
+                    errorMsg.includes('User denied') ||
+                    errorMsg.includes('rejected')
+                  
+                  if (isCancellation) {
+                    // User intentionally cancelled - no error message needed
+                    console.log('ℹ️ Transaction cancelled by user')
+                    return
+                  }
+                  
+                  if (errorMsg.includes('Insufficient funds')) {
                     alert('❌ Insufficient funds for transaction (including fees).')
                   } else {
-                    alert(`❌ Cash out failed: ${error.message || 'Unknown error'}`)
+                    alert(`❌ Cash out failed: ${errorMsg}`)
                   }
                 }
               }}
