@@ -3859,13 +3859,31 @@ export default function TurfLootTactical() {
                   transaction.feePayer = fromPubkey
                   
                   console.log('📝 Transaction created, opening Privy modal for signature...')
+                  console.log('🔍 Checking Privy transaction method:', {
+                    hasPrivyMethod: !!privySignAndSendTransaction,
+                    methodType: typeof privySignAndSendTransaction
+                  })
+                  
+                  // Check if Privy transaction method is available
+                  if (!privySignAndSendTransaction) {
+                    console.error('❌ Privy signAndSendTransaction not available')
+                    alert('❌ Transaction signing not available. Please refresh the page and try again.')
+                    return
+                  }
                   
                   // Send transaction using Privy - this will open the native Privy UI
-                  const result = await privySignAndSendTransaction({
-                    transaction,
-                    connection,
-                    sendOptions: { skipPreflight: false }
-                  })
+                  let result
+                  try {
+                    result = await privySignAndSendTransaction({
+                      transaction,
+                      connection,
+                      sendOptions: { skipPreflight: false }
+                    })
+                  } catch (txError) {
+                    // Try alternative method if first approach fails
+                    console.warn('⚠️ First method failed, trying alternative...')
+                    result = await privySignAndSendTransaction(transaction, connection)
+                  }
                   
                   console.log('✅ Transaction sent:', result)
                   alert(`✅ Cash out successful!\n\nTransaction: ${result?.signature || 'Confirmed'}\n\nAmount: $${withdrawalAmount} sent to ${destinationAddress}`)
