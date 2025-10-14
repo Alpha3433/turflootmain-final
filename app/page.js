@@ -3800,13 +3800,23 @@ export default function TurfLootTactical() {
                   // Import Solana web3
                   const { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } = await import('@solana/web3.js')
                   
-                  // Get embedded wallet
-                  const embeddedWallet = wallets.find(w => w.walletClientType === 'privy')
+                  // Get embedded wallet from Privy user object
+                  console.log('🔍 Looking for embedded wallet in user.linkedAccounts...')
+                  const embeddedWallet = user?.linkedAccounts?.find(
+                    account => account.type === 'wallet' && account.chainType === 'solana'
+                  )
+                  
                   if (!embeddedWallet || !embeddedWallet.address) {
+                    console.error('❌ Embedded wallet not found:', { 
+                      hasUser: !!user, 
+                      linkedAccounts: user?.linkedAccounts?.length,
+                      wallets: wallets?.length 
+                    })
                     alert('❌ Embedded wallet not found. Please try logging in again.')
                     return
                   }
                   
+                  console.log('✅ Found embedded wallet:', embeddedWallet.address)
                   const fromPubkey = new PublicKey(embeddedWallet.address)
                   const toPubkey = new PublicKey(destinationAddress)
                   
