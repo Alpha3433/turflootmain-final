@@ -494,6 +494,36 @@ const MultiplayerArena = () => {
       if (deduped.length === 0) {
         return prev
       }
+      
+      // Save completed missions to database for paid arenas
+      if (isPaidArena && user?.id) {
+        deduped.forEach(async (missionId) => {
+          const mission = activeMissions.find(m => m.id === missionId)
+          if (mission) {
+            try {
+              console.log(`💾 Saving mission completion to database: ${missionId}`)
+              const response = await fetch('/api/missions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  userIdentifier: user.id,
+                  missionId: mission.id,
+                  missionType: mission.type,
+                  coinsAwarded: mission.reward || 0
+                })
+              })
+              
+              if (response.ok) {
+                const result = await response.json()
+                console.log(`✅ Mission saved! Coins awarded: ${result.coinsAwarded} | Total coins: ${result.coinBalance}`)
+              }
+            } catch (error) {
+              console.error('❌ Failed to save mission:', error)
+            }
+          }
+        })
+      }
+      
       return [...prev, ...deduped]
     })
     setMissionRunCompleted(true)
