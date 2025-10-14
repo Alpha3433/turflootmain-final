@@ -1773,6 +1773,33 @@ export default function TurfLootTactical() {
 
     // Load currency when authentication state or user changes
     loadUserCurrency()
+    
+    // Fetch missions from database for authenticated users
+    const fetchMissionsFromDatabase = async () => {
+      if (isAuthenticated && user?.id) {
+        try {
+          console.log('📋 Fetching missions from database...')
+          const response = await fetch(`/api/missions?userIdentifier=${user.id}`)
+          
+          if (response.ok) {
+            const data = await response.json()
+            console.log(`✅ Missions loaded: ${data.completedMissions.length} completed | ${data.coinBalance} coins`)
+            
+            // Update coin balance from database
+            if (data.coinBalance > 0) {
+              setCurrency(data.coinBalance)
+              const userIdentifier = user?.wallet?.address || user?.email?.address || user?.id || 'unknown'
+              const userCurrencyKey = `userCurrency_${userIdentifier}`
+              localStorage.setItem(userCurrencyKey, data.coinBalance.toString())
+            }
+          }
+        } catch (error) {
+          console.error('❌ Failed to fetch missions:', error)
+        }
+      }
+    }
+    
+    fetchMissionsFromDatabase()
   }, [isAuthenticated, user])
 
   // Save currency to appropriate localStorage key whenever it changes
