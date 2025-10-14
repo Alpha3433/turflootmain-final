@@ -3893,6 +3893,9 @@ export default function TurfLootTactical() {
                   
                   console.log('🚀 Opening Privy modal for transaction signature...')
                   
+                  // Close the cash out modal BEFORE opening Privy modal so it's visible
+                  setDesktopWithdrawalModalVisible(false)
+                  
                   // Send transaction using Privy - this will open the native Privy UI
                   const result = await privySignAndSendTransaction({
                     transaction: txBytes,
@@ -3901,9 +3904,6 @@ export default function TurfLootTactical() {
                   
                   const signature = result.signature || result
                   alert(`✅ Cash out successful!\n\nTransaction: ${signature}\n\nAmount: $${withdrawalAmount} sent to ${destinationAddress}`)
-                  
-                  // Close modal and refresh balance
-                  setDesktopWithdrawalModalVisible(false)
                   setWithdrawalAmount('')
                   setDestinationAddress('')
                   
