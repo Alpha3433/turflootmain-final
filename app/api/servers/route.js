@@ -85,12 +85,8 @@ export async function GET(request) {
       realPlayers = 0
     }
 
-    // TEMPORARY: Simulate an active room for testing JOIN functionality
-    // Set this to 1 to test the JOIN button, set to 0 to test CREATE functionality
-    const simulatedPlayers = 1
-    realPlayers = Math.max(realPlayers, simulatedPlayers)
-    
-    console.log(`🧪 TESTING MODE: Using ${realPlayers} players (${simulatedPlayers} simulated + ${realPlayers - simulatedPlayers} real)`)
+    // No simulation - use real player counts only
+    console.log(`✅ Using real player count: ${realPlayers} active players`)
 
     // Update server with real player count
     arenaServer.currentPlayers = realPlayers

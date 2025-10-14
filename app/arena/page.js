@@ -57,6 +57,10 @@ const MultiplayerArena = () => {
   const [autoRedirectCountdown, setAutoRedirectCountdown] = useState(10)
   const [showLoadingModal, setShowLoadingModal] = useState(false)
   const cashOutIntervalRef = useRef(null)
+  
+  // Track player balances for paid arenas (to handle eliminations)
+  const playerBalancesRef = useRef(new Map()) // sessionId -> cashOutValue
+  const previousPlayerCountRef = useRef(0)
 
   const gameStatsRef = useRef(gameStats)
 
@@ -924,6 +928,23 @@ const MultiplayerArena = () => {
       console.log('🚀 Sending split message to server')
       wsRef.current.send("split", { targetX, targetY })
       console.log('✅ Split message sent to server successfully')
+      
+      // Start cooldown timer for UI
+      lastSplitTimeRef.current = Date.now()
+      setSplitCooldownRemaining(SPLIT_COOLDOWN)
+      
+      // Update cooldown timer every 100ms
+      const cooldownInterval = setInterval(() => {
+        const elapsed = Date.now() - lastSplitTimeRef.current
+        const remaining = Math.max(0, SPLIT_COOLDOWN - elapsed)
+        
+        setSplitCooldownRemaining(remaining)
+        
+        if (remaining <= 0) {
+          clearInterval(cooldownInterval)
+        }
+      }, 100)
+      
     } catch (error) {
       console.error('❌ Error sending split message:', error)
       
@@ -953,7 +974,17 @@ const MultiplayerArena = () => {
 
   // Cash out key event handlers - ported from agario with split spam prevention
   const lastSplitTimeRef = useRef(0)
-  const SPLIT_COOLDOWN = 500 // 500ms cooldown between splits
+  const SPLIT_COOLDOWN = 5000 // 5000ms (5 seconds) cooldown between splits
+  const [splitCooldownRemaining, setSplitCooldownRemaining] = useState(0)
+  
+  // Spawn protection for paid arenas
+  const [hasSpawnProtection, setHasSpawnProtection] = useState(false)
+  const spawnProtectionTimeRef = useRef(0)
+  const SPAWN_PROTECTION_DURATION = 5000 // 5 seconds
+  
+  // Wallet balance for cashout modal
+  const [walletBalance, setWalletBalance] = useState(null)
+  const [loadingWalletBalance, setLoadingWalletBalance] = useState(false)
   
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -1472,6 +1503,65 @@ const MultiplayerArena = () => {
       console.log(`✅ [${componentId}] Connected to dedicated arena:`, room.id)
       console.log('🎮 DEDICATED Session ID (should stay stable):', room.sessionId)
       
+      // Activate spawn protection for paid arenas
+      if (isPaidArena) {
+        setHasSpawnProtection(true)
+        spawnProtectionTimeRef.current = Date.now()
+        console.log('🛡️ Spawn protection activated for 5 seconds')
+        
+        // Disable spawn protection after 5 seconds
+        setTimeout(() => {
+          setHasSpawnProtection(false)
+          console.log('🛡️ Spawn protection expired')
+        }, SPAWN_PROTECTION_DURATION)
+      }
+      
+      // Track game session for server browser player counts
+      try {
+        await fetch('/api/game-sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'join',
+            session: {
+              roomId: 'colyseus-arena-global',
+              sessionId: room.sessionId,
+              userId: user?.id || room.sessionId,
+              playerName: playerName,
+              joinedAt: new Date().toISOString(),
+              lastActivity: new Date().toISOString(),
+              entryFee: entryFee,
+              mode: isPaidArena ? 'paid' : 'free',
+              region: 'au-syd'
+            }
+          })
+        })
+        console.log('✅ Game session tracked for player count')
+        
+        // Send heartbeat every 30 seconds to keep session active
+        const sessionHeartbeat = setInterval(() => {
+          fetch('/api/game-sessions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'update',
+              roomId: 'colyseus-arena-global',
+              sessionId: room.sessionId,
+              userId: user?.id || room.sessionId,
+              lastActivity: new Date().toISOString()
+            })
+          }).catch(err => console.warn('⚠️ Heartbeat failed:', err))
+        }, 30000)
+        
+        // Clear heartbeat on disconnect
+        room.onLeave(() => {
+          clearInterval(sessionHeartbeat)
+        })
+        
+      } catch (err) {
+        console.warn('⚠️ Failed to track game session:', err)
+      }
+      
       // Set expected session ID in game engine for camera stability
       if (gameRef.current) {
         gameRef.current.expectedSessionId = room.sessionId
@@ -1509,6 +1599,18 @@ const MultiplayerArena = () => {
         }
         lastInputRef.current = { dx: 0, dy: 0 }
         setConnectionStatus(prevStatus => (prevStatus === 'eliminated' ? prevStatus : 'disconnected'))
+        
+        // Track session leave for server browser player counts
+        fetch('/api/game-sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'leave',
+            roomId: 'colyseus-arena-global',
+            sessionId: room.sessionId,
+            userId: user?.id || room.sessionId
+          })
+        }).catch(err => console.warn('⚠️ Failed to track session leave:', err))
       })
 
       room.onMessage('gameOver', (payload) => {
@@ -1534,6 +1636,57 @@ const MultiplayerArena = () => {
         if (cashOutIntervalRef.current) {
           clearInterval(cashOutIntervalRef.current)
           cashOutIntervalRef.current = null
+        }
+        
+        // Update loyalty stats and leaderboard after game completion (only for paid arenas)
+        if (isPaidArena && user?.id && entryFee > 0) {
+          console.log('📊 Game completed - updating loyalty stats and leaderboard...')
+          
+          // Update loyalty stats
+          fetch('/api/loyalty', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userIdentifier: user.id,
+              gameData: {
+                wagered: entryFee,
+                gameType: 'paid_arena_completed'
+              }
+            })
+          })
+          .then(res => res.json())
+          .then(result => {
+            console.log('✅ Loyalty stats updated after game completion:', result.message)
+            if (result.tierUpgrade?.isUpgrade) {
+              console.log(`🎉 TIER UPGRADE! ${result.oldTier} → ${result.newTier}`)
+            }
+          })
+          .catch(err => {
+            console.warn('⚠️ Failed to update loyalty stats:', err)
+          })
+          
+          // Update leaderboard with elimination earnings
+          // In paid arenas, score represents cash-out value (earnings from eliminations)
+          const earningsFromEliminations = Math.max(0, safeScore - (entryFee * 0.9)) // Subtract starting balance
+          
+          fetch('/api/leaderboard', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userIdentifier: user.id,
+              playerName: user.name || 'Anonymous',
+              earningsAdded: earningsFromEliminations,
+              eliminationsAdded: 1 // Track number of games with eliminations
+            })
+          })
+          .then(res => res.json())
+          .then(result => {
+            console.log(`✅ Leaderboard updated: +$${earningsFromEliminations.toFixed(2)} earnings`)
+            console.log(`🏆 Total earnings: $${result.user?.totalEarnings?.toFixed(2)}`)
+          })
+          .catch(err => {
+            console.warn('⚠️ Failed to update leaderboard:', err)
+          })
         }
         setJoystickActive(false)
         setJoystickPosition({ x: 0, y: 0 })
@@ -1581,7 +1734,12 @@ const MultiplayerArena = () => {
           console.log('🎮 Players in state:', Array.from(state.players.keys()))
           let currentPlayerFound = false
           
+          // Track previous player sessions to detect eliminations
+          const currentSessions = new Set()
+          const previousSessions = new Set(playerBalancesRef.current.keys())
+          
           state.players.forEach((player, sessionId) => {
+            currentSessions.add(sessionId)
             console.log(`🎮 Player: ${player.name} (${sessionId}) - isCurrentPlayer: ${sessionId === room.sessionId}`)
             const isCurrentPlayer = sessionId === room.sessionId
             if (isCurrentPlayer) {
@@ -1589,12 +1747,62 @@ const MultiplayerArena = () => {
               currentPlayerFound = true
             }
             
+            // CLIENT-SIDE: Add paid arena properties since Colyseus Cloud doesn't have updated schema
+            // Calculate starting balance: entry fee minus 10% platform fee
+            const PLATFORM_FEE_PERCENTAGE = 0.10
+            const startingBalance = isPaidArena ? (entryFee * (1 - PLATFORM_FEE_PERCENTAGE)) : 0
+            
+            // Get or initialize player balance
+            if (!playerBalancesRef.current.has(sessionId)) {
+              playerBalancesRef.current.set(sessionId, startingBalance)
+            }
+            
+            const currentCashOutValue = isPaidArena ? playerBalancesRef.current.get(sessionId) : 0
+            
             gameState.players.push({
               ...player,
               sessionId,
-              isCurrentPlayer
+              isCurrentPlayer,
+              // Add these properties for paid arena display
+              isPaidArena: isPaidArena,
+              cashOutValue: currentCashOutValue
             })
           })
+          
+          // Detect eliminated players (players who were in previous state but not in current)
+          if (isPaidArena && previousPlayerCountRef.current > 0) {
+            const eliminatedSessions = Array.from(previousSessions).filter(s => !currentSessions.has(s))
+            
+            if (eliminatedSessions.length > 0) {
+              console.log('💀 Players eliminated:', eliminatedSessions.length)
+              
+              // Sum up all eliminated players' balances
+              let totalEliminatedBalance = 0
+              eliminatedSessions.forEach(eliminatedSessionId => {
+                const eliminatedBalance = playerBalancesRef.current.get(eliminatedSessionId) || startingBalance
+                totalEliminatedBalance += eliminatedBalance
+                // Remove eliminated player from tracking
+                playerBalancesRef.current.delete(eliminatedSessionId)
+              })
+              
+              // Find current player and check if they should get the balance
+              const currentPlayer = Array.from(state.players.entries()).find(([sid]) => sid === room.sessionId)
+              if (currentPlayer && totalEliminatedBalance > 0) {
+                const [currentSessionId, currentPlayerData] = currentPlayer
+                
+                // Award the eliminated balance to current player
+                // Note: This assumes current player did the elimination. In a real scenario,
+                // the server should track this, but since we can't update the server, this is our workaround.
+                const currentBalance = playerBalancesRef.current.get(currentSessionId) || startingBalance
+                const newBalance = currentBalance + totalEliminatedBalance
+                
+                playerBalancesRef.current.set(currentSessionId, newBalance)
+                console.log(`💰 Elimination reward! Balance updated: $${currentBalance.toFixed(2)} → $${newBalance.toFixed(2)} (+$${totalEliminatedBalance.toFixed(2)} from eliminations)`)
+              }
+            }
+          }
+          
+          previousPlayerCountRef.current = currentSessions.size
           
           if (!currentPlayerFound) {
             console.log('❌ Current player not found! Available sessions:', 
@@ -2092,7 +2300,7 @@ const MultiplayerArena = () => {
         })
         
         // Update mass and score (server is always authoritative for these)
-        // For paid arenas, use cashOutValue instead of score
+        // For paid arenas, use cashOutValue (client-side calculated) instead of score
         const currentScoreRounded = isPaidArena 
           ? (currentPlayer.cashOutValue || 0)
           : Math.max(0, Math.round(currentPlayer.score || 0))
@@ -2101,12 +2309,11 @@ const MultiplayerArena = () => {
 
         console.log('🎯 Mass update from server:', currentPlayer.mass, '(rounded:', roundedMass || 25, ')')
         console.log('💰 Cash-out value update:', isPaidArena ? `$${currentScoreRounded.toFixed(2)}` : currentScoreRounded)
-        console.log('💰 Server player props:', {
+        console.log('💰 Player props (client-enriched):', {
           isPaidArena: currentPlayer.isPaidArena,
           cashOutValue: currentPlayer.cashOutValue,
           score: currentPlayer.score,
-          name: currentPlayer.name,
-          allKeys: Object.keys(currentPlayer)
+          name: currentPlayer.name
         })
         setMass(roundedMass || 25)
         setScore(currentScoreRounded)
@@ -2631,6 +2838,35 @@ const MultiplayerArena = () => {
       this.ctx.lineWidth = isCurrentPlayer ? 4 : 3
       this.ctx.stroke()
       
+      // Spawn protection border for current player in paid arenas
+      if (isCurrentPlayer && hasSpawnProtection && isPaidArena) {
+        const elapsed = Date.now() - spawnProtectionTimeRef.current
+        const remaining = SPAWN_PROTECTION_DURATION - elapsed
+        
+        if (remaining > 0) {
+          // Animated dashed blue border
+          const dashOffset = (Date.now() / 50) % 20 // Animate dash offset
+          
+          this.ctx.save()
+          this.ctx.strokeStyle = '#0099ff'
+          this.ctx.lineWidth = 5
+          this.ctx.setLineDash([10, 10]) // Dashed pattern
+          this.ctx.lineDashOffset = -dashOffset // Animate the dashes
+          this.ctx.shadowColor = '#0099ff'
+          this.ctx.shadowBlur = 10
+          
+          // Draw outer protection ring
+          this.ctx.beginPath()
+          this.ctx.arc(drawX, drawY, playerRadius + 8, 0, Math.PI * 2)
+          this.ctx.stroke()
+          
+          // Reset context
+          this.ctx.setLineDash([])
+          this.ctx.shadowBlur = 0
+          this.ctx.restore()
+        }
+      }
+      
       // Black eyes (classic Agar.io style)
       const eyeSize = Math.max(3, playerRadius * 0.15)
       const eyeOffsetX = playerRadius * 0.3
@@ -2773,61 +3009,57 @@ const MultiplayerArena = () => {
       }
       
       // Draw money indicator above player head in paid arenas
-      // Debug: Log player properties to see what we're receiving
-      if (isCurrentPlayer && player) {
-        console.log('🎨 Drawing current player:', {
-          isPaidArena: player.isPaidArena,
-          cashOutValue: player.cashOutValue,
-          name: player.name,
-          condition: player.isPaidArena && player.cashOutValue > 0
-        })
-      }
-      
-      if (player.isPaidArena) {
+      // Only show balance and username on main player, NOT on split pieces
+      if (player.isPaidArena && typeof player.cashOutValue !== 'undefined' && !player.isSplitPiece) {
         const cashOutValue = Number.isFinite(player.cashOutValue)
           ? player.cashOutValue
           : 0
-        const textY = drawY - playerRadius - 35 // Position above player
+        const textY = drawY - playerRadius - 25 // Position above player
         const displayValue = `$${cashOutValue.toFixed(2)}`
         
-        // Draw background for better visibility
-        this.ctx.font = 'bold 16px Arial'
+        // Match local practice mode styling - compact rounded rectangle
+        this.ctx.font = 'bold 11px Arial'
         this.ctx.textAlign = 'center'
         this.ctx.textBaseline = 'middle'
         
-        // Measure text for background
+        // Measure text for compact box
         const textMetrics = this.ctx.measureText(displayValue)
         const textWidth = textMetrics.width
-        const padding = 8
+        const boxWidth = textWidth + 12 // Compact padding
+        const boxHeight = 18 // Compact height
+        const boxX = drawX - boxWidth / 2
+        const boxY = textY - boxHeight / 2
+        const borderRadius = 9 // Rounded corners
         
-        // Draw semi-transparent background
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'
-        this.ctx.fillRect(
-          drawX - textWidth / 2 - padding,
-          textY - 12,
-          textWidth + padding * 2,
-          24
-        )
+        // Draw rounded rectangle background (dark)
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.75)'
+        this.ctx.beginPath()
+        this.ctx.moveTo(boxX + borderRadius, boxY)
+        this.ctx.lineTo(boxX + boxWidth - borderRadius, boxY)
+        this.ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + borderRadius)
+        this.ctx.lineTo(boxX + boxWidth, boxY + boxHeight - borderRadius)
+        this.ctx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - borderRadius, boxY + boxHeight)
+        this.ctx.lineTo(boxX + borderRadius, boxY + boxHeight)
+        this.ctx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - borderRadius)
+        this.ctx.lineTo(boxX, boxY + borderRadius)
+        this.ctx.quadraticCurveTo(boxX, boxY, boxX + borderRadius, boxY)
+        this.ctx.closePath()
+        this.ctx.fill()
         
-        // Draw green border
-        this.ctx.strokeStyle = '#10b981'
-        this.ctx.lineWidth = 2
-        this.ctx.strokeRect(
-          drawX - textWidth / 2 - padding,
-          textY - 12,
-          textWidth + padding * 2,
-          24
-        )
+        // Draw rounded rectangle border (gold)
+        this.ctx.strokeStyle = '#FFD700'
+        this.ctx.lineWidth = 1.5
+        this.ctx.stroke()
         
-        // Draw $ symbol in gold
+        // Draw balance text in gold
         this.ctx.fillStyle = '#FFD700'
         this.ctx.shadowColor = '#000000'
-        this.ctx.shadowBlur = 4
+        this.ctx.shadowBlur = 2
         this.ctx.fillText(displayValue, drawX, textY)
         this.ctx.shadowBlur = 0
         
-        // Draw username below player avatar in paid arenas
-        const nameY = drawY + playerRadius + 30 // Position below player
+        // Draw username below player avatar in paid arenas (no box, closer to player)
+        const nameY = drawY + playerRadius + 20 // Position closer to player (was 30)
         const playerName = player.name || 'Anonymous'
         
         // Style for username
@@ -2835,34 +3067,10 @@ const MultiplayerArena = () => {
         this.ctx.textAlign = 'center'
         this.ctx.textBaseline = 'middle'
         
-        // Measure username for background
-        const nameMetrics = this.ctx.measureText(playerName)
-        const nameWidth = nameMetrics.width
-        const namePadding = 6
-        
-        // Draw semi-transparent background
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'
-        this.ctx.fillRect(
-          drawX - nameWidth / 2 - namePadding,
-          nameY - 10,
-          nameWidth + namePadding * 2,
-          20
-        )
-        
-        // Draw white border
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'
-        this.ctx.lineWidth = 1
-        this.ctx.strokeRect(
-          drawX - nameWidth / 2 - namePadding,
-          nameY - 10,
-          nameWidth + namePadding * 2,
-          20
-        )
-        
-        // Draw username in white
+        // Draw username in white with shadow (no background box)
         this.ctx.fillStyle = '#FFFFFF'
         this.ctx.shadowColor = '#000000'
-        this.ctx.shadowBlur = 3
+        this.ctx.shadowBlur = 4
         this.ctx.fillText(playerName, drawX, nameY)
         this.ctx.shadowBlur = 0
       }
@@ -4276,17 +4484,21 @@ const MultiplayerArena = () => {
           </span>
         </div>
 
-        {/* Split Button - centered bottom right position */}
+        {/* Split Button - centered bottom right position with cooldown timer */}
         <div 
-          onClick={(e) => handleSplit(e)}
+          onClick={(e) => {
+            if (splitCooldownRemaining <= 0) {
+              handleSplit(e)
+            }
+          }}
           style={{
-            backgroundColor: 'rgba(0, 100, 255, 0.9)',
-            border: '3px solid #0064ff',
+            backgroundColor: splitCooldownRemaining > 0 ? 'rgba(100, 100, 100, 0.6)' : 'rgba(0, 100, 255, 0.9)',
+            border: splitCooldownRemaining > 0 ? '3px solid #666666' : '3px solid #0064ff',
             borderRadius: '8px',
-            color: '#ffffff',
+            color: splitCooldownRemaining > 0 ? '#aaaaaa' : '#ffffff',
             fontSize: isMobile ? '12px' : '14px',
             fontWeight: '700',
-            cursor: 'pointer',
+            cursor: splitCooldownRemaining > 0 ? 'not-allowed' : 'pointer',
             padding: isMobile ? '8px 12px' : '10px 16px',
             display: 'flex',
             alignItems: 'center',
@@ -4301,16 +4513,21 @@ const MultiplayerArena = () => {
             userSelect: 'none',
             minWidth: isMobile ? '120px' : '160px',
             textAlign: 'center',
-            boxShadow: '0 4px 12px rgba(0, 100, 255, 0.4)',
-            transition: 'all 0.2s ease'
+            boxShadow: splitCooldownRemaining > 0 ? '0 2px 6px rgba(0, 0, 0, 0.3)' : '0 4px 12px rgba(0, 100, 255, 0.4)',
+            transition: 'all 0.2s ease',
+            opacity: splitCooldownRemaining > 0 ? 0.6 : 1
           }}
           onMouseOver={(e) => {
-            e.target.style.backgroundColor = 'rgba(0, 80, 200, 1)'
-            e.target.style.boxShadow = '0 0 20px rgba(0, 100, 255, 0.8)'
+            if (splitCooldownRemaining <= 0) {
+              e.target.style.backgroundColor = 'rgba(0, 80, 200, 1)'
+              e.target.style.boxShadow = '0 0 20px rgba(0, 100, 255, 0.8)'
+            }
           }}
           onMouseOut={(e) => {
-            e.target.style.backgroundColor = 'rgba(0, 100, 255, 0.9)'
-            e.target.style.boxShadow = '0 4px 12px rgba(0, 100, 255, 0.4)'
+            if (splitCooldownRemaining <= 0) {
+              e.target.style.backgroundColor = 'rgba(0, 100, 255, 0.9)'
+              e.target.style.boxShadow = '0 4px 12px rgba(0, 100, 255, 0.4)'
+            }
           }}
           onTouchStart={(e) => {
             if (!isMobile) return
@@ -4325,7 +4542,10 @@ const MultiplayerArena = () => {
             textAlign: 'center',
             textShadow: '0 1px 2px rgba(0, 0, 0, 0.8)'
           }}>
-            {isMobile ? '✂️ Split' : '✂️ Split (Space)'}
+            {splitCooldownRemaining > 0 
+              ? `⏱️ ${(splitCooldownRemaining / 1000).toFixed(1)}s`
+              : (isMobile ? '✂️ Split' : '✂️ Split (Space)')
+            }
           </span>
         </div>
 
@@ -4406,7 +4626,48 @@ const MultiplayerArena = () => {
         </div>
       )}
 
-      {/* Cashout Success Modal */}
+      {/* Cashout Success Modal - Redesigned to match practice modal */}
+      {showCashOutSuccessModal && (() => {
+        // Fetch wallet balance when modal opens
+        if (!loadingWalletBalance && walletBalance === null) {
+          setLoadingWalletBalance(true)
+          
+          const fetchBalance = async () => {
+            try {
+              if (user && wallets && wallets.length > 0) {
+                const embeddedWallet = wallets.find(w => w.walletClientType === 'privy')
+                if (embeddedWallet && embeddedWallet.address) {
+                  const rpcUrl = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://api.mainnet-beta.solana.com'
+                  const response = await fetch(rpcUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      jsonrpc: '2.0',
+                      id: 1,
+                      method: 'getBalance',
+                      params: [embeddedWallet.address]
+                    })
+                  })
+                  
+                  const data = await response.json()
+                  const lamports = data.result?.value || 0
+                  const sol = lamports / 1_000_000_000
+                  setWalletBalance(sol)
+                }
+              }
+            } catch (error) {
+              console.error('Error fetching wallet balance:', error)
+              setWalletBalance(0)
+            }
+            setLoadingWalletBalance(false)
+          }
+          
+          fetchBalance()
+        }
+        
+        return null
+      })()}
+      
       {showCashOutSuccessModal && (
         <div style={{
           position: 'fixed',
@@ -4414,186 +4675,178 @@ const MultiplayerArena = () => {
           left: 0,
           width: '100vw',
           height: '100vh',
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          zIndex: 10000,
-          fontFamily: '"Rajdhani", sans-serif'
+          zIndex: 999999999,
+          pointerEvents: 'auto'
         }}>
           <div style={{
-            backgroundColor: '#1f1f1f',
-            border: '3px solid #ffff00',
-            borderRadius: '12px',
-            padding: '40px',
-            maxWidth: '500px',
+            backgroundColor: '#1a202c',
+            border: '3px solid #68d391',
+            borderRadius: isMobile ? '8px' : '12px',
+            maxWidth: isMobile ? '300px' : '500px',
             width: '90%',
-            textAlign: 'center',
-            boxShadow: '0 0 30px rgba(255, 255, 0, 0.5)',
-            animation: 'pulse 2s ease-in-out infinite'
+            padding: '0',
+            color: 'white',
+            boxShadow: '0 0 50px rgba(104, 211, 145, 0.5)',
+            fontFamily: '"Rajdhani", sans-serif'
           }}>
-            {/* Trophy Icon */}
-            <div style={{ fontSize: '48px', marginBottom: '20px' }}>🏆</div>
-            
-            {/* Main Title */}
-            <h1 style={{
-              color: '#ffff00',
-              fontSize: '32px',
-              fontWeight: 'bold',
-              margin: '0 0 16px 0',
-              textTransform: 'uppercase',
-              letterSpacing: '2px'
-            }}>
-              CASHOUT SUCCESSFUL!
-            </h1>
-            
-            {/* Subtitle */}
-            <p style={{
-              color: '#ffffff',
-              fontSize: '16px',
-              margin: '0 0 16px 0',
-              opacity: 0.9
-            }}>
-              Congratulations! You've successfully cashed out!
-            </p>
-            
-            {/* Auto-redirect countdown */}
-            <p style={{
-              color: '#ffff00',
-              fontSize: '14px',
-              margin: '0 0 32px 0',
-              opacity: 0.8
-            }}>
-              Returning to main menu in {autoRedirectCountdown} seconds...
-            </p>
-            
-            {/* Stats Cards */}
+            {/* Header */}
             <div style={{
-              display: 'flex',
-              gap: '20px',
-              marginBottom: '32px',
-              justifyContent: 'center'
+              padding: isMobile ? '12px' : '24px',
+              borderBottom: '2px solid #68d391',
+              background: 'linear-gradient(45deg, rgba(104, 211, 145, 0.1) 0%, rgba(104, 211, 145, 0.05) 100%)',
+              textAlign: 'center'
             }}>
-              {/* Time Survived Card */}
               <div style={{
-                backgroundColor: '#2a2a2a',
-                borderRadius: '8px',
-                padding: '20px',
-                minWidth: '120px',
-                border: '1px solid #404040'
+                width: isMobile ? '40px' : '60px',
+                height: isMobile ? '40px' : '60px',
+                background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)',
+                borderRadius: isMobile ? '8px' : '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: isMobile ? '20px' : '30px',
+                margin: isMobile ? '0 auto 8px' : '0 auto 16px'
               }}>
-                <div style={{ fontSize: '24px', marginBottom: '8px' }}>⏱️</div>
-                <div style={{
-                  color: '#ffffff',
-                  fontSize: '24px',
-                  fontWeight: 'bold',
-                  marginBottom: '4px'
-                }}>
-                  {Math.floor((Date.now() - gameStats.timeStarted) / 60000)}m {Math.floor(((Date.now() - gameStats.timeStarted) % 60000) / 1000)}s
-                </div>
-                <div style={{
-                  color: '#9ca3af',
-                  fontSize: '12px',
-                  textTransform: 'uppercase'
-                }}>
-                  TIME SURVIVED
-                </div>
+                💰
               </div>
-              
-              {/* Eliminations Card */}
-              <div style={{
-                backgroundColor: '#2a2a2a',
-                borderRadius: '8px',
-                padding: '20px',
-                minWidth: '120px',
-                border: '1px solid #404040'
+              <h2 style={{
+                color: '#68d391',
+                fontSize: isMobile ? '20px' : '32px',
+                fontWeight: '700',
+                margin: isMobile ? '0 0 4px' : '0 0 8px',
+                textTransform: 'uppercase',
+                textShadow: '0 0 10px rgba(104, 211, 145, 0.6)'
               }}>
-                <div style={{ fontSize: '24px', marginBottom: '8px' }}>⚔️</div>
-                <div style={{
-                  color: '#ffffff',
-                  fontSize: '24px',
-                  fontWeight: 'bold',
-                  marginBottom: '4px'
-                }}>
-                  {gameStats.eliminations}
-                </div>
-                <div style={{
-                  color: '#9ca3af',
-                  fontSize: '12px',
-                  textTransform: 'uppercase'
-                }}>
-                  ELIMINATIONS
-                </div>
-              </div>
+                CASHOUT SUCCESSFUL!
+              </h2>
+              <p style={{
+                color: '#e2e8f0',
+                fontSize: isMobile ? '12px' : '16px',
+                margin: '0',
+                opacity: '0.8'
+              }}>
+                Your earnings have been sent!
+              </p>
             </div>
+
+            {/* Stats */}
+            <div style={{ padding: isMobile ? '12px' : '24px' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: isMobile ? '8px' : '16px',
+                marginBottom: isMobile ? '12px' : '24px'
+              }}>
+                <div style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  padding: isMobile ? '8px' : '16px',
+                  borderRadius: '8px',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ 
+                    color: '#ffd700', 
+                    fontSize: isMobile ? '16px' : '24px', 
+                    fontWeight: '700' 
+                  }}>
+                    ${score.toFixed(2)}
+                  </div>
+                  <div style={{ 
+                    color: '#a0aec0', 
+                    fontSize: isMobile ? '10px' : '14px' 
+                  }}>Cashed Out</div>
+                </div>
+                <div style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  padding: isMobile ? '8px' : '16px',
+                  borderRadius: '8px',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ 
+                    color: '#60a5fa', 
+                    fontSize: isMobile ? '16px' : '24px', 
+                    fontWeight: '700' 
+                  }}>
+                    {loadingWalletBalance ? '...' : `${(walletBalance || 0).toFixed(4)} SOL`}
+                  </div>
+                  <div style={{ 
+                    color: '#a0aec0', 
+                    fontSize: isMobile ? '10px' : '14px' 
+                  }}>Wallet Balance</div>
+                </div>
+              </div>
             
-            {/* Buttons */}
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '12px'
-            }}>
-              <button
-                onClick={() => {
-                  setShowCashOutSuccessModal(false)
-                  setCashOutComplete(false)
-                  setGameStats({ timeStarted: Date.now(), eliminations: 0 })
-                  // Reset game state but stay in arena
-                  window.location.reload()
-                }}
-                style={{
-                  backgroundColor: '#ffff00',
-                  color: '#1f1f1f',
-                  border: 'none',
-                  borderRadius: '8px',
-                  padding: '16px 32px',
-                  fontSize: '16px',
-                  fontWeight: 'bold',
-                  textTransform: 'uppercase',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  fontFamily: '"Rajdhani", sans-serif'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#ffff66'
-                  e.target.style.transform = 'scale(1.05)'
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#ffff00'
-                  e.target.style.transform = 'scale(1)'
-                }}
-              >
-                PLAY AGAIN
-              </button>
-              
-              <button
-                onClick={() => {
-                  window.location.href = '/'
-                }}
-                style={{
-                  backgroundColor: '#404040',
-                  color: '#ffffff',
-                  border: 'none',
-                  borderRadius: '8px',
-                  padding: '16px 32px',
-                  fontSize: '16px',
-                  fontWeight: 'bold',
-                  textTransform: 'uppercase',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  fontFamily: '"Rajdhani", sans-serif'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#505050'
-                  e.target.style.transform = 'scale(1.05)'
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#404040'
-                  e.target.style.transform = 'scale(1)'
-                }}
-              >
-                BACK TO MAIN MENU
-              </button>
+              {/* Action Buttons */}
+              <div style={{
+                display: 'flex',
+                gap: isMobile ? '8px' : '12px',
+                flexDirection: 'column'
+              }}>
+                <button
+                  onClick={() => {
+                    setShowCashOutSuccessModal(false)
+                    setCashOutComplete(false)
+                    setWalletBalance(null)
+                    window.location.reload()
+                  }}
+                  style={{
+                    backgroundColor: '#68d391',
+                    border: '2px solid #48bb78',
+                    borderRadius: '8px',
+                    color: '#1a202c',
+                    fontSize: isMobile ? '14px' : '18px',
+                    fontWeight: '700',
+                    padding: isMobile ? '8px 16px' : '12px 24px',
+                    cursor: 'pointer',
+                    transition: 'all 150ms',
+                    fontFamily: '"Rajdhani", sans-serif',
+                    textTransform: 'uppercase',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.backgroundColor = '#48bb78'
+                    e.target.style.transform = 'translateY(-2px)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.backgroundColor = '#68d391'
+                    e.target.style.transform = 'translateY(0)'
+                  }}
+                >
+                  PLAY AGAIN
+                </button>
+                <button
+                  onClick={() => window.location.href = '/'}
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: '2px solid #a0aec0',
+                    borderRadius: '8px',
+                    color: '#a0aec0',
+                    fontSize: isMobile ? '12px' : '16px',
+                    fontWeight: '600',
+                    padding: isMobile ? '8px 16px' : '12px 24px',
+                    cursor: 'pointer',
+                    transition: 'all 150ms',
+                    fontFamily: '"Rajdhani", sans-serif',
+                    textTransform: 'uppercase'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.borderColor = '#cbd5e0'
+                    e.target.style.color = '#cbd5e0'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.borderColor = '#a0aec0'
+                    e.target.style.color = '#a0aec0'
+                  }}
+                >
+                  RETURN TO MENU
+                </button>
+              </div>
             </div>
           </div>
         </div>

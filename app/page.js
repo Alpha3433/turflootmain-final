@@ -732,6 +732,12 @@ export default function TurfLootTactical() {
   const [serverOptions, setServerOptions] = useState([])
   const [serverDataLoading, setServerDataLoading] = useState(false)
   
+  // Feature request modal state
+  const [showFeatureRequestModal, setShowFeatureRequestModal] = useState(false)
+  const [featureCategory, setFeatureCategory] = useState('Gameplay')
+  const [featureRequest, setFeatureRequest] = useState('')
+  const [featureSubmitting, setFeatureSubmitting] = useState(false)
+  
   // Fetch real-time server data
   const fetchServerData = async () => {
     setServerDataLoading(true)
@@ -916,6 +922,36 @@ export default function TurfLootTactical() {
       fetchLoyaltyData()
     }
   }, [isAuthenticated, privyUser])
+  
+  // Fetch leaderboard data for paid arena top earners
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        console.log('🏆 Fetching leaderboard data...')
+        const response = await fetch('/api/leaderboard?limit=5')
+        
+        if (response.ok) {
+          const data = await response.json()
+          const formattedLeaderboard = data.leaderboard.map(user => ({
+            name: user.name,
+            cashout: user.totalEarnings
+          }))
+          
+          setLeaderboard(formattedLeaderboard)
+          console.log(`✅ Leaderboard loaded: ${formattedLeaderboard.length} players`)
+        }
+      } catch (error) {
+        console.error('❌ Error fetching leaderboard:', error)
+      }
+    }
+    
+    fetchLeaderboard()
+    
+    // Refresh leaderboard every 30 seconds
+    const interval = setInterval(fetchLeaderboard, 30000)
+    
+    return () => clearInterval(interval)
+  }, [])
   
   // Update loyalty stats after a PAID game only (not practice games)
   const updateLoyaltyStats = async (gameData) => {
@@ -1280,6 +1316,32 @@ export default function TurfLootTactical() {
     } else {
       return userName || 'PLAYER'
     }
+  }
+
+  // Validate that user has set a custom username before entering game
+  const validateUsername = (action = 'play') => {
+    const currentUsername = customUsername?.trim()
+    
+    if (!currentUsername) {
+      alert('⚠️ Please set a username before entering the game!\n\nEnter your desired username in the input field and click the checkmark (✓) to confirm.')
+      console.log('❌ Username validation failed - no custom username set')
+      return false
+    }
+    
+    if (currentUsername.length < 3) {
+      alert('⚠️ Username must be at least 3 characters long!')
+      console.log('❌ Username validation failed - too short')
+      return false
+    }
+    
+    if (currentUsername.length > 20) {
+      alert('⚠️ Username must be 20 characters or less!')
+      console.log('❌ Username validation failed - too long')
+      return false
+    }
+    
+    console.log(`✅ Username validated: ${currentUsername}`)
+    return true
   }
 
   // Load username when authentication state changes and register Privy user
@@ -1655,6 +1717,8 @@ export default function TurfLootTactical() {
   
   // Mouse tracking for interactive eyes
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const mousePositionRef = useRef({ x: 0, y: 0 })
+  const animationFrameRef = useRef(null)
   const circleRef = useRef(null)
 
   // Currency system for skin store (matches the game page)
@@ -1748,15 +1812,31 @@ export default function TurfLootTactical() {
     }
   }, [])
 
-  // Track mouse movement for interactive eyes
+  // Track mouse movement for interactive eyes with smooth continuous updates
   useEffect(() => {
     const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY })
+      // Update ref immediately (no state batching)
+      mousePositionRef.current = { x: e.clientX, y: e.clientY }
+      
+      // Cancel any pending animation frame
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+      
+      // Schedule state update on next frame for smooth animation
+      animationFrameRef.current = requestAnimationFrame(() => {
+        setMousePosition({ x: e.clientX, y: e.clientY })
+      })
     }
 
     if (typeof window !== 'undefined') {
-      window.addEventListener('mousemove', handleMouseMove)
-      return () => window.removeEventListener('mousemove', handleMouseMove)
+      window.addEventListener('mousemove', handleMouseMove, { passive: true })
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove)
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current)
+        }
+      }
     }
   }, [])
 
@@ -1874,10 +1954,10 @@ export default function TurfLootTactical() {
     }
   }, [showOrientationModal, pendingGameUrl, isMobile])
 
-  // Calculate eye positions based on mouse position
+  // Calculate eye positions based on mouse position with more responsive tracking
   const getEyePositions = () => {
     if (typeof window === 'undefined' || !circleRef.current) {
-      return { leftEye: { x: 18, y: 22 }, rightEye: { x: 54, y: 22 } }
+      return { leftEye: { x: 24, y: 28 }, rightEye: { x: 48, y: 28 } }
     }
 
     try {
@@ -1888,24 +1968,34 @@ export default function TurfLootTactical() {
       // Calculate angle from circle center to mouse
       const angle = Math.atan2(mousePosition.y - centerY, mousePosition.x - centerX)
       
-      // Limit eye movement within the circle (max 4px from default position for subtle movement)
-      const maxDistance = 4
+      // Calculate distance from circle center to mouse (normalized)
+      const dx = mousePosition.x - centerX
+      const dy = mousePosition.y - centerY
+      const distance = Math.sqrt(dx * dx + dy * dy)
+      
+      // More responsive eye movement - increases with distance from circle
+      const maxDistance = Math.min(8, distance / 20) // Increased from 4 to 8, scales with cursor distance
       const eyeOffsetX = Math.cos(angle) * maxDistance
       const eyeOffsetY = Math.sin(angle) * maxDistance
       
+      // Base positions for eyes (centered better)
+      const leftEyeBaseX = 24
+      const rightEyeBaseX = 48
+      const eyeBaseY = 28
+      
       return {
         leftEye: { 
-          x: 25 + eyeOffsetX, // Moved closer to center (was 18)
-          y: 22 + eyeOffsetY 
+          x: leftEyeBaseX + eyeOffsetX,
+          y: eyeBaseY + eyeOffsetY 
         },
         rightEye: { 
-          x: 47 + eyeOffsetX, // Moved closer to center (was 54)
-          y: 22 + eyeOffsetY 
+          x: rightEyeBaseX + eyeOffsetX,
+          y: eyeBaseY + eyeOffsetY 
         }
       }
     } catch (error) {
       // Fallback to default positions
-      return { leftEye: { x: 18, y: 22 }, rightEye: { x: 54, y: 22 } }
+      return { leftEye: { x: 24, y: 28 }, rightEye: { x: 48, y: 28 } }
     }
   }
 
@@ -2383,14 +2473,19 @@ export default function TurfLootTactical() {
     const existing = document.getElementById('desktop-leaderboard-popup')
     if (existing) existing.remove()
 
-    // Fetch leaderboard data
+    // Fetch leaderboard data from new paid arena earnings API
     let leaderboardData = []
     try {
-      console.log('🏆 Fetching leaderboard data...')
-      const response = await fetch('/api/users/leaderboard')
+      console.log('🏆 Fetching leaderboard data from paid arenas...')
+      const response = await fetch('/api/leaderboard?limit=10')
       if (response.ok) {
         const data = await response.json()
-        leaderboardData = data.users?.slice(0, 10) || [] // Top 10 players
+        leaderboardData = data.leaderboard?.map(user => ({
+          name: user.name,
+          cashout: user.totalEarnings,
+          eliminations: user.totalEliminations,
+          gamesPlayed: user.gamesPlayed
+        })) || []
       }
     } catch (error) {
       console.error('Error fetching leaderboard:', error)
@@ -5968,8 +6063,17 @@ export default function TurfLootTactical() {
           </div>
 
           {/* Player Name Input */}
-          <div style={{ marginBottom: '32px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px', marginBottom: '24px' }}>
+          <div style={{ marginBottom: '32px', minHeight: '80px' }}>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              gap: '24px', 
+              marginBottom: '24px', 
+              transition: 'opacity 0.15s ease',
+              opacity: (ready || authenticated) ? 1 : 0.7,
+              pointerEvents: (ready || authenticated) ? 'auto' : 'none'
+            }}>
               <div style={{ position: 'relative' }}>
                 <div 
                   onClick={() => setServerSelectorOpen(!serverSelectorOpen)}
@@ -6238,18 +6342,22 @@ export default function TurfLootTactical() {
             ))}
           </div>
 
-          {/* Loyalty Progress Bar - Minimalistic Design */}
-          {isAuthenticated && loyaltyData && (
-            <div style={{ 
-              marginBottom: '12px',
-              padding: '8px 12px',
-              backgroundColor: 'rgba(16, 185, 129, 0.1)',
-              border: '1px solid rgba(16, 185, 129, 0.2)',
-              borderRadius: '6px',
-              fontSize: '12px',
-              color: '#10b981'
-            }}>
-              {!loyaltyData.progress?.isMaxTier ? (
+          {/* Loyalty Progress Bar - Always Visible */}
+          <div style={{ 
+            marginBottom: '12px',
+            padding: isAuthenticated && loyaltyData ? '8px 12px' : '6px 12px',
+            backgroundColor: isAuthenticated && loyaltyData ? 'rgba(16, 185, 129, 0.1)' : 'rgba(107, 114, 128, 0.1)',
+            border: isAuthenticated && loyaltyData ? '1px solid rgba(16, 185, 129, 0.2)' : '1px solid rgba(107, 114, 128, 0.2)',
+            borderRadius: '6px',
+            fontSize: isAuthenticated && loyaltyData ? '12px' : '11px',
+            color: isAuthenticated && loyaltyData ? '#10b981' : '#9ca3af',
+            textAlign: isAuthenticated && loyaltyData ? 'left' : 'center',
+            minHeight: '32px',
+            transition: 'all 0.3s ease'
+          }}>
+            {isAuthenticated && loyaltyData ? (
+              // Show loyalty progress when authenticated and data loaded
+              !loyaltyData.progress?.isMaxTier ? (
                 <div style={{ 
                   display: 'flex', 
                   justifyContent: 'space-between', 
@@ -6269,25 +6377,19 @@ export default function TurfLootTactical() {
                 <div style={{ textAlign: 'center' }}>
                   🏆 {loyaltyData.tierInfo?.name} ({loyaltyData.feePercentage}% fees)
                 </div>
-              )}
-            </div>
-          )}
-          
-          {/* Minimalistic login prompt */}
-          {!isAuthenticated && (
-            <div style={{ 
-              marginBottom: '12px',
-              padding: '6px 12px',
-              backgroundColor: 'rgba(107, 114, 128, 0.1)',
-              border: '1px solid rgba(107, 114, 128, 0.2)',
-              borderRadius: '6px',
-              fontSize: '11px',
-              color: '#9ca3af',
-              textAlign: 'center'
-            }}>
-              Login to reduce fees with loyalty tiers
-            </div>
-          )}
+              )
+            ) : isAuthenticated && !loyaltyData ? (
+              // Loading state when authenticated but data not loaded yet
+              <span style={{ opacity: 0.7 }}>
+                Loading loyalty data...
+              </span>
+            ) : (
+              // Not authenticated - show login prompt
+              <span>
+                Login to reduce fees with loyalty tiers
+              </span>
+            )}
+          </div>
           
           {/* Main Deploy Button - UPDATED with Paid Rooms Validation */}
           <button 
@@ -6295,6 +6397,11 @@ export default function TurfLootTactical() {
               console.log('▶ PLAY NOW button clicked!')
               console.log(`💰 Selected stake: ${selectedStake}`)
               console.log(`🌍 Selected server: ${selectedServer}`)
+              
+              // Validate username before proceeding
+              if (!validateUsername('PLAY NOW')) {
+                return
+              }
               
               const authenticated = await requireAuthentication('PLAY NOW')
               if (authenticated) {
@@ -6444,6 +6551,12 @@ export default function TurfLootTactical() {
                 }
                 
                 console.log('🤖 LOCAL PRACTICE button clicked!')
+                
+                // Validate username before proceeding
+                if (!validateUsername('LOCAL PRACTICE')) {
+                  e.preventDefault()
+                  return
+                }
                 
                 // Show loading popup on desktop only
                 console.log('📏 Window width:', window.innerWidth)
@@ -7744,7 +7857,7 @@ export default function TurfLootTactical() {
                 e.target.style.transform = 'scale(1)'
               }}
             >
-              {/* Smooth Interactive Black Eyes */}
+              {/* Smooth Interactive Black Eyes with Enhanced Responsiveness */}
               <div style={{
                 position: 'absolute',
                 width: '8px',
@@ -7753,7 +7866,8 @@ export default function TurfLootTactical() {
                 borderRadius: '50%',
                 left: `${eyePositions.leftEye.x}px`,
                 top: `${eyePositions.leftEye.y}px`,
-                transform: 'translate(-50%, -50%)'
+                transform: 'translate(-50%, -50%)',
+                transition: 'left 0.1s ease-out, top 0.1s ease-out'
               }} />
               <div style={{
                 position: 'absolute', 
@@ -7763,7 +7877,8 @@ export default function TurfLootTactical() {
                 borderRadius: '50%',
                 left: `${eyePositions.rightEye.x}px`,
                 top: `${eyePositions.rightEye.y}px`,
-                transform: 'translate(-50%, -50%)'
+                transform: 'translate(-50%, -50%)',
+                transition: 'left 0.1s ease-out, top 0.1s ease-out'
               }} />
             </div>
           </div>
@@ -7870,146 +7985,261 @@ export default function TurfLootTactical() {
           </button>
         </div>
 
-        {/* Cash Out Notifications - Bottom Right - Tactical HUD Style */}
-        <div style={{
-          position: 'absolute',
-          bottom: '20px',
-          right: '20px',
-          zIndex: 30,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '12px',
-          alignItems: 'flex-end'
-        }}>
-          {cashOutNotifications.map((notification, index) => (
-            <div
-              key={notification.id}
+        {/* Feature Request Button - Bottom Right */}
+        <button
+          onClick={() => setShowFeatureRequestModal(true)}
+          style={{
+            position: 'absolute',
+            bottom: '20px',
+            right: '20px',
+            zIndex: 30,
+            backgroundColor: 'rgba(20, 184, 166, 0.95)',
+            border: '2px solid #14b8a6',
+            borderRadius: '8px',
+            padding: '12px 20px',
+            color: 'white',
+            fontSize: '13px',
+            fontWeight: '700',
+            boxShadow: '0 0 20px rgba(20, 184, 166, 0.4)',
+            backdropFilter: 'blur(10px)',
+            cursor: 'pointer',
+            fontFamily: '"Rajdhani", sans-serif',
+            textTransform: 'uppercase',
+            letterSpacing: '1px',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.transform = 'translateY(-2px)'
+            e.target.style.boxShadow = '0 0 30px rgba(20, 184, 166, 0.6)'
+            e.target.style.backgroundColor = 'rgba(20, 184, 166, 1)'
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = 'translateY(0)'
+            e.target.style.boxShadow = '0 0 20px rgba(20, 184, 166, 0.4)'
+            e.target.style.backgroundColor = 'rgba(20, 184, 166, 0.95)'
+          }}
+        >
+          <span style={{ fontSize: '18px' }}>💡</span>
+          REQUEST A FEATURE
+        </button>
+
+        {/* Feature Request Modal */}
+        {showFeatureRequestModal && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            backdropFilter: 'blur(5px)',
+            zIndex: 10000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px'
+          }}
+          onClick={() => setShowFeatureRequestModal(false)}
+          >
+            <div 
               style={{
-                position: 'relative',
-                backgroundColor: 'rgba(26, 32, 44, 0.95)',
-                border: '2px solid #10b981',
-                borderRadius: '4px',
-                padding: '12px 16px',
+                backgroundColor: '#1a202c',
+                border: '2px solid #4c51bf',
+                borderRadius: '12px',
+                padding: '32px',
+                maxWidth: '500px',
+                width: '100%',
+                boxShadow: '0 0 40px rgba(99, 102, 241, 0.3)',
                 color: 'white',
-                fontSize: '12px',
-                fontWeight: '600',
-                boxShadow: '0 0 25px rgba(16, 185, 129, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(15px)',
-                minWidth: '240px',
-                maxWidth: '260px',
-                fontFamily: '"Rajdhani", sans-serif',
-                animation: `slideInRight 0.5s ease-out ${index * 0.1}s both`,
-                opacity: 1 - (index * 0.15), // Fade older notifications
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
+                fontFamily: '"Rajdhani", sans-serif'
               }}
+              onClick={(e) => e.stopPropagation()}
             >
-              {/* Status Indicator */}
-              <div style={{
-                position: 'absolute',
-                top: '6px',
-                right: '6px',
-                width: '8px',
-                height: '8px',
-                background: '#10b981',
-                borderRadius: '50%',
-                boxShadow: '0 0 10px #10b981',
-                animation: 'statusBlink 2s ease-in-out infinite'
-              }} />
-              
-              {/* Header with Player and Amount */}
+              {/* Header */}
               <div style={{
                 display: 'flex',
-                alignItems: 'center',
                 justifyContent: 'space-between',
-                marginBottom: '8px',
-                borderBottom: '1px solid rgba(16, 185, 129, 0.3)',
-                paddingBottom: '8px'
+                alignItems: 'center',
+                marginBottom: '24px',
+                borderBottom: '2px solid rgba(99, 102, 241, 0.3)',
+                paddingBottom: '16px'
               }}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}>
-                  <div style={{
-                    width: '6px',
-                    height: '6px',
-                    background: '#10b981',
-                    transform: 'rotate(45deg)'
-                  }} />
-                  <span style={{ 
-                    fontSize: '11px',
-                    fontWeight: '800',
-                    color: '#10b981'
-                  }}>
-                    CASH OUT
-                  </span>
-                </div>
-                <span style={{ 
-                  fontSize: '14px', 
+                <h2 style={{
+                  fontSize: '24px',
                   fontWeight: '700',
-                  color: '#ffd700',
-                  textShadow: '0 0 10px rgba(255, 215, 0, 0.5)'
-                }}>
-                  ${notification.amount}
-                </span>
-              </div>
-              
-              {/* Player Info */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                fontSize: '12px'
-              }}>
-                <div style={{
+                  color: '#818cf8',
+                  margin: 0,
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px'
+                  gap: '12px'
                 }}>
-                  <div style={{
-                    width: '4px',
-                    height: '4px',
-                    background: '#68d391',
-                    borderRadius: '50%'
-                  }} />
-                  <span style={{ 
-                    fontWeight: '700',
-                    color: 'white'
-                  }}>
-                    {notification.player}
-                  </span>
-                </div>
-                <span style={{ 
-                  color: 'rgba(255, 255, 255, 0.7)',
-                  fontSize: '11px'
-                }}>
-                  {notification.country}
-                </span>
+                  <span style={{ fontSize: '28px' }}>💡</span>
+                  Request a Feature
+                </h2>
+                <button
+                  onClick={() => setShowFeatureRequestModal(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#cbd5e0',
+                    fontSize: '24px',
+                    cursor: 'pointer',
+                    padding: '4px 8px',
+                    transition: 'color 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.target.style.color = '#f56565'}
+                  onMouseLeave={(e) => e.target.style.color = '#cbd5e0'}
+                >
+                  ×
+                </button>
               </div>
-              
-              {/* Corner Accents */}
-              <div style={{
-                position: 'absolute',
-                top: '-1px',
-                left: '-1px',
-                width: '12px',
-                height: '12px',
-                borderTop: '2px solid #10b981',
-                borderLeft: '2px solid #10b981'
-              }} />
-              <div style={{
-                position: 'absolute',
-                bottom: '-1px',
-                right: '-1px',
-                width: '12px',
-                height: '12px',
-                borderBottom: '2px solid #10b981',
-                borderRight: '2px solid #10b981'
-              }} />
+
+              {/* Category Selection */}
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#cbd5e0',
+                  marginBottom: '8px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Category
+                </label>
+                <select
+                  value={featureCategory}
+                  onChange={(e) => setFeatureCategory(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#2d3748',
+                    border: '2px solid #4c51bf',
+                    borderRadius: '6px',
+                    color: 'white',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    fontFamily: '"Rajdhani", sans-serif',
+                    outline: 'none'
+                  }}
+                >
+                  <option value="Gameplay">Gameplay</option>
+                  <option value="Wallet">Wallet</option>
+                  <option value="UI">UI</option>
+                  <option value="New Feature">New Feature</option>
+                </select>
+              </div>
+
+              {/* Request Text Area */}
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#cbd5e0',
+                  marginBottom: '8px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Your Request
+                </label>
+                <textarea
+                  value={featureRequest}
+                  onChange={(e) => setFeatureRequest(e.target.value)}
+                  placeholder="Describe your feature request or suggestion..."
+                  style={{
+                    width: '100%',
+                    minHeight: '150px',
+                    padding: '12px',
+                    backgroundColor: '#2d3748',
+                    border: '2px solid #4c51bf',
+                    borderRadius: '6px',
+                    color: 'white',
+                    fontSize: '14px',
+                    fontFamily: '"Rajdhani", sans-serif',
+                    resize: 'vertical',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              {/* Submit Button */}
+              <button
+                onClick={async () => {
+                  if (!featureRequest.trim()) {
+                    alert('Please enter your feature request!')
+                    return
+                  }
+                  
+                  setFeatureSubmitting(true)
+                  
+                  try {
+                    const response = await fetch('/api/feature-requests', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        category: featureCategory,
+                        request: featureRequest,
+                        userIdentifier: user?.id || 'anonymous',
+                        userName: customUsername || userName || 'Anonymous',
+                        timestamp: new Date().toISOString()
+                      })
+                    })
+                    
+                    if (response.ok) {
+                      alert('✅ Feature request submitted successfully! Thank you for your feedback.')
+                      setFeatureRequest('')
+                      setFeatureCategory('Gameplay')
+                      setShowFeatureRequestModal(false)
+                    } else {
+                      alert('❌ Failed to submit request. Please try again.')
+                    }
+                  } catch (error) {
+                    console.error('Error submitting feature request:', error)
+                    alert('❌ Error submitting request. Please try again.')
+                  }
+                  
+                  setFeatureSubmitting(false)
+                }}
+                disabled={featureSubmitting}
+                style={{
+                  width: '100%',
+                  padding: '14px',
+                  backgroundColor: featureSubmitting ? '#4c51bf' : '#6366f1',
+                  border: 'none',
+                  borderRadius: '6px',
+                  color: 'white',
+                  fontSize: '16px',
+                  fontWeight: '700',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
+                  cursor: featureSubmitting ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.3s ease',
+                  fontFamily: '"Rajdhani", sans-serif',
+                  opacity: featureSubmitting ? 0.7 : 1
+                }}
+                onMouseEnter={(e) => {
+                  if (!featureSubmitting) {
+                    e.target.style.backgroundColor = '#818cf8'
+                    e.target.style.transform = 'translateY(-2px)'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!featureSubmitting) {
+                    e.target.style.backgroundColor = '#6366f1'
+                    e.target.style.transform = 'translateY(0)'
+                  }
+                }}
+              >
+                {featureSubmitting ? 'Submitting...' : 'Submit Request'}
+              </button>
             </div>
-          ))}
-        </div>
+          </div>
+        )}
 
         {/* Enhanced CSS Animations */}
         <style jsx global>{`
@@ -10517,6 +10747,12 @@ export default function TurfLootTactical() {
                 }
                 
                 console.log('🤖 MOBILE LOCAL PRACTICE button clicked!')
+                
+                // Validate username before proceeding
+                if (!validateUsername('MOBILE LOCAL PRACTICE')) {
+                  e.preventDefault()
+                  return
+                }
                 
                 // Create completely local room with bots - no Hathora charges
                 const localRoomId = 'local-bots-' + Math.random().toString(36).substring(2, 10)
