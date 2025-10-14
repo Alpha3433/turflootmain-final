@@ -3874,18 +3874,24 @@ export default function TurfLootTactical() {
                   // Send transaction using Privy - this will open the native Privy UI
                   let result
                   try {
+                    // Serialize transaction to base64 for Privy
+                    const serializedTx = transaction.serialize({
+                      requireAllSignatures: false,
+                      verifySignatures: false
+                    }).toString('base64')
+                    
+                    console.log('📤 Sending serialized transaction to Privy...')
+                    
                     result = await privySignAndSendTransaction({
-                      transaction,
-                      connection,
-                      sendOptions: { skipPreflight: false }
+                      transaction: serializedTx,
+                      chain: 'solana:mainnet'
                     })
+                    
+                    console.log('✅ Transaction sent:', result)
                   } catch (txError) {
-                    // Try alternative method if first approach fails
-                    console.warn('⚠️ First method failed, trying alternative...')
-                    result = await privySignAndSendTransaction(transaction, connection)
+                    console.error('❌ Transaction error details:', txError)
+                    throw txError
                   }
-                  
-                  console.log('✅ Transaction sent:', result)
                   alert(`✅ Cash out successful!\n\nTransaction: ${result?.signature || 'Confirmed'}\n\nAmount: $${withdrawalAmount} sent to ${destinationAddress}`)
                   
                   // Close modal and refresh balance
