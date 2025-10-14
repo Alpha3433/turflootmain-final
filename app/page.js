@@ -3800,6 +3800,15 @@ export default function TurfLootTactical() {
                   // Import Solana web3
                   const { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } = await import('@solana/web3.js')
                   
+                  // Validate destination address is a valid Solana public key
+                  try {
+                    new PublicKey(destinationAddress)
+                  } catch (validationError) {
+                    console.error('❌ Invalid Solana address:', destinationAddress)
+                    alert('❌ Invalid destination address.\n\nPlease enter a valid Solana wallet address.\n\nExample format:\n7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU')
+                    return
+                  }
+                  
                   // Get embedded wallet from Privy user object
                   console.log('🔍 Looking for embedded wallet in user.linkedAccounts...')
                   const embeddedWallet = user?.linkedAccounts?.find(
