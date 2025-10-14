@@ -3900,8 +3900,7 @@ export default function TurfLootTactical() {
                   })
                   
                   const signature = result.signature || result
-                  console.log('✅ Transaction sent! Signature:', signature)
-                  alert(`✅ Cash out successful!\n\nTransaction: ${result?.signature || 'Confirmed'}\n\nAmount: $${withdrawalAmount} sent to ${destinationAddress}`)
+                  alert(`✅ Cash out successful!\n\nTransaction: ${signature}\n\nAmount: $${withdrawalAmount} sent to ${destinationAddress}`)
                   
                   // Close modal and refresh balance
                   setDesktopWithdrawalModalVisible(false)
