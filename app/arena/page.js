@@ -2352,15 +2352,18 @@ const MultiplayerArena = () => {
         })
         
         // Update mass and score (server is always authoritative for these)
-        // For paid arenas, use cashOutValue (client-side calculated) instead of score
-        const currentScoreRounded = isPaidArena 
-          ? (currentPlayer.cashOutValue || 0)
-          : Math.max(0, Math.round(currentPlayer.score || 0))
+        // For paid arenas: score = worth (cashOutValue), coins = server score
+        // For free arenas: score = coins collected (server score)
+        const serverCoins = Math.max(0, Math.round(currentPlayer.score || 0))
+        const currentWorth = isPaidArena ? (currentPlayer.cashOutValue || 0) : 0
+        const currentScoreRounded = isPaidArena ? currentWorth : serverCoins
+        
         const rawMass = Number.isFinite(currentPlayer.mass) ? currentPlayer.mass : 0
         const roundedMass = Math.max(0, Math.round(rawMass))
 
         console.log('🎯 Mass update from server:', currentPlayer.mass, '(rounded:', roundedMass || 25, ')')
-        console.log('💰 Cash-out value update:', isPaidArena ? `$${currentScoreRounded.toFixed(2)}` : currentScoreRounded)
+        console.log('💰 Worth (eliminations):', isPaidArena ? `$${currentWorth.toFixed(2)}` : 'N/A')
+        console.log('🪙 Coins collected (server score):', serverCoins)
         console.log('💰 Player props (client-enriched):', {
           isPaidArena: currentPlayer.isPaidArena,
           cashOutValue: currentPlayer.cashOutValue,
@@ -2369,6 +2372,9 @@ const MultiplayerArena = () => {
         })
         setMass(roundedMass || 25)
         setScore(currentScoreRounded)
+        if (isPaidArena) {
+          setCoinsCollected(serverCoins) // Track coins separately in paid arena
+        }
 
         const missionStats = missionStatsRef.current || {}
 
