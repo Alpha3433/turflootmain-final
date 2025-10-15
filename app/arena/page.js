@@ -37,7 +37,8 @@ const MultiplayerArena = () => {
   const [connectionStatus, setConnectionStatus] = useState('connecting')
   const [playerCount, setPlayerCount] = useState(0)
   const [mass, setMass] = useState(25) // Fixed to match server starting mass
-  const [score, setScore] = useState(0)
+  const [score, setScore] = useState(0) // For paid arena: worth from eliminations, For free: coins collected
+  const [coinsCollected, setCoinsCollected] = useState(0) // Track coins separately for paid arena
   const [serverState, setServerState] = useState(null)
   const [timeSurvived, setTimeSurvived] = useState(0)
   const [eliminations, setEliminations] = useState(0)
