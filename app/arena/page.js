@@ -1442,8 +1442,17 @@ const MultiplayerArena = () => {
                 const cashOutValueUSD = score
                 
                 console.log('💵 Cashout details:', {
+                  scoreValue: score,
+                  scoreType: typeof score,
                   amount: `$${cashOutValueUSD.toFixed(2)}`,
-                  wallet: userWalletAddress
+                  wallet: userWalletAddress,
+                  isPaidArena: isPaidArena
+                })
+                console.log('🔍 Current state values:', {
+                  score,
+                  coinsCollected,
+                  eliminations,
+                  mass
                 })
                 
                 // Get player name
