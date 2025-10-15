@@ -5136,12 +5136,7 @@ const MultiplayerArena = () => {
                 flexDirection: 'column'
               }}>
                 <button
-                  onClick={() => {
-                    setShowCashOutSuccessModal(false)
-                    setCashOutComplete(false)
-                    setWalletBalance(null)
-                    window.location.reload()
-                  }}
+                  onClick={handleReplayPayment}
                   style={{
                     backgroundColor: '#68d391',
                     border: '2px solid #48bb78',
@@ -5168,7 +5163,7 @@ const MultiplayerArena = () => {
                     e.target.style.transform = 'translateY(0)'
                   }}
                 >
-                  PLAY AGAIN
+                  💰 PLAY AGAIN
                 </button>
                 <button
                   onClick={() => window.location.href = '/'}
