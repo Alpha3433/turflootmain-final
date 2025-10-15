@@ -947,24 +947,29 @@ const MultiplayerArena = () => {
       const txBytes = Uint8Array.from(serializedTx)
       
       console.log('🔐 Signing with Privy...')
+      console.log('Available Solana wallets:', solanaWallets?.length)
       
-      // Get the wallet object for signing
-      const walletForSigning = solanaWallets?.find(w => {
-        const addr = w.address || w.publicKey?.toString() || w.publicKey?.toBase58?.()
-        return addr === userWalletAddress
-      })
+      // Find the embedded wallet
+      const wallet = solanaWallets?.find(w => 
+        w.walletClientType === 'privy' || 
+        w.address === userWalletAddress
+      )
       
-      if (!walletForSigning) {
-        throw new Error('Wallet not found for signing')
+      if (!wallet) {
+        console.error('No wallet found. Available wallets:', solanaWallets)
+        throw new Error('Privy wallet not available. Please ensure your wallet is connected.')
       }
       
-      // Sign and send transaction
-      const result = await signAndSendTransaction({
-        transaction: txBytes,
-        wallet: walletForSigning
+      console.log('Using wallet:', {
+        type: wallet.walletClientType,
+        address: wallet.address
       })
       
-      const signature = result.signature || result
+      // Sign and send transaction using Privy
+      const signature = await signAndSendTransaction(txBytes, {
+        wallet: wallet
+      })
+      
       console.log('✅ Payment successful! Signature:', signature)
       
       // Close modal and reload page to rejoin
