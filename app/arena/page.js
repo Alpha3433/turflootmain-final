@@ -1447,21 +1447,33 @@ const MultiplayerArena = () => {
                 }
                 
                 const userWalletAddress = embeddedWallet.address
-                const cashOutValueUSD = score
                 
-                console.log('💵 Cashout details:', {
-                  scoreValue: score,
+                // DEBUG: Log all balance-related values
+                console.log('🔍 PRE-CASHOUT DEBUG:', {
+                  score: score,
                   scoreType: typeof score,
-                  amount: `$${cashOutValueUSD.toFixed(2)}`,
-                  wallet: userWalletAddress,
-                  isPaidArena: isPaidArena
-                })
-                console.log('🔍 Current state values:', {
-                  score,
                   coinsCollected,
                   eliminations,
-                  mass
+                  mass,
+                  isPaidArena,
+                  playerBalancesRef: Array.from(playerBalancesRef.current.entries())
                 })
+                
+                const cashOutValueUSD = score
+                
+                console.log('💵 Cashout amount being sent to API:', {
+                  cashOutValueUSD,
+                  formattedAmount: `$${cashOutValueUSD.toFixed(2)}`,
+                  wallet: userWalletAddress
+                })
+                
+                // VALIDATION: Check if score matches expected balance
+                if (Math.abs(cashOutValueUSD - 0.45) > 0.10) {
+                  console.warn('⚠️ WARNING: Cashout value seems incorrect!', {
+                    expected: '$0.45 (starting balance)',
+                    actual: `$${cashOutValueUSD.toFixed(2)}`
+                  })
+                }
                 
                 // Get player name
                 let playerName = 'Anonymous'
