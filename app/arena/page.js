@@ -1430,37 +1430,38 @@ const MultiplayerArena = () => {
                   console.log('⏳ Waiting for transaction confirmation...')
                   await new Promise(resolve => setTimeout(resolve, 3000)) // Wait 3 seconds
                   
-                  // Fetch updated wallet balance using Helius
+                  // Fetch updated wallet balance using Helius via our own API
                   setLoadingWalletBalance(true)
-                  const rpcUrl = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://api.mainnet-beta.solana.com'
                   
                   console.log('💰 Fetching updated balance from Helius...')
-                  console.log('   RPC URL:', rpcUrl)
                   console.log('   Wallet:', embeddedWallet.address)
                   
-                  const balanceResponse = await fetch(rpcUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      jsonrpc: '2.0',
-                      id: 1,
-                      method: 'getBalance',
-                      params: [embeddedWallet.address]
+                  try {
+                    // Use our own API endpoint to fetch balance (avoids CORS issues)
+                    const balanceResponse = await fetch('/api/user/balance', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        walletAddress: embeddedWallet.address
+                      })
                     })
-                  })
-                  
-                  const balanceData = await balanceResponse.json()
-                  console.log('📊 Balance response:', balanceData)
-                  
-                  if (balanceData.error) {
-                    console.error('❌ Balance fetch error:', balanceData.error)
+                    
+                    const balanceData = await balanceResponse.json()
+                    console.log('📊 Balance response:', balanceData)
+                    
+                    if (balanceData.success) {
+                      const sol = balanceData.balance
+                      console.log('✅ Updated balance:', sol, 'SOL')
+                      setWalletBalance(sol)
+                    } else {
+                      console.error('❌ Balance fetch error:', balanceData.error)
+                      setWalletBalance(0)
+                    }
+                  } catch (error) {
+                    console.error('❌ Failed to fetch balance:', error)
                     setWalletBalance(0)
-                  } else {
-                    const lamports = balanceData.result?.value || 0
-                    const sol = lamports / 1_000_000_000
-                    console.log('✅ Updated balance:', sol, 'SOL (', lamports, 'lamports )')
-                    setWalletBalance(sol)
                   }
+                  
                   setLoadingWalletBalance(false)
                   
                   // Store transaction signature for modal
