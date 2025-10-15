@@ -17,11 +17,15 @@ export async function POST(request) {
       )
     }
 
-    console.log('💰 Cash-out request:', {
-      user: playerName || privyUserId,
-      wallet: userWalletAddress,
-      amount: `$${cashOutValueUSD.toFixed(2)}`
+    console.log('💰 Processing cash-out request:', {
+      userWalletAddress,
+      cashOutValueUSD,
+      cashOutValueType: typeof cashOutValueUSD,
+      privyUserId,
+      playerName: playerName || privyUserId
     })
+    
+    console.log('🔍 API RECEIVED - Raw body:', body)
 
     // NO platform fee on cashout - user gets 100% of their balance
     const payoutUSD = cashOutValueUSD
