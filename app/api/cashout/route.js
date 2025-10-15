@@ -23,14 +23,12 @@ export async function POST(request) {
       amount: `$${cashOutValueUSD.toFixed(2)}`
     })
 
-    // Calculate platform fee (10%)
-    const platformFeeUSD = cashOutValueUSD * 0.10
-    const payoutUSD = cashOutValueUSD * 0.90
+    // NO platform fee on cashout - user gets 100% of their balance
+    const payoutUSD = cashOutValueUSD
 
-    console.log('💵 Fee breakdown:', {
-      total: `$${cashOutValueUSD.toFixed(2)}`,
-      platformFee: `$${platformFeeUSD.toFixed(2)} (10%)`,
-      userPayout: `$${payoutUSD.toFixed(2)} (90%)`
+    console.log('💵 Cashout amount:', {
+      userBalance: `$${cashOutValueUSD.toFixed(2)}`,
+      payout: `$${payoutUSD.toFixed(2)} (100% - no fee on cashout)`
     })
 
     // Convert USD to SOL using the same rate as transactions
@@ -41,7 +39,8 @@ export async function POST(request) {
     console.log('🔄 SOL conversion:', {
       usdAmount: `$${payoutUSD.toFixed(2)}`,
       solAmount: payoutSOL.toFixed(8),
-      lamports: lamportsToSend
+      lamports: lamportsToSend,
+      rateUsed: `$${USD_PER_SOL}/SOL`
     })
 
     // Import Solana libraries
