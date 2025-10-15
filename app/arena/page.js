@@ -868,137 +868,34 @@ const MultiplayerArena = () => {
     }
   }
 
-  // Handle replay payment from cashout modal
-  const handleReplayPayment = async () => {
-    console.log('💰 Starting replay payment process...')
+  // Handle replay - redirect to landing page to go through payment flow
+  const handleReplayPayment = () => {
+    console.log('🔄 Redirecting to landing page for replay...')
     
-    try {
-      // Check if hooks are available
-      if (!signAndSendTransaction) {
-        throw new Error('Transaction signing not available. Please refresh the page and try again.')
-      }
-      
-      // Get entry fee from URL params
-      const urlParams = new URLSearchParams(window.location.search)
-      const entryFee = parseFloat(urlParams.get('fee')) || 0.05
-      
-      console.log('   Entry Fee: $' + entryFee)
-      
-      // Get embedded wallet from linkedAccounts
-      const embeddedWallet = user?.linkedAccounts?.find(
-        account => account.type === 'wallet' && account.chainType === 'solana'
-      )
-      if (!embeddedWallet || !embeddedWallet.address) {
-        throw new Error('No Solana wallet found. Please ensure your wallet is connected.')
-      }
-      
-      const userWalletAddress = embeddedWallet.address
-      console.log('   From Wallet:', userWalletAddress)
-      console.log('   Available wallets:', solanaWallets?.length || 0)
-      
-      // Import Solana libraries
-      const { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } = await import('@solana/web3.js')
-      
-      // Setup connection
-      const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC
-      const connection = new Connection(heliusRpc, 'confirmed')
-      console.log('✅ Connected to Solana')
-      
-      // Calculate SOL amount
-      const platformWallet = process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS || 'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
-      const USD_PER_SOL = 18.18
-      const solAmount = entryFee / USD_PER_SOL
-      const lamports = Math.floor(solAmount * LAMPORTS_PER_SOL)
-      
-      console.log('💵 Payment Details:')
-      console.log('   SOL Amount:', solAmount.toFixed(6), 'SOL')
-      console.log('   Lamports:', lamports)
-      
-      // Check balance
-      const fromPubkey = new PublicKey(userWalletAddress)
-      const currentBalanceLamports = await connection.getBalance(fromPubkey)
-      const RENT_EXEMPT_MINIMUM = 890880
-      const TRANSACTION_FEE_ESTIMATE = 5000
-      
-      const remainingBalance = currentBalanceLamports - lamports - TRANSACTION_FEE_ESTIMATE
-      if (remainingBalance < RENT_EXEMPT_MINIMUM) {
-        throw new Error('Insufficient balance for replay')
-      }
-      
-      // Build transaction
-      const toPubkey = new PublicKey(platformWallet)
-      const transferIx = SystemProgram.transfer({
-        fromPubkey,
-        toPubkey,
-        lamports
-      })
-      
-      const { blockhash } = await connection.getLatestBlockhash('confirmed')
-      const transaction = new Transaction({
-        recentBlockhash: blockhash,
-        feePayer: fromPubkey
-      }).add(transferIx)
-      
-      // Serialize transaction
-      const serializedTx = transaction.serialize({
-        requireAllSignatures: false,
-        verifySignatures: false
-      })
-      const txBytes = Uint8Array.from(serializedTx)
-      
-      console.log('🔐 Signing with Privy...')
-      console.log('Available Solana wallets:', solanaWallets?.length)
-      
-      // Find the embedded wallet
-      const wallet = solanaWallets?.find(w => 
-        w.walletClientType === 'privy' || 
-        w.address === userWalletAddress
-      )
-      
-      if (!wallet) {
-        console.error('No wallet found. Available wallets:', solanaWallets)
-        throw new Error('Privy wallet not available. Please ensure your wallet is connected.')
-      }
-      
-      console.log('Using wallet:', {
-        type: wallet.walletClientType,
-        address: wallet.address
-      })
-      
-      // Sign and send transaction using Privy
-      const signature = await signAndSendTransaction(txBytes, {
-        wallet: wallet
-      })
-      
-      console.log('✅ Payment successful! Signature:', signature)
-      
-      // Close modal and reload page to rejoin
-      setShowCashOutSuccessModal(false)
-      setCashOutComplete(false)
-      setWalletBalance(null)
-      window.cashoutSignature = null
-      window.location.reload()
-      
-    } catch (error) {
-      console.error('❌ Replay payment failed:', error)
-      console.error('Error details:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name
-      })
-      
-      // User-friendly error messages
-      let errorMessage = error.message
-      if (error.message.includes('User rejected')) {
-        errorMessage = 'Transaction cancelled. Please try again when ready.'
-      } else if (error.message.includes('Insufficient balance')) {
-        errorMessage = 'Insufficient balance. Please add more SOL to your wallet.'
-      } else if (error.message.includes('not available')) {
-        errorMessage = 'Wallet connection issue. Please refresh the page and try again.'
-      }
-      
-      alert(`Payment failed: ${errorMessage}`)
+    // Get room details from URL
+    const urlParams = new URLSearchParams(window.location.search)
+    const roomId = urlParams.get('room')
+    const fee = urlParams.get('fee')
+    const mode = urlParams.get('mode')
+    
+    // Close modal
+    setShowCashOutSuccessModal(false)
+    setCashOutComplete(false)
+    setWalletBalance(null)
+    window.cashoutSignature = null
+    
+    // Redirect to landing page with room info for automatic reconnection
+    if (roomId && fee && mode) {
+      // Store the room they want to rejoin
+      window.sessionStorage.setItem('rejoinRoom', JSON.stringify({
+        roomId,
+        fee: parseFloat(fee),
+        mode
+      }))
     }
+    
+    // Redirect to landing page
+    window.location.href = '/'
   }
 
 
