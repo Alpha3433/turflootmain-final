@@ -2862,17 +2862,21 @@ const MultiplayerArena = () => {
           }
         }
         
-        // Check for merge between pieces (agario allows this)
+        // Check for collision and merge between pieces
         for (let j = i - 1; j >= 0; j--) {
           const otherPiece = this.playerPieces[j]
           
-          if (piece.canMerge && otherPiece.canMerge) {
-            const dx = piece.x - otherPiece.x
-            const dy = piece.y - otherPiece.y
-            const distance = Math.sqrt(dx * dx + dy * dy)
-            const minMergeDistance = (piece.radius + otherPiece.radius) * 0.8
+          const dx = piece.x - otherPiece.x
+          const dy = piece.y - otherPiece.y
+          const distance = Math.sqrt(dx * dx + dy * dy)
+          const minDistance = piece.radius + otherPiece.radius
+          
+          // Check for collision
+          if (distance < minDistance) {
+            const minMergeDistance = minDistance * 0.8
             
-            if (distance < minMergeDistance) {
+            // If both can merge and close enough, merge them
+            if (piece.canMerge && otherPiece.canMerge && distance < minMergeDistance) {
               // Merge the two pieces (exact agario style)
               otherPiece.mass += piece.mass
               otherPiece.radius = Math.sqrt(otherPiece.mass / Math.PI) * 6  // Exact agario radius
@@ -2886,6 +2890,17 @@ const MultiplayerArena = () => {
               
               console.log('🔄 Pieces merged! New piece mass:', Math.round(otherPiece.mass))
               break
+            } else {
+              // Collision - push them apart
+              const overlap = minDistance - distance
+              const pushX = (dx / distance) * overlap * 0.5
+              const pushY = (dy / distance) * overlap * 0.5
+              
+              // Push both pieces apart
+              piece.x += pushX
+              piece.y += pushY
+              otherPiece.x -= pushX
+              otherPiece.y -= pushY
             }
           }
         }
