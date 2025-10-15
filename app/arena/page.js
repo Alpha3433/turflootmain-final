@@ -1373,6 +1373,16 @@ const MultiplayerArena = () => {
                   throw new Error('No Solana wallet found')
                 }
                 
+                // Get player name safely
+                let playerName = 'Anonymous'
+                if (user?.email && typeof user.email === 'string') {
+                  try {
+                    playerName = user.email.split('@')[0]
+                  } catch (e) {
+                    console.warn('Error parsing email:', e)
+                  }
+                }
+                
                 // Call cashout API
                 const response = await fetch('/api/cashout', {
                   method: 'POST',
@@ -1381,7 +1391,7 @@ const MultiplayerArena = () => {
                     userWalletAddress: embeddedWallet.address,
                     cashOutValueUSD: score,
                     privyUserId: user?.id,
-                    playerName: user?.email?.split('@')[0] || 'Anonymous'
+                    playerName: playerName
                   })
                 })
                 
