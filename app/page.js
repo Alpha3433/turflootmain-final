@@ -2312,12 +2312,6 @@ export default function TurfLootTactical() {
   const handleJoinLobby = async (serverData) => {
     console.log('🎮 HANDLEFNLOBIOY - Starting Colyseus game with server data:', serverData)
     
-    // Show loading popup immediately when JOIN is clicked
-    if (!isMobile) {
-      console.log('🎮 Creating loading popup immediately on JOIN click...')
-      createGameLoadingPopup()
-    }
-    
     try {
       // Validate server data
       if (!serverData) {
