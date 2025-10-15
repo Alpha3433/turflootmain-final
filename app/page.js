@@ -2468,8 +2468,18 @@ export default function TurfLootTactical() {
         // Add Privy user data
         privyUserId: privyUserData.privyUserId,
         playerName: encodeURIComponent(privyUserData.playerName),
-        walletAddress: privyUserData.walletAddress || ''
+        walletAddress: privyUserData.walletAddress || '',
+        // Add selected skin data
+        skinId: selectedSkin.id || 'default',
+        skinColor: encodeURIComponent(selectedSkin.color || '#4A90E2'),
+        skinName: encodeURIComponent(selectedSkin.name || 'Default Warrior')
       }
+      
+      console.log('🎨 Passing selected skin to arena:', {
+        skinId: selectedSkin.id,
+        skinName: selectedSkin.name,
+        skinColor: selectedSkin.color
+      })
 
       if (serverData.endpoint) {
         queryParams.endpoint = serverData.endpoint
