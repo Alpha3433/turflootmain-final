@@ -30,6 +30,10 @@ const MultiplayerArena = () => {
   // Privy authentication
   const { ready, authenticated, user, login, wallets } = usePrivy()
   
+  // Solana wallet hooks for payment
+  const { wallets: solanaWallets } = useSolanaWallets()
+  const { signAndSendTransaction } = useSignAndSendTransaction()
+  
   // Player name state that updates when localStorage changes
   const [playerName, setPlayerName] = useState('Anonymous Player')
   
