@@ -4,6 +4,10 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Client } from 'colyseus.js'
 import { usePrivy } from '@privy-io/react-auth'
+import { 
+  useWallets as useSolanaWallets,
+  useSignAndSendTransaction
+} from '@privy-io/react-auth/solana'
 
 // Global connection tracker to prevent duplicates across component instances
 const GLOBAL_CONNECTION_TRACKER = {
@@ -27,7 +31,40 @@ const MultiplayerArena = () => {
   const inputThrottleMs = 16 // ~60fps input rate (like agario)
   
   // Privy authentication
-  const { ready, authenticated, user, login } = usePrivy()
+  const { ready, authenticated, user, login, wallets } = usePrivy()
+  
+  // Solana wallet hooks for payment
+  const { wallets: solanaWallets } = useSolanaWallets()
+  const signAndSendTransactionResponse = useSignAndSendTransaction()
+  const privySignAndSendTransaction = useMemo(() => {
+    if (typeof signAndSendTransactionResponse === 'function') {
+      return signAndSendTransactionResponse
+    }
+    if (
+      signAndSendTransactionResponse &&
+      typeof signAndSendTransactionResponse.signAndSendTransaction === 'function'
+    ) {
+      return signAndSendTransactionResponse.signAndSendTransaction
+    }
+    if (
+      signAndSendTransactionResponse &&
+      typeof signAndSendTransactionResponse.sendTransaction === 'function'
+    ) {
+      return signAndSendTransactionResponse.sendTransaction
+    }
+    if (
+      signAndSendTransactionResponse &&
+      typeof signAndSendTransactionResponse === 'object'
+    ) {
+      const firstFunctionKey = Object.keys(signAndSendTransactionResponse).find(
+        (key) => typeof signAndSendTransactionResponse[key] === 'function'
+      )
+      if (firstFunctionKey) {
+        return signAndSendTransactionResponse[firstFunctionKey]
+      }
+    }
+    return null
+  }, [signAndSendTransactionResponse])
   
   // Player name state that updates when localStorage changes
   const [playerName, setPlayerName] = useState('Anonymous Player')
@@ -37,7 +74,8 @@ const MultiplayerArena = () => {
   const [connectionStatus, setConnectionStatus] = useState('connecting')
   const [playerCount, setPlayerCount] = useState(0)
   const [mass, setMass] = useState(25) // Fixed to match server starting mass
-  const [score, setScore] = useState(0)
+  const [score, setScore] = useState(0) // For paid arena: worth from eliminations, For free: coins collected
+  const [coinsCollected, setCoinsCollected] = useState(0) // Track coins separately for paid arena
   const [serverState, setServerState] = useState(null)
   const [timeSurvived, setTimeSurvived] = useState(0)
   const [eliminations, setEliminations] = useState(0)
@@ -185,10 +223,11 @@ const MultiplayerArena = () => {
   ]), [])
 
   const visibleMissions = useMemo(() => {
-    return activeMissions.filter(mission => !mission.completed && !completedMissions.includes(mission.id))
-  }, [activeMissions, completedMissions])
+    // Show all missions, including completed ones
+    return activeMissions
+  }, [activeMissions])
   const missionsToDisplay = useMemo(() => visibleMissions.slice(0, 1), [visibleMissions])
-  const activeMissionCount = missionsToDisplay.length
+  const activeMissionCount = missionsToDisplay.filter(m => !m.completed && !completedMissions.includes(m.id)).length
   const hasActiveMissions = activeMissionCount > 0
   const showMissionCompletion = Boolean(missionCompletionIndicator && !hasActiveMissions)
   const shouldRenderMissionPopup = (missionPopupVisible && (hasActiveMissions || missionPopupCondensed)) || showMissionCompletion
@@ -247,8 +286,16 @@ const MultiplayerArena = () => {
   
   // Parse URL parameters and get authenticated user data
   const roomId = searchParams.get('roomId') || 'global-turfloot-arena'
-  const entryFee = parseFloat(searchParams.get('fee')) || 0
+  const feeParam = searchParams.get('fee')
+  const entryFee = parseFloat(feeParam) || 0
   const isPaidArena = searchParams.get('paid') === 'true' || entryFee > 0
+  
+  console.log('🔍 URL Parameters:', {
+    feeParam,
+    entryFee,
+    isPaidArena,
+    roomId
+  })
   
   const privyUserId = user?.id || null
   const walletAddress = user?.wallet?.address
@@ -494,6 +541,36 @@ const MultiplayerArena = () => {
       if (deduped.length === 0) {
         return prev
       }
+      
+      // Save completed missions to database for paid arenas
+      if (isPaidArena && user?.id) {
+        deduped.forEach(async (missionId) => {
+          const mission = activeMissions.find(m => m.id === missionId)
+          if (mission) {
+            try {
+              console.log(`💾 Saving mission completion to database: ${missionId}`)
+              const response = await fetch('/api/missions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  userIdentifier: user.id,
+                  missionId: mission.id,
+                  missionType: mission.type,
+                  coinsAwarded: mission.reward || 0
+                })
+              })
+              
+              if (response.ok) {
+                const result = await response.json()
+                console.log(`✅ Mission saved! Coins awarded: ${result.coinsAwarded} | Total coins: ${result.coinBalance}`)
+              }
+            } catch (error) {
+              console.error('❌ Failed to save mission:', error)
+            }
+          }
+        })
+      }
+      
       return [...prev, ...deduped]
     })
     setMissionRunCompleted(true)
@@ -736,20 +813,41 @@ const MultiplayerArena = () => {
     selectedSkin?.pattern
   ])
 
-  // Load selected skin from localStorage
+  // Load selected skin from URL parameters (priority) or localStorage (fallback)
   useEffect(() => {
+    // First, check URL parameters for skin data
+    const skinId = searchParams.get('skinId')
+    const skinColor = searchParams.get('skinColor')
+    const skinName = searchParams.get('skinName')
+    
+    if (skinId && skinColor) {
+      // Use skin from URL parameters (passed from landing page)
+      const urlSkin = {
+        id: skinId,
+        color: decodeURIComponent(skinColor),
+        name: decodeURIComponent(skinName || 'Default Warrior'),
+        type: 'circle',
+        pattern: 'solid'
+      }
+      setSelectedSkin(urlSkin)
+      console.log('🎨 Using selected skin from URL parameters:', urlSkin)
+      setSelectedSkinLoaded(true)
+      return
+    }
+    
+    // Fallback to localStorage if no URL parameters
     const savedSkin = localStorage.getItem('selectedSkin')
     if (savedSkin) {
       try {
         const parsedSkin = JSON.parse(savedSkin)
         setSelectedSkin(parsedSkin)
-        console.log('🎨 Loaded selected skin for arena:', parsedSkin)
+        console.log('🎨 Loaded selected skin from localStorage:', parsedSkin)
       } catch (error) {
         console.log('❌ Error loading saved skin:', error)
       }
     }
     setSelectedSkinLoaded(true)
-  }, [])
+  }, [searchParams])
 
   // Authentication check - redirect to login if not authenticated with user feedback
   useEffect(() => {
@@ -809,6 +907,129 @@ const MultiplayerArena = () => {
       }
     }
   }
+
+  // Handle replay payment from cashout modal
+  const handleReplayPayment = async () => {
+    console.log('💰 Starting replay payment process...')
+    
+    try {
+      // Check if Privy signing is available
+      if (!privySignAndSendTransaction) {
+        throw new Error('Privy payment system not available. Please refresh and try again.')
+      }
+      
+      // Get entry fee from URL params
+      const urlParams = new URLSearchParams(window.location.search)
+      const entryFee = parseFloat(urlParams.get('fee')) || 0.05
+      const roomId = urlParams.get('room')
+      const mode = urlParams.get('mode')
+      
+      console.log('   Entry Fee: $' + entryFee)
+      
+      // Get embedded wallet
+      const embeddedWallet = user?.linkedAccounts?.find(
+        account => account.type === 'wallet' && account.chainType === 'solana'
+      )
+      if (!embeddedWallet || !embeddedWallet.address) {
+        throw new Error('No Solana wallet found')
+      }
+      
+      const userWalletAddress = embeddedWallet.address
+      console.log('   From Wallet:', userWalletAddress)
+      
+      // Import Solana libraries
+      const { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } = await import('@solana/web3.js')
+      
+      // Setup connection
+      const heliusRpc = 'https://mainnet.helius-rpc.com/?api-key=9ce7937c-f2a5-4759-8d79-dd8f9ca63fa5'
+      const connection = new Connection(heliusRpc, 'confirmed')
+      
+      // Calculate SOL amount
+      const platformWallet = 'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
+      const USD_PER_SOL = 18.18
+      const solAmount = entryFee / USD_PER_SOL
+      const lamports = Math.floor(solAmount * LAMPORTS_PER_SOL)
+      
+      console.log('💵 Payment: $' + entryFee + ' = ' + solAmount.toFixed(6) + ' SOL')
+      
+      // Check balance
+      const fromPubkey = new PublicKey(userWalletAddress)
+      const currentBalanceLamports = await connection.getBalance(fromPubkey)
+      const RENT_EXEMPT_MINIMUM = 890880
+      const TRANSACTION_FEE_ESTIMATE = 5000
+      
+      const remainingBalance = currentBalanceLamports - lamports - TRANSACTION_FEE_ESTIMATE
+      if (remainingBalance < RENT_EXEMPT_MINIMUM) {
+        throw new Error('Insufficient balance. Please add more SOL to your wallet.')
+      }
+      
+      // Build transaction
+      const toPubkey = new PublicKey(platformWallet)
+      const transferIx = SystemProgram.transfer({
+        fromPubkey,
+        toPubkey,
+        lamports
+      })
+      
+      const { blockhash } = await connection.getLatestBlockhash('confirmed')
+      const transaction = new Transaction({
+        recentBlockhash: blockhash,
+        feePayer: fromPubkey
+      }).add(transferIx)
+      
+      // Serialize transaction
+      const serializedTx = transaction.serialize({
+        requireAllSignatures: false,
+        verifySignatures: false
+      })
+      
+      console.log('🔐 Opening Privy transaction modal...')
+      
+      // Find wallet object for Privy
+      const embeddedWalletObj = solanaWallets?.find(w => {
+        const addr = w.address || w.publicKey?.toString() || w.publicKey?.toBase58?.()
+        return addr === userWalletAddress
+      })
+      
+      if (!embeddedWalletObj) {
+        throw new Error('Wallet object not found for Privy signing')
+      }
+      
+      console.log('Wallet object found:', !!embeddedWalletObj)
+      
+      // Sign and send transaction with Privy
+      const result = await privySignAndSendTransaction({
+        transaction: serializedTx,
+        wallet: embeddedWalletObj
+      })
+      
+      const signature = result.signature || result
+      console.log('✅ Payment successful! Signature:', signature)
+      
+      // Close cashout modal
+      setShowCashOutSuccessModal(false)
+      setCashOutComplete(false)
+      setWalletBalance(null)
+      window.cashoutSignature = null
+      
+      // Reload to rejoin game
+      window.location.reload()
+      
+    } catch (error) {
+      console.error('❌ Replay payment failed:', error)
+      
+      // User-friendly error messages
+      let errorMessage = error.message
+      if (error.message && error.message.includes('User rejected')) {
+        errorMessage = 'Transaction cancelled. Please try again when ready.'
+      } else if (error.message && error.message.includes('Insufficient')) {
+        errorMessage = 'Insufficient balance. Please add more SOL to your wallet.'
+      }
+      
+      alert(`Payment failed: ${errorMessage}`)
+    }
+  }
+
 
   // Handle split functionality - ported from agario with improved error handling
   const handleSplit = (e) => {
@@ -1185,7 +1406,7 @@ const MultiplayerArena = () => {
           }
           
           if (newProgress >= 100) {
-            console.log('Cash out completed!')
+            console.log('💰 Cash out completed! Disconnecting and processing transaction...')
             setIsCashingOut(false)
             setCashOutComplete(true)
             clearInterval(cashOutIntervalRef.current)
@@ -1196,24 +1417,175 @@ const MultiplayerArena = () => {
               gameRef.current.updateLocalCashOutState(false, 100)
             }
             
-            // Add currency based on score
-            setCurrency(prevCurrency => prevCurrency + score)
+            // IMMEDIATELY disconnect from game
+            setConnectionStatus('eliminated')
+            if (wsRef.current) {
+              try {
+                wsRef.current.leave()
+                console.log('🔌 Player disconnected from game for cashout')
+              } catch (e) {
+                console.error('Error leaving room:', e)
+              }
+            }
             
-            // Show cashout success modal and start countdown
-            setShowCashOutSuccessModal(true)
-            setAutoRedirectCountdown(10)
-            
-            // Start countdown timer
-            const countdownInterval = setInterval(() => {
-              setAutoRedirectCountdown(prev => {
-                if (prev <= 1) {
-                  clearInterval(countdownInterval)
-                  window.location.href = '/'
-                  return 0
+            // Process cashout with Privy transaction workflow
+            const processCashoutWithPrivy = async () => {
+              try {
+                console.log('🔐 Preparing Privy cashout transaction...')
+                
+                // Check if Privy is available
+                if (!privySignAndSendTransaction) {
+                  throw new Error('Privy not available. Please refresh and try again.')
                 }
-                return prev - 1
-              })
-            }, 1000)
+                
+                // Get user wallet
+                const embeddedWallet = user?.linkedAccounts?.find(
+                  account => account.type === 'wallet' && account.chainType === 'solana'
+                )
+                if (!embeddedWallet || !embeddedWallet.address) {
+                  throw new Error('No Solana wallet found')
+                }
+                
+                const userWalletAddress = embeddedWallet.address
+                
+                // Get the actual cashout value from playerBalancesRef (not score)
+                const actualCashOutValue = playerBalancesRef.current.get(wsRef.current.sessionId) || 0
+                
+                // DEBUG: Log all balance-related values
+                console.log('🔍 PRE-CASHOUT DEBUG:', {
+                  score: score,
+                  scoreType: typeof score,
+                  actualCashOutValue: actualCashOutValue,
+                  coinsCollected,
+                  eliminations,
+                  mass,
+                  isPaidArena,
+                  sessionId: wsRef.current?.sessionId,
+                  playerBalancesRef: Array.from(playerBalancesRef.current.entries())
+                })
+                
+                const cashOutValueUSD = actualCashOutValue
+                
+                console.log('💵 Cashout amount being sent to API:', {
+                  cashOutValueUSD,
+                  formattedAmount: `$${cashOutValueUSD.toFixed(2)}`,
+                  wallet: userWalletAddress
+                })
+                
+                console.log('🚨 CRITICAL CHECK - What is being sent to cashout API:', {
+                  variableName: 'cashOutValueUSD',
+                  value: cashOutValueUSD,
+                  type: typeof cashOutValueUSD,
+                  isNumber: !isNaN(cashOutValueUSD),
+                  sourceWas: 'playerBalancesRef.current.get(sessionId)'
+                })
+                
+                // Get player name
+                let playerName = 'Anonymous'
+                if (user?.email && typeof user.email === 'string') {
+                  try {
+                    playerName = user.email.split('@')[0]
+                  } catch (e) {
+                    console.warn('Error parsing email:', e)
+                  }
+                }
+                
+                // Step 1: Call API to prepare the transaction (get pre-signed transaction)
+                console.log('📞 Building cashout transaction on server...')
+                const prepareResponse = await fetch('/api/cashout', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    userWalletAddress,
+                    cashOutValueUSD,
+                    privyUserId: user?.id,
+                    playerName,
+                    prepareOnly: true // Flag to return serialized transaction instead of sending
+                  })
+                })
+                
+                const prepareData = await prepareResponse.json()
+                
+                if (!prepareData.success) {
+                  throw new Error(prepareData.error || 'Failed to prepare cashout transaction')
+                }
+                
+                // Step 2: Get the pre-signed transaction from server
+                const serializedTransaction = prepareData.serializedTransaction
+                console.log('✅ Transaction prepared by server')
+                
+                // Step 3: Find the wallet object for Privy (like landing page does)
+                const embeddedWalletObj = solanaWallets?.find(w => {
+                  const addr = w.address || w.publicKey?.toString() || w.publicKey?.toBase58?.()
+                  return addr === userWalletAddress
+                })
+                
+                console.log('🔐 Opening Privy modal for user approval...')
+                console.log('User wallet address:', userWalletAddress)
+                console.log('Wallet object found:', !!embeddedWalletObj)
+                console.log('privySignAndSendTransaction available:', !!privySignAndSendTransaction)
+                
+                if (!embeddedWalletObj) {
+                  throw new Error('Wallet object not found for Privy signing')
+                }
+                
+                // Convert base64 to Uint8Array for Privy
+                const txBuffer = Buffer.from(serializedTransaction, 'base64')
+                console.log('Transaction buffer length:', txBuffer.length)
+                
+                // Call Privy with wallet object (not address)
+                const result = await privySignAndSendTransaction({
+                  transaction: txBuffer,
+                  wallet: embeddedWalletObj
+                })
+                
+                const signature = result.signature || result
+                console.log('✅ Cashout transaction confirmed! Signature:', signature)
+                
+                // Store signature for display
+                window.cashoutSignature = signature
+                
+                // Fetch updated balance
+                setLoadingWalletBalance(true)
+                try {
+                  const balanceResponse = await fetch('/api/user/balance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ walletAddress: userWalletAddress })
+                  })
+                  const balanceData = await balanceResponse.json()
+                  if (balanceData.success) {
+                    setWalletBalance(balanceData.balance)
+                  }
+                } catch (err) {
+                  console.error('Balance fetch error:', err)
+                }
+                setLoadingWalletBalance(false)
+                
+                // Show success modal
+                setShowCashOutSuccessModal(true)
+                
+              } catch (error) {
+                console.error('❌ Cashout transaction failed:', error)
+                console.error('Error details:', {
+                  message: error.message,
+                  stack: error.stack,
+                  name: error.name,
+                  error: error
+                })
+                
+                if (error.message && error.message.includes('User rejected')) {
+                  alert('Transaction cancelled. Reloading game...')
+                } else {
+                  alert(`Cashout failed: ${error.message || 'Unknown error'}`)
+                }
+                
+                // Reload game on error
+                window.location.reload()
+              }
+            }
+            
+            processCashoutWithPrivy()
             
             return 100
           }
@@ -1486,6 +1858,10 @@ const MultiplayerArena = () => {
       GLOBAL_CONNECTION_TRACKER.isConnecting = false // Reset global flag on success
       console.log(`🔗 [${componentId}] Setting initial connection status to connected`)
       setConnectionStatus('connected')
+      
+      // Reset player balances for new game session
+      playerBalancesRef.current.clear()
+      console.log('💰 Reset player balances for new game session')
 
       initializePingMeasurement(room)
 
@@ -1739,8 +2115,15 @@ const MultiplayerArena = () => {
           const previousSessions = new Set(playerBalancesRef.current.keys())
           
           state.players.forEach((player, sessionId) => {
-            currentSessions.add(sessionId)
-            console.log(`🎮 Player: ${player.name} (${sessionId}) - isCurrentPlayer: ${sessionId === room.sessionId}`)
+            // Skip split pieces - they are not separate players
+            const isSplitPiece = player?.isSplitPiece === true
+            
+            // Only track real players (not split pieces) for elimination detection
+            if (!isSplitPiece) {
+              currentSessions.add(sessionId)
+            }
+            
+            console.log(`🎮 Player: ${player.name} (${sessionId}) - isCurrentPlayer: ${sessionId === room.sessionId}, isSplitPiece: ${isSplitPiece}`)
             const isCurrentPlayer = sessionId === room.sessionId
             if (isCurrentPlayer) {
               console.log('✅ Found current player:', sessionId, player.name)
@@ -1748,16 +2131,15 @@ const MultiplayerArena = () => {
             }
             
             // CLIENT-SIDE: Add paid arena properties since Colyseus Cloud doesn't have updated schema
-            // Calculate starting balance: entry fee minus 10% platform fee
-            const PLATFORM_FEE_PERCENTAGE = 0.10
-            const startingBalance = isPaidArena ? (entryFee * (1 - PLATFORM_FEE_PERCENTAGE)) : 0
+            // Hardcoded starting balance for paid arenas
+            const startingBalance = isPaidArena ? 0.45 : 0
             
-            // Get or initialize player balance
-            if (!playerBalancesRef.current.has(sessionId)) {
+            // Only track balance for real players, not split pieces
+            if (!isSplitPiece && !playerBalancesRef.current.has(sessionId)) {
               playerBalancesRef.current.set(sessionId, startingBalance)
             }
             
-            const currentCashOutValue = isPaidArena ? playerBalancesRef.current.get(sessionId) : 0
+            const currentCashOutValue = isPaidArena && !isSplitPiece ? (playerBalancesRef.current.get(sessionId) || 0) : 0
             
             gameState.players.push({
               ...player,
@@ -2086,8 +2468,8 @@ const MultiplayerArena = () => {
 
       this.cameraZoom = isMobileFlag ? 0.75 : 1
 
-      // World setup with circular zone system
-      this.world = { width: 8000, height: 8000 }
+      // World setup with circular zone system - Extended to prevent black space visibility
+      this.world = { width: 10000, height: 10000 }
       this.expectedSessionId = null // Will be set when we connect to Colyseus
       this.localCashOutState = { isCashingOut: false, cashOutProgress: 0 } // Local state for immediate feedback
       
@@ -2285,8 +2667,8 @@ const MultiplayerArena = () => {
         }
         
         // Verify spawn position is within playable area (for debugging)
-        const worldCenterX = this.world.width / 4 // 2000 - left-side playable area
-        const worldCenterY = this.world.height / 4 // 2000 - top-side playable area
+        const worldCenterX = 2000 // Fixed center - left-side playable area
+        const worldCenterY = 2000 // Fixed center - top-side playable area
         const distanceFromCenter = Math.sqrt(
           Math.pow(currentPlayer.x - worldCenterX, 2) + 
           Math.pow(currentPlayer.y - worldCenterY, 2)
@@ -2300,15 +2682,18 @@ const MultiplayerArena = () => {
         })
         
         // Update mass and score (server is always authoritative for these)
-        // For paid arenas, use cashOutValue (client-side calculated) instead of score
-        const currentScoreRounded = isPaidArena 
-          ? (currentPlayer.cashOutValue || 0)
-          : Math.max(0, Math.round(currentPlayer.score || 0))
+        // For paid arenas: score = worth (cashOutValue), coins = server score
+        // For free arenas: score = coins collected (server score)
+        const serverCoins = Math.max(0, Math.round(currentPlayer.score || 0))
+        const currentWorth = isPaidArena ? (currentPlayer.cashOutValue || 0) : 0
+        const currentScoreRounded = isPaidArena ? currentWorth : serverCoins
+        
         const rawMass = Number.isFinite(currentPlayer.mass) ? currentPlayer.mass : 0
         const roundedMass = Math.max(0, Math.round(rawMass))
 
         console.log('🎯 Mass update from server:', currentPlayer.mass, '(rounded:', roundedMass || 25, ')')
-        console.log('💰 Cash-out value update:', isPaidArena ? `$${currentScoreRounded.toFixed(2)}` : currentScoreRounded)
+        console.log('💰 Worth (eliminations):', isPaidArena ? `$${currentWorth.toFixed(2)}` : 'N/A')
+        console.log('🪙 Coins collected (server score):', serverCoins)
         console.log('💰 Player props (client-enriched):', {
           isPaidArena: currentPlayer.isPaidArena,
           cashOutValue: currentPlayer.cashOutValue,
@@ -2317,6 +2702,9 @@ const MultiplayerArena = () => {
         })
         setMass(roundedMass || 25)
         setScore(currentScoreRounded)
+        if (isPaidArena) {
+          setCoinsCollected(serverCoins) // Track coins separately in paid arena
+        }
 
         const missionStats = missionStatsRef.current || {}
 
@@ -2562,8 +2950,8 @@ const MultiplayerArena = () => {
         }
         
         // Keep pieces within arena boundaries (exact agario style)
-        const centerX = this.world.width / 4
-        const centerY = this.world.height / 4
+        const centerX = 2000 // Fixed playable area center
+        const centerY = 2000 // Fixed playable area center
         const playableRadius = 1800
         const maxRadius = playableRadius - piece.radius
         
@@ -2580,15 +2968,29 @@ const MultiplayerArena = () => {
           piece.vy = 0
         }
         
-        // Check for merge with main player (exact agario merge detection)
-        if (piece.canMerge) {
-          const dx = piece.x - this.player.x
-          const dy = piece.y - this.player.y
-          const distance = Math.sqrt(dx * dx + dy * dy)
-          // Exact agario merge distance
-          const minMergeDistance = (piece.radius + this.player.radius) * 0.8
+        // Remove split piece if mass drops to 1 or below (from hitting spikes)
+        if (piece.mass <= 1) {
+          console.log('💥 Split piece destroyed (mass <= 1)')
+          this.playerPieces.splice(i, 1)
           
-          if (distance < minMergeDistance) {
+          // Update total mass UI
+          const totalMass = this.player.mass + this.playerPieces.reduce((sum, p) => sum + p.mass, 0)
+          setMass(Math.floor(totalMass))
+          continue // Skip to next piece
+        }
+        
+        // Collision detection with main player (prevent overlap)
+        const dx = piece.x - this.player.x
+        const dy = piece.y - this.player.y
+        const distance = Math.sqrt(dx * dx + dy * dy)
+        const minDistance = piece.radius + this.player.radius
+        
+        // Check for collision (touching but not overlapping)
+        if (distance < minDistance) {
+          // If can merge and close enough, merge them
+          const minMergeDistance = minDistance * 0.8
+          
+          if (piece.canMerge && distance < minMergeDistance) {
             // Merge piece into main player (exact agario style)
             this.player.mass += piece.mass
             this.player.radius = Math.sqrt(this.player.mass / Math.PI) * 6  // Exact agario radius
@@ -2602,20 +3004,34 @@ const MultiplayerArena = () => {
             
             console.log('🔄 Piece merged! New player mass:', Math.round(this.player.mass), 'Total mass:', Math.floor(totalMass))
             continue
+          } else {
+            // Collision - push piece away but don't affect main player movement
+            // This prevents the "dragging" feeling
+            const overlap = minDistance - distance + 1 // Add 1px buffer
+            const pushX = (dx / distance) * overlap
+            const pushY = (dy / distance) * overlap
+            
+            // Only push the split piece away, main player moves freely
+            piece.x += pushX
+            piece.y += pushY
           }
         }
         
-        // Check for merge between pieces (agario allows this)
+        // Check for collision and merge between pieces
         for (let j = i - 1; j >= 0; j--) {
           const otherPiece = this.playerPieces[j]
           
-          if (piece.canMerge && otherPiece.canMerge) {
-            const dx = piece.x - otherPiece.x
-            const dy = piece.y - otherPiece.y
-            const distance = Math.sqrt(dx * dx + dy * dy)
-            const minMergeDistance = (piece.radius + otherPiece.radius) * 0.8
+          const dx = piece.x - otherPiece.x
+          const dy = piece.y - otherPiece.y
+          const distance = Math.sqrt(dx * dx + dy * dy)
+          const minDistance = piece.radius + otherPiece.radius
+          
+          // Check for collision
+          if (distance < minDistance) {
+            const minMergeDistance = minDistance * 0.8
             
-            if (distance < minMergeDistance) {
+            // If both can merge and close enough, merge them
+            if (piece.canMerge && otherPiece.canMerge && distance < minMergeDistance) {
               // Merge the two pieces (exact agario style)
               otherPiece.mass += piece.mass
               otherPiece.radius = Math.sqrt(otherPiece.mass / Math.PI) * 6  // Exact agario radius
@@ -2629,6 +3045,17 @@ const MultiplayerArena = () => {
               
               console.log('🔄 Pieces merged! New piece mass:', Math.round(otherPiece.mass))
               break
+            } else {
+              // Collision - push them apart
+              const overlap = minDistance - distance
+              const pushX = (dx / distance) * overlap * 0.5
+              const pushY = (dy / distance) * overlap * 0.5
+              
+              // Push both pieces apart
+              piece.x += pushX
+              piece.y += pushY
+              otherPiece.x -= pushX
+              otherPiece.y -= pushY
             }
           }
         }
@@ -2735,8 +3162,8 @@ const MultiplayerArena = () => {
     
     drawWorldBoundary() {
       // Circular zone system for top-left playable area
-      const centerX = this.world.width / 4  // 2000 - top left area center X
-      const centerY = this.world.height / 4 // 2000 - top left area center Y
+      const centerX = 2000  // Fixed playable area center X
+      const centerY = 2000 // Fixed playable area center Y
       const playableRadius = this.currentPlayableRadius
       
       // Draw red danger zone everywhere  
@@ -3056,22 +3483,6 @@ const MultiplayerArena = () => {
         this.ctx.shadowColor = '#000000'
         this.ctx.shadowBlur = 2
         this.ctx.fillText(displayValue, drawX, textY)
-        this.ctx.shadowBlur = 0
-        
-        // Draw username below player avatar in paid arenas (no box, closer to player)
-        const nameY = drawY + playerRadius + 20 // Position closer to player (was 30)
-        const playerName = player.name || 'Anonymous'
-        
-        // Style for username
-        this.ctx.font = 'bold 14px Arial'
-        this.ctx.textAlign = 'center'
-        this.ctx.textBaseline = 'middle'
-        
-        // Draw username in white with shadow (no background box)
-        this.ctx.fillStyle = '#FFFFFF'
-        this.ctx.shadowColor = '#000000'
-        this.ctx.shadowBlur = 4
-        this.ctx.fillText(playerName, drawX, nameY)
         this.ctx.shadowBlur = 0
       }
     }
@@ -3597,8 +4008,12 @@ const MultiplayerArena = () => {
               type="button"
               onClick={handleMissionExpand}
               style={{
-                background: 'rgba(15, 15, 15, 0.92)',
-                border: '1px solid rgba(251, 191, 36, 0.6)',
+                background: missionsToDisplay[0]?.completed || completedMissions.includes(missionsToDisplay[0]?.id) 
+                  ? 'rgba(34, 197, 94, 0.15)' 
+                  : 'rgba(15, 15, 15, 0.92)',
+                border: missionsToDisplay[0]?.completed || completedMissions.includes(missionsToDisplay[0]?.id)
+                  ? '1px solid rgba(34, 197, 94, 0.6)'
+                  : '1px solid rgba(251, 191, 36, 0.6)',
                 borderRadius: '9999px',
                 padding: isMobile ? '8px 14px' : '10px 18px',
                 display: 'flex',
@@ -3615,21 +4030,34 @@ const MultiplayerArena = () => {
                 backdropFilter: 'blur(6px)'
               }}
             >
-              <span style={{ fontSize: isMobile ? '16px' : '18px' }}>🎯</span>
-              <span style={{ color: '#fbbf24', textTransform: 'uppercase' }}>Missions</span>
-              <span
-                style={{
-                  background: 'rgba(251, 191, 36, 0.2)',
-                  color: '#fbbf24',
-                  borderRadius: '9999px',
-                  padding: '2px 10px',
-                  fontSize: isMobile ? '11px' : '12px',
-                  fontWeight: 700,
-                  letterSpacing: '0.5px'
-                }}
-              >
-                {activeMissionCount}
+              <span style={{ fontSize: isMobile ? '16px' : '18px' }}>
+                {missionsToDisplay[0]?.completed || completedMissions.includes(missionsToDisplay[0]?.id) ? '✅' : '🎯'}
               </span>
+              <span style={{ 
+                color: missionsToDisplay[0]?.completed || completedMissions.includes(missionsToDisplay[0]?.id) 
+                  ? '#22c55e' 
+                  : '#fbbf24', 
+                textTransform: 'uppercase' 
+              }}>
+                {missionsToDisplay[0]?.completed || completedMissions.includes(missionsToDisplay[0]?.id) 
+                  ? 'Mission Complete' 
+                  : 'Missions'}
+              </span>
+              {!(missionsToDisplay[0]?.completed || completedMissions.includes(missionsToDisplay[0]?.id)) && (
+                <span
+                  style={{
+                    background: 'rgba(251, 191, 36, 0.2)',
+                    color: '#fbbf24',
+                    borderRadius: '9999px',
+                    padding: '2px 10px',
+                    fontSize: isMobile ? '11px' : '12px',
+                    fontWeight: 700,
+                    letterSpacing: '0.5px'
+                  }}
+                >
+                  {activeMissionCount}
+                </span>
+              )}
             </button>
           ) : (
             <div
@@ -3855,7 +4283,8 @@ const MultiplayerArena = () => {
             }
           </div>
           
-          {/* Multiplayer Status Indicator */}
+          {/* Multiplayer Status Indicator - Mobile Only */}
+          {isMobile && (
           <div style={{
             backgroundColor: 'rgba(0, 0, 0, 0.7)',
             color: connectionStatus === 'connected'
@@ -3865,9 +4294,9 @@ const MultiplayerArena = () => {
                 : connectionStatus === 'eliminated'
                   ? '#ff4444'
                   : '#ff0000',
-            padding: isMobile ? '4px 8px' : '6px 12px',
+            padding: '4px 8px',
             borderRadius: '8px',
-            fontSize: isMobile ? '10px' : '12px',
+            fontSize: '10px',
             fontWeight: 'bold',
             marginBottom: '8px',
             display: 'flex',
@@ -3902,6 +4331,7 @@ const MultiplayerArena = () => {
               {connectionStatus === 'eliminated' && '☠️ ELIMINATED'}
             </span>
           </div>
+          )}
 
           {/* Player Rankings - Dynamic Leaderboard */}
           <div style={{ 
@@ -4016,6 +4446,23 @@ const MultiplayerArena = () => {
               ))
             })()}
           </div>
+          
+          {/* Divider and Player Count - Agario Style */}
+          <div style={{
+            marginTop: isMobile ? '6px' : '8px',
+            paddingTop: isMobile ? '6px' : '8px',
+            borderTop: '1px solid rgba(255, 255, 255, 0.1)'
+          }}>
+            <div style={{
+              fontSize: isMobile ? (leaderboardExpanded ? '8px' : '7px') : '10px',
+              color: '#9ca3af',
+              textAlign: 'center',
+              fontWeight: '500',
+              letterSpacing: '0.02em'
+            }}>
+              {playerCount === 1 ? '1 player in game' : `${playerCount} players in game`}
+            </div>
+          </div>
         </div>
 
         {/* Live Ping Meter - Bottom Left */}
@@ -4078,29 +4525,22 @@ const MultiplayerArena = () => {
           </div>
         </div>
 
-        {/* Player Info Panel - Bottom Right (compact) - FROM LOCAL AGARIO */}
+        {/* Player Info Panel - Mobile Only */}
+        {isMobile && (
         <div style={{
           position: 'fixed',
-          bottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 8px)' : '10px',
-          left: isMobile ? '50%' : 'auto',
-          right: isMobile ? 'auto' : '10px',
-          transform: isMobile ? 'translateX(-50%)' : 'none',
+          bottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
+          left: '50%',
+          transform: 'translateX(-50%)',
           zIndex: 1000,
-          // Minimal mobile styling
-          background: isMobile 
-            ? 'rgba(0, 0, 0, 0.6)'
-            : 'rgba(0, 0, 0, 0.85)',
-          border: isMobile 
-            ? 'none' 
-            : '2px solid #333',
-          borderRadius: isMobile ? '6px' : '4px',
-          padding: isMobile ? (statsExpanded ? '4px 6px' : '2px 4px') : '12px 14px',
-          fontSize: isMobile ? (statsExpanded ? '9px' : '8px') : '11px',
+          background: 'rgba(0, 0, 0, 0.6)',
+          borderRadius: '6px',
+          padding: statsExpanded ? '4px 6px' : '2px 4px',
+          fontSize: statsExpanded ? '9px' : '8px',
           color: '#ccc',
           fontFamily: '"Rajdhani", sans-serif',
           fontWeight: '600',
-          minWidth: isMobile ? (statsExpanded ? '100px' : '75px') : '160px',
-          maxWidth: isMobile ? 'none' : '180px',
+          minWidth: statsExpanded ? '100px' : '75px',
           transition: 'all 0.2s ease'
         }}>
           {/* Header */}
@@ -4137,14 +4577,6 @@ const MultiplayerArena = () => {
               gap: isMobile ? '3px' : '4px'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#9ca3af' }}>Worth:</span>
-                <span style={{ color: '#22c55e', fontWeight: '700' }}>${score}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#9ca3af' }}>Mass:</span>
-                <span style={{ color: '#ffffff', fontWeight: '700' }}>{Math.floor(mass)}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: '#9ca3af' }}>K/D:</span>
                 <span style={{ color: '#ffffff', fontWeight: '700' }}>{eliminations}/0</span>
               </div>
@@ -4154,7 +4586,7 @@ const MultiplayerArena = () => {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: '#9ca3af' }}>Coins:</span>
-                <span style={{ color: '#ffffff', fontWeight: '700' }}>{score}</span>
+                <span style={{ color: '#ffffff', fontWeight: '700' }}>{isPaidArena ? coinsCollected : score}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: '#9ca3af' }}>Time:</span>
@@ -4243,6 +4675,40 @@ const MultiplayerArena = () => {
             </div>
           )}
         </div>
+        )}
+
+        {/* Multiplayer Player Count - Desktop Bottom Right */}
+        {!isMobile && (
+          <div style={{
+            position: 'fixed',
+            bottom: '10px',
+            right: '10px',
+            zIndex: 1000,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            color: connectionStatus === 'connected' ? '#00ff00' : '#ff0000',
+            padding: '6px 12px',
+            borderRadius: '8px',
+            fontSize: '12px',
+            fontWeight: 'bold',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            border: `1px solid ${connectionStatus === 'connected' ? '#00ff00' : '#ff0000'}`
+          }}>
+            <span style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: connectionStatus === 'connected' ? '#00ff00' : '#ff0000'
+            }}></span>
+            <span>
+              {connectionStatus === 'connected' && `🌐 MULTIPLAYER (${playerCount} players)`}
+              {connectionStatus === 'connecting' && '🔄 CONNECTING...'}
+              {connectionStatus === 'failed' && '❌ CONNECTION ERROR'}
+              {connectionStatus === 'eliminated' && '☠️ ELIMINATED'}
+            </span>
+          </div>
+        )}
 
         {/* Virtual Joystick - Mobile Only */}
         {isMobile && (
@@ -4399,6 +4865,97 @@ const MultiplayerArena = () => {
           </div>
         </div>
 
+        {/* Paid Arena Stats - Desktop Only - Below Minimap - Fortnite Inspired */}
+        {!isMobile && isPaidArena && (
+          <div style={{
+            position: 'fixed',
+            top: '240px',
+            right: '10px',
+            zIndex: 1000,
+            width: '220px',
+            background: 'rgba(0, 0, 0, 0.75)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            borderRadius: '8px',
+            padding: '8px',
+            backdropFilter: 'blur(12px)',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            flexDirection: 'row',
+            gap: '8px'
+          }}>
+            {/* Worth Display */}
+            <div style={{
+              flex: 1,
+              background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.08) 100%)',
+              border: '1.5px solid rgba(34, 197, 94, 0.5)',
+              borderRadius: '6px',
+              padding: '8px 6px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '2px'
+            }}>
+              <div style={{
+                fontSize: '9px',
+                fontWeight: '700',
+                color: '#a3a3a3',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                fontFamily: '"Rajdhani", sans-serif'
+              }}>
+                WORTH
+              </div>
+              <div style={{
+                fontSize: '20px',
+                fontWeight: '800',
+                color: '#22c55e',
+                textShadow: '0 0 12px rgba(34, 197, 94, 0.6)',
+                fontFamily: '"Rajdhani", sans-serif',
+                lineHeight: '1'
+              }}>
+                ${typeof score === 'number' ? score.toFixed(2) : '0.00'}
+              </div>
+            </div>
+
+            {/* Mass Display */}
+            <div style={{
+              flex: 1,
+              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.08) 100%)',
+              border: '1.5px solid rgba(59, 130, 246, 0.5)',
+              borderRadius: '6px',
+              padding: '8px 6px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '2px'
+            }}>
+              <div style={{
+                fontSize: '9px',
+                fontWeight: '700',
+                color: '#a3a3a3',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                fontFamily: '"Rajdhani", sans-serif'
+              }}>
+                MASS
+              </div>
+              <div style={{
+                fontSize: '20px',
+                fontWeight: '800',
+                color: '#3b82f6',
+                textShadow: '0 0 12px rgba(59, 130, 246, 0.6)',
+                fontFamily: '"Rajdhani", sans-serif',
+                lineHeight: '1'
+              }}>
+                {Math.floor(mass)}
+              </div>
+            </div>
+          </div>
+        )}
+
+
         {/* Cash Out Button - centered bottom position */}
         <div 
           style={{
@@ -4487,18 +5044,18 @@ const MultiplayerArena = () => {
         {/* Split Button - centered bottom right position with cooldown timer */}
         <div 
           onClick={(e) => {
-            if (splitCooldownRemaining <= 0) {
+            if (splitCooldownRemaining <= 0 && mass >= 40) {
               handleSplit(e)
             }
           }}
           style={{
-            backgroundColor: splitCooldownRemaining > 0 ? 'rgba(100, 100, 100, 0.6)' : 'rgba(0, 100, 255, 0.9)',
-            border: splitCooldownRemaining > 0 ? '3px solid #666666' : '3px solid #0064ff',
+            backgroundColor: (splitCooldownRemaining > 0 || mass < 40) ? 'rgba(100, 100, 100, 0.6)' : 'rgba(0, 100, 255, 0.9)',
+            border: (splitCooldownRemaining > 0 || mass < 40) ? '3px solid #666666' : '3px solid #0064ff',
             borderRadius: '8px',
-            color: splitCooldownRemaining > 0 ? '#aaaaaa' : '#ffffff',
+            color: (splitCooldownRemaining > 0 || mass < 40) ? '#aaaaaa' : '#ffffff',
             fontSize: isMobile ? '12px' : '14px',
             fontWeight: '700',
-            cursor: splitCooldownRemaining > 0 ? 'not-allowed' : 'pointer',
+            cursor: (splitCooldownRemaining > 0 || mass < 40) ? 'not-allowed' : 'pointer',
             padding: isMobile ? '8px 12px' : '10px 16px',
             display: 'flex',
             alignItems: 'center',
@@ -4513,18 +5070,18 @@ const MultiplayerArena = () => {
             userSelect: 'none',
             minWidth: isMobile ? '120px' : '160px',
             textAlign: 'center',
-            boxShadow: splitCooldownRemaining > 0 ? '0 2px 6px rgba(0, 0, 0, 0.3)' : '0 4px 12px rgba(0, 100, 255, 0.4)',
+            boxShadow: (splitCooldownRemaining > 0 || mass < 40) ? '0 2px 6px rgba(0, 0, 0, 0.3)' : '0 4px 12px rgba(0, 100, 255, 0.4)',
             transition: 'all 0.2s ease',
-            opacity: splitCooldownRemaining > 0 ? 0.6 : 1
+            opacity: (splitCooldownRemaining > 0 || mass < 40) ? 0.6 : 1
           }}
           onMouseOver={(e) => {
-            if (splitCooldownRemaining <= 0) {
+            if (splitCooldownRemaining <= 0 && mass >= 40) {
               e.target.style.backgroundColor = 'rgba(0, 80, 200, 1)'
               e.target.style.boxShadow = '0 0 20px rgba(0, 100, 255, 0.8)'
             }
           }}
           onMouseOut={(e) => {
-            if (splitCooldownRemaining <= 0) {
+            if (splitCooldownRemaining <= 0 && mass >= 40) {
               e.target.style.backgroundColor = 'rgba(0, 100, 255, 0.9)'
               e.target.style.boxShadow = '0 4px 12px rgba(0, 100, 255, 0.4)'
             }
@@ -4544,7 +5101,9 @@ const MultiplayerArena = () => {
           }}>
             {splitCooldownRemaining > 0 
               ? `⏱️ ${(splitCooldownRemaining / 1000).toFixed(1)}s`
-              : (isMobile ? '✂️ Split' : '✂️ Split (Space)')
+              : mass < 40
+                ? `✂️ Need ${40 - Math.floor(mass)} mass`
+                : (isMobile ? '✂️ Split' : '✂️ Split (Space)')
             }
           </span>
         </div>
@@ -4627,46 +5186,6 @@ const MultiplayerArena = () => {
       )}
 
       {/* Cashout Success Modal - Redesigned to match practice modal */}
-      {showCashOutSuccessModal && (() => {
-        // Fetch wallet balance when modal opens
-        if (!loadingWalletBalance && walletBalance === null) {
-          setLoadingWalletBalance(true)
-          
-          const fetchBalance = async () => {
-            try {
-              if (user && wallets && wallets.length > 0) {
-                const embeddedWallet = wallets.find(w => w.walletClientType === 'privy')
-                if (embeddedWallet && embeddedWallet.address) {
-                  const rpcUrl = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://api.mainnet-beta.solana.com'
-                  const response = await fetch(rpcUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      jsonrpc: '2.0',
-                      id: 1,
-                      method: 'getBalance',
-                      params: [embeddedWallet.address]
-                    })
-                  })
-                  
-                  const data = await response.json()
-                  const lamports = data.result?.value || 0
-                  const sol = lamports / 1_000_000_000
-                  setWalletBalance(sol)
-                }
-              }
-            } catch (error) {
-              console.error('Error fetching wallet balance:', error)
-              setWalletBalance(0)
-            }
-            setLoadingWalletBalance(false)
-          }
-          
-          fetchBalance()
-        }
-        
-        return null
-      })()}
       
       {showCashOutSuccessModal && (
         <div style={{
@@ -4778,6 +5297,48 @@ const MultiplayerArena = () => {
                   }}>Wallet Balance</div>
                 </div>
               </div>
+              
+              {/* Transaction Signature */}
+              {window.cashoutSignature && (
+                <div style={{
+                  backgroundColor: 'rgba(104, 211, 145, 0.1)',
+                  padding: isMobile ? '8px' : '12px',
+                  borderRadius: '8px',
+                  marginBottom: isMobile ? '12px' : '16px',
+                  border: '1px solid rgba(104, 211, 145, 0.3)'
+                }}>
+                  <div style={{ 
+                    color: '#68d391', 
+                    fontSize: isMobile ? '10px' : '12px',
+                    fontWeight: '600',
+                    marginBottom: '4px',
+                    textTransform: 'uppercase'
+                  }}>
+                    Transaction Signature
+                  </div>
+                  <a
+                    href={`https://solscan.io/tx/${window.cashoutSignature}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      color: '#60a5fa',
+                      fontSize: isMobile ? '10px' : '12px',
+                      wordBreak: 'break-all',
+                      textDecoration: 'underline',
+                      display: 'block'
+                    }}
+                  >
+                    {window.cashoutSignature.slice(0, 8)}...{window.cashoutSignature.slice(-8)}
+                  </a>
+                  <div style={{
+                    color: '#a0aec0',
+                    fontSize: isMobile ? '9px' : '10px',
+                    marginTop: '4px'
+                  }}>
+                    Click to view on Solscan
+                  </div>
+                </div>
+              )}
             
               {/* Action Buttons */}
               <div style={{
@@ -4786,12 +5347,7 @@ const MultiplayerArena = () => {
                 flexDirection: 'column'
               }}>
                 <button
-                  onClick={() => {
-                    setShowCashOutSuccessModal(false)
-                    setCashOutComplete(false)
-                    setWalletBalance(null)
-                    window.location.reload()
-                  }}
+                  onClick={handleReplayPayment}
                   style={{
                     backgroundColor: '#68d391',
                     border: '2px solid #48bb78',
@@ -4818,7 +5374,7 @@ const MultiplayerArena = () => {
                     e.target.style.transform = 'translateY(0)'
                   }}
                 >
-                  PLAY AGAIN
+                  💰 PLAY AGAIN
                 </button>
                 <button
                   onClick={() => window.location.href = '/'}

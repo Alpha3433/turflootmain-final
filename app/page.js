@@ -1773,6 +1773,33 @@ export default function TurfLootTactical() {
 
     // Load currency when authentication state or user changes
     loadUserCurrency()
+    
+    // Fetch missions from database for authenticated users
+    const fetchMissionsFromDatabase = async () => {
+      if (isAuthenticated && user?.id) {
+        try {
+          console.log('📋 Fetching missions from database...')
+          const response = await fetch(`/api/missions?userIdentifier=${user.id}`)
+          
+          if (response.ok) {
+            const data = await response.json()
+            console.log(`✅ Missions loaded: ${data.completedMissions.length} completed | ${data.coinBalance} coins`)
+            
+            // Update coin balance from database
+            if (data.coinBalance > 0) {
+              setCurrency(data.coinBalance)
+              const userIdentifier = user?.wallet?.address || user?.email?.address || user?.id || 'unknown'
+              const userCurrencyKey = `userCurrency_${userIdentifier}`
+              localStorage.setItem(userCurrencyKey, data.coinBalance.toString())
+            }
+          }
+        } catch (error) {
+          console.error('❌ Failed to fetch missions:', error)
+        }
+      }
+    }
+    
+    fetchMissionsFromDatabase()
   }, [isAuthenticated, user])
 
   // Save currency to appropriate localStorage key whenever it changes
@@ -2309,15 +2336,15 @@ export default function TurfLootTactical() {
         {
           idMatches: ['turfloot-au-5'],
           nameMatches: ['Turfloot $5 Room - Australia'],
-          entryFee: 0.05,
-          minBalance: 0.05,
-          feePercentage: 10
+          entryFee: 0.044,  // 0.0024 SOL at $18.18/SOL
+          minBalance: 0.044,
+          feePercentage: 0  // No platform fee - user gets full amount
         },
         {
           idMatches: ['turfloot-au-20'],
           nameMatches: ['Turfloot $20 Room - Australia'],
-          entryFee: 0.10,
-          minBalance: 0.10,
+          entryFee: 0.65,
+          minBalance: 0.65,
           feePercentage: 10
         }
       ]
@@ -2335,6 +2362,8 @@ export default function TurfLootTactical() {
 
       if (paidRoomConfig) {
         console.log('💰 Paid room detected. Applying wallet validation rules:', paidRoomConfig)
+        console.log('   Entry Fee from config:', paidRoomConfig.entryFee)
+        console.log('   Min Balance from config:', paidRoomConfig.minBalance)
 
         if (!ready || !authenticated) {
           console.log('🔐 Privy session not ready for paid room entry, opening login modal.')
@@ -2435,8 +2464,18 @@ export default function TurfLootTactical() {
         // Add Privy user data
         privyUserId: privyUserData.privyUserId,
         playerName: encodeURIComponent(privyUserData.playerName),
-        walletAddress: privyUserData.walletAddress || ''
+        walletAddress: privyUserData.walletAddress || '',
+        // Add selected skin data
+        skinId: selectedSkin.id || 'default',
+        skinColor: encodeURIComponent(selectedSkin.color || '#4A90E2'),
+        skinName: encodeURIComponent(selectedSkin.name || 'Default Warrior')
       }
+      
+      console.log('🎨 Passing selected skin to arena:', {
+        skinId: selectedSkin.id,
+        skinName: selectedSkin.name,
+        skinColor: selectedSkin.color
+      })
 
       if (serverData.endpoint) {
         queryParams.endpoint = serverData.endpoint
@@ -3770,7 +3809,16 @@ export default function TurfLootTactical() {
               Cancel
             </button>
             <button
-              onClick={() => {
+              onClick={async () => {
+                // Only allow authenticated users to cash out
+                if (!authenticated) {
+                  alert('⚠️ Please log in first to cash out.')
+                  console.log('🔐 User not authenticated, login required for cash out')
+                  await login()
+                  return
+                }
+                
+                // Validate inputs
                 if (!withdrawalAmount || parseFloat(withdrawalAmount) <= 0) {
                   alert('Please enter a valid amount to cash out.')
                   return
@@ -3783,8 +3831,150 @@ export default function TurfLootTactical() {
                   alert('Please enter a destination wallet address.')
                   return
                 }
-                alert(`Cash out of $${withdrawalAmount} to ${destinationAddress} will be implemented here!`)
-                setDesktopWithdrawalModalVisible(false)
+                
+                console.log('💰 Cash out initiated - Creating Solana transaction...')
+                console.log(`💸 Amount: $${withdrawalAmount} | Destination: ${destinationAddress}`)
+                
+                try {
+                  // Import Solana web3
+                  const { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } = await import('@solana/web3.js')
+                  
+                  // Validate destination address is a valid Solana public key
+                  try {
+                    new PublicKey(destinationAddress)
+                  } catch (validationError) {
+                    console.error('❌ Invalid Solana address:', destinationAddress)
+                    alert('❌ Invalid destination address.\n\nPlease enter a valid Solana wallet address.\n\nExample format:\n7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU')
+                    return
+                  }
+                  
+                  // Get embedded wallet from Privy user object
+                  console.log('🔍 Looking for embedded wallet in user.linkedAccounts...')
+                  const embeddedWallet = user?.linkedAccounts?.find(
+                    account => account.type === 'wallet' && account.chainType === 'solana'
+                  )
+                  
+                  if (!embeddedWallet || !embeddedWallet.address) {
+                    console.error('❌ Embedded wallet not found:', { 
+                      hasUser: !!user, 
+                      linkedAccounts: user?.linkedAccounts?.length,
+                      wallets: wallets?.length 
+                    })
+                    alert('❌ Embedded wallet not found. Please try logging in again.')
+                    return
+                  }
+                  
+                  console.log('✅ Found embedded wallet:', embeddedWallet.address)
+                  const fromPubkey = new PublicKey(embeddedWallet.address)
+                  const toPubkey = new PublicKey(destinationAddress)
+                  
+                  // Convert USD to SOL (using current SOL balance to calculate rate)
+                  const usdAmount = parseFloat(withdrawalAmount)
+                  const currentSolBalance = parseFloat(walletBalance.sol || 0)
+                  const currentUsdBalance = parseFloat(walletBalance.usd || 0)
+                  const solPerUsd = currentSolBalance / currentUsdBalance
+                  const solAmount = usdAmount * solPerUsd
+                  const lamports = Math.floor(solAmount * LAMPORTS_PER_SOL)
+                  
+                  console.log(`💱 Converting: $${usdAmount} → ${solAmount.toFixed(6)} SOL (${lamports} lamports)`)
+                  
+                  // Create Solana connection
+                  const rpcUrl = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://api.mainnet-beta.solana.com'
+                  const connection = new Connection(rpcUrl, 'confirmed')
+                  
+                  // Get recent blockhash
+                  const { blockhash } = await connection.getLatestBlockhash()
+                  
+                  // Create transfer instruction
+                  const transferInstruction = SystemProgram.transfer({
+                    fromPubkey,
+                    toPubkey,
+                    lamports
+                  })
+                  
+                  // Create transaction
+                  const transaction = new Transaction().add(transferInstruction)
+                  transaction.recentBlockhash = blockhash
+                  transaction.feePayer = fromPubkey
+                  
+                  console.log('📝 Transaction created, opening Privy modal for signature...')
+                  
+                  // Check if Privy transaction method is available
+                  if (!privySignAndSendTransaction) {
+                    console.error('❌ Privy signAndSendTransaction not available')
+                    alert('❌ Transaction signing not available. Please refresh the page and try again.')
+                    return
+                  }
+                  
+                  // Serialize transaction to Uint8Array for Privy
+                  const serializedTx = transaction.serialize({
+                    requireAllSignatures: false,
+                    verifySignatures: false
+                  })
+                  
+                  // Force convert to proper Uint8Array (not Buffer)
+                  const txBytes = Uint8Array.from(serializedTx)
+                  console.log('📦 Transaction ready:', txBytes.length, 'bytes')
+                  
+                  // Get the embedded wallet object from wallets array
+                  const embeddedWalletObj = wallets.find(w => {
+                    const addr = w.address || w.publicKey?.toString() || w.publicKey?.toBase58?.()
+                    return addr === embeddedWallet.address
+                  })
+                  
+                  console.log('🔍 Wallet for signing:', embeddedWalletObj ? 'Found' : 'Not found')
+                  
+                  if (!embeddedWalletObj) {
+                    console.error('❌ Wallet object not found in wallets array')
+                    alert('❌ Wallet not ready for signing. Please try again.')
+                    return
+                  }
+                  
+                  console.log('🚀 Opening Privy modal for transaction signature...')
+                  
+                  // Close the cash out modal BEFORE opening Privy modal so it's visible
+                  setDesktopWithdrawalModalVisible(false)
+                  
+                  // Send transaction using Privy - this will open the native Privy UI
+                  const result = await privySignAndSendTransaction({
+                    transaction: txBytes,
+                    wallet: embeddedWalletObj
+                  })
+                  
+                  const signature = result.signature || result
+                  alert(`✅ Cash out successful!\n\nTransaction: ${signature}\n\nAmount: $${withdrawalAmount} sent to ${destinationAddress}`)
+                  setWithdrawalAmount('')
+                  setDestinationAddress('')
+                  
+                  // Refresh wallet balance after transaction
+                  setTimeout(() => {
+                    fetchWalletBalance()
+                  }, 2000)
+                  
+                } catch (error) {
+                  console.error('❌ Cash out transaction failed:', error)
+                  
+                  // Check if user cancelled/closed the modal
+                  const errorMsg = error.message || error.toString()
+                  const isCancellation = 
+                    errorMsg.includes('User rejected') ||
+                    errorMsg.includes('Failed to connect to wallet') ||
+                    errorMsg.includes('User cancelled') ||
+                    errorMsg.includes('User denied') ||
+                    errorMsg.includes('rejected')
+                  
+                  if (isCancellation) {
+                    // User intentionally cancelled - no error message needed
+                    console.log('ℹ️ Transaction cancelled by user')
+                    return
+                  }
+                  
+                  if (errorMsg.includes('Insufficient funds')) {
+                    alert('❌ Insufficient funds for transaction (including fees).')
+                  } else {
+                    alert(`❌ Cash out failed: ${errorMsg}`)
+                  }
+                }
               }}
               disabled={parseFloat(walletBalance.usd || 0) < 0.21}
               style={{
@@ -4095,36 +4285,36 @@ export default function TurfLootTactical() {
     const availableSkins = [
       // Owned skins
       { id: 'default', name: 'Default Warrior', price: 0, owned: true, rarity: 'common', color: '#4A90E2' },
-      { id: 'stealth', name: 'Stealth Operative', price: 150, owned: true, rarity: 'common', color: '#2C3E50' },
-      { id: 'flame', name: 'Flame Guardian', price: 300, owned: true, rarity: 'common', color: '#E74C3C' },
-      { id: 'toxic', name: 'Toxic Assassin', price: 250, owned: true, rarity: 'common', color: '#27AE60' },
-      { id: 'electric', name: 'Electric Storm', price: 500, owned: true, rarity: 'common', color: '#F39C12' },
-      { id: 'shadow', name: 'Shadow Reaper', price: 450, owned: true, rarity: 'common', color: '#8E44AD' },
+      { id: 'stealth', name: 'Stealth Operative', price: 1500, owned: true, rarity: 'common', color: '#2C3E50' },
+      { id: 'flame', name: 'Flame Guardian', price: 3000, owned: true, rarity: 'common', color: '#E74C3C' },
+      { id: 'toxic', name: 'Toxic Assassin', price: 2500, owned: true, rarity: 'common', color: '#27AE60' },
+      { id: 'electric', name: 'Electric Storm', price: 5000, owned: true, rarity: 'common', color: '#F39C12' },
+      { id: 'shadow', name: 'Shadow Reaper', price: 4500, owned: true, rarity: 'common', color: '#8E44AD' },
       
-      // Shop skins - Common tier
-      { id: 'coral', name: 'Coral Reef', price: 100, owned: false, rarity: 'common', color: '#FF7F7F' },
-      { id: 'forest', name: 'Forest Spirit', price: 120, owned: false, rarity: 'common', color: '#228B22' },
+      // Shop skins - Common tier (10x more expensive)
+      { id: 'coral', name: 'Coral Reef', price: 1000, owned: false, rarity: 'common', color: '#FF7F7F' },
+      { id: 'forest', name: 'Forest Spirit', price: 1200, owned: false, rarity: 'common', color: '#228B22' },
       
-      // Shop skins - Uncommon tier  
-      { id: 'crimson', name: 'Crimson Blade', price: 200, owned: false, rarity: 'uncommon', color: '#DC143C' },
-      { id: 'ocean', name: 'Ocean Depths', price: 180, owned: false, rarity: 'uncommon', color: '#1E90FF' },
-      { id: 'mint', name: 'Mint Fresh', price: 160, owned: false, rarity: 'uncommon', color: '#00FA9A' },
+      // Shop skins - Uncommon tier (10x more expensive)
+      { id: 'crimson', name: 'Crimson Blade', price: 2000, owned: false, rarity: 'uncommon', color: '#DC143C' },
+      { id: 'ocean', name: 'Ocean Depths', price: 1800, owned: false, rarity: 'uncommon', color: '#1E90FF' },
+      { id: 'mint', name: 'Mint Fresh', price: 1600, owned: false, rarity: 'uncommon', color: '#00FA9A' },
       
-      // Shop skins - Rare tier
-      { id: 'midnight', name: 'Midnight Oil', price: 350, owned: false, rarity: 'rare', color: '#191970' },
-      { id: 'magma', name: 'Magma Core', price: 400, owned: false, rarity: 'rare', color: '#FF4500' },
-      { id: 'arctic', name: 'Arctic Frost', price: 380, owned: false, rarity: 'rare', color: '#B0E0E6' },
+      // Shop skins - Rare tier (10x more expensive)
+      { id: 'midnight', name: 'Midnight Oil', price: 3500, owned: false, rarity: 'rare', color: '#191970' },
+      { id: 'magma', name: 'Magma Core', price: 4000, owned: false, rarity: 'rare', color: '#FF4500' },
+      { id: 'arctic', name: 'Arctic Frost', price: 3800, owned: false, rarity: 'rare', color: '#B0E0E6' },
       
-      // Shop skins - Epic tier
-      { id: 'plasma', name: 'Plasma Fury', price: 600, owned: false, rarity: 'epic', color: '#FF1493' },
-      { id: 'void', name: 'Void Walker', price: 650, owned: false, rarity: 'epic', color: '#483D8B' },
-      { id: 'neon', name: 'Neon Pulse', price: 700, owned: false, rarity: 'epic', color: '#00FF00' },
+      // Shop skins - Epic tier (10x more expensive)
+      { id: 'plasma', name: 'Plasma Fury', price: 6000, owned: false, rarity: 'epic', color: '#FF1493' },
+      { id: 'void', name: 'Void Walker', price: 6500, owned: false, rarity: 'epic', color: '#483D8B' },
+      { id: 'neon', name: 'Neon Pulse', price: 7000, owned: false, rarity: 'epic', color: '#00FF00' },
       
-      // Shop skins - Legendary tier
-      { id: 'golden', name: 'Golden Emperor', price: 1000, owned: false, rarity: 'legendary', color: '#FFD700' },
-      { id: 'diamond', name: 'Diamond Elite', price: 2000, owned: false, rarity: 'legendary', color: '#E8F4FD' },
-      { id: 'rainbow', name: 'Rainbow Prism', price: 1500, owned: false, rarity: 'legendary', color: 'linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1)' },
-      { id: 'cosmic', name: 'Cosmic Entity', price: 2500, owned: false, rarity: 'legendary', color: '#4B0082' }
+      // Shop skins - Legendary tier (10x more expensive)
+      { id: 'golden', name: 'Golden Emperor', price: 10000, owned: false, rarity: 'legendary', color: '#FFD700' },
+      { id: 'diamond', name: 'Diamond Elite', price: 20000, owned: false, rarity: 'legendary', color: '#E8F4FD' },
+      { id: 'rainbow', name: 'Rainbow Prism', price: 15000, owned: false, rarity: 'legendary', color: 'linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1)' },
+      { id: 'cosmic', name: 'Cosmic Entity', price: 25000, owned: false, rarity: 'legendary', color: '#4B0082' }
     ]
 
     let currentSkin = selectedSkinData.id || 'default' // Initialize with current selected skin

@@ -11,7 +11,7 @@ import sys
 from datetime import datetime
 
 # Test Configuration
-BASE_URL = "https://turfloot-fix-1.preview.emergentagent.com"
+BASE_URL = "https://battle-rewards-13.preview.emergentagent.com"
 LOCALHOST_URL = "http://localhost:3000"
 
 # Real Privy User IDs from review request

@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server'
 export async function POST(request) {
   try {
     const body = await request.json()
-    const { userWalletAddress, cashOutValueUSD, privyUserId, playerName } = body
+    const { userWalletAddress, cashOutValueUSD, privyUserId, playerName, prepareOnly } = body
 
     // Validate required fields
     if (!userWalletAddress || !cashOutValueUSD || !privyUserId) {
@@ -17,20 +17,22 @@ export async function POST(request) {
       )
     }
 
-    console.log('💰 Cash-out request:', {
-      user: playerName || privyUserId,
-      wallet: userWalletAddress,
-      amount: `$${cashOutValueUSD.toFixed(2)}`
+    console.log('💰 Processing cash-out request:', {
+      userWalletAddress,
+      cashOutValueUSD,
+      cashOutValueType: typeof cashOutValueUSD,
+      privyUserId,
+      playerName: playerName || privyUserId
     })
+    
+    console.log('🔍 API RECEIVED - Raw body:', body)
 
-    // Calculate platform fee (10%)
-    const platformFeeUSD = cashOutValueUSD * 0.10
-    const payoutUSD = cashOutValueUSD * 0.90
+    // NO platform fee on cashout - user gets 100% of their balance
+    const payoutUSD = cashOutValueUSD
 
-    console.log('💵 Fee breakdown:', {
-      total: `$${cashOutValueUSD.toFixed(2)}`,
-      platformFee: `$${platformFeeUSD.toFixed(2)} (10%)`,
-      userPayout: `$${payoutUSD.toFixed(2)} (90%)`
+    console.log('💵 Cashout amount:', {
+      userBalance: `$${cashOutValueUSD.toFixed(2)}`,
+      payout: `$${payoutUSD.toFixed(2)} (100% - no fee on cashout)`
     })
 
     // Convert USD to SOL using the same rate as transactions
@@ -41,7 +43,8 @@ export async function POST(request) {
     console.log('🔄 SOL conversion:', {
       usdAmount: `$${payoutUSD.toFixed(2)}`,
       solAmount: payoutSOL.toFixed(8),
-      lamports: lamportsToSend
+      lamports: lamportsToSend,
+      rateUsed: `$${USD_PER_SOL}/SOL`
     })
 
     // Import Solana libraries
@@ -103,6 +106,20 @@ export async function POST(request) {
 
     // Sign transaction with platform wallet
     transaction.sign(platformKeypair)
+
+    // If prepareOnly flag is set, return the serialized transaction for Privy
+    if (prepareOnly) {
+      const serializedTransaction = transaction.serialize().toString('base64')
+      console.log('✅ Transaction prepared (not sent), returning for Privy approval')
+      
+      return NextResponse.json({
+        success: true,
+        serializedTransaction,
+        payoutUSD,
+        payoutSOL,
+        message: 'Transaction prepared, awaiting user approval via Privy'
+      })
+    }
 
     console.log('📤 Sending transaction...')
 

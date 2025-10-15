@@ -28,7 +28,7 @@ from datetime import datetime
 
 class SpawnPositionFixTester:
     def __init__(self):
-        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://turfloot-fix-1.preview.emergentagent.com')
+        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://battle-rewards-13.preview.emergentagent.com')
         self.api_url = f"{self.base_url}/api"
         self.results = []
         self.start_time = time.time()
