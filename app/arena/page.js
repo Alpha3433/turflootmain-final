@@ -4212,7 +4212,7 @@ const MultiplayerArena = () => {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: '#9ca3af' }}>Coins:</span>
-                <span style={{ color: '#ffffff', fontWeight: '700' }}>{score}</span>
+                <span style={{ color: '#ffffff', fontWeight: '700' }}>{isPaidArena ? coinsCollected : score}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: '#9ca3af' }}>Time:</span>
