@@ -867,6 +867,101 @@ const MultiplayerArena = () => {
     }
   }
 
+  // Handle replay payment from cashout modal
+  const handleReplayPayment = async () => {
+    console.log('💰 Starting replay payment process...')
+    
+    try {
+      // Get entry fee from URL params
+      const urlParams = new URLSearchParams(window.location.search)
+      const entryFee = parseFloat(urlParams.get('fee')) || 0.05
+      
+      console.log('   Entry Fee: $' + entryFee)
+      
+      // Get embedded wallet
+      const embeddedWallet = wallets?.find(w => w.walletClientType === 'privy')
+      if (!embeddedWallet || !embeddedWallet.address) {
+        throw new Error('No wallet found')
+      }
+      
+      const userWalletAddress = embeddedWallet.address
+      console.log('   From Wallet:', userWalletAddress)
+      
+      // Import Solana libraries
+      const { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } = await import('@solana/web3.js')
+      
+      // Setup connection
+      const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC
+      const connection = new Connection(heliusRpc, 'confirmed')
+      console.log('✅ Connected to Solana')
+      
+      // Calculate SOL amount
+      const platformWallet = process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS || 'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
+      const USD_PER_SOL = 18.18
+      const solAmount = entryFee / USD_PER_SOL
+      const lamports = Math.floor(solAmount * LAMPORTS_PER_SOL)
+      
+      console.log('💵 Payment Details:')
+      console.log('   SOL Amount:', solAmount.toFixed(6), 'SOL')
+      console.log('   Lamports:', lamports)
+      
+      // Check balance
+      const fromPubkey = new PublicKey(userWalletAddress)
+      const currentBalanceLamports = await connection.getBalance(fromPubkey)
+      const RENT_EXEMPT_MINIMUM = 890880
+      const TRANSACTION_FEE_ESTIMATE = 5000
+      
+      const remainingBalance = currentBalanceLamports - lamports - TRANSACTION_FEE_ESTIMATE
+      if (remainingBalance < RENT_EXEMPT_MINIMUM) {
+        throw new Error('Insufficient balance for replay')
+      }
+      
+      // Build transaction
+      const toPubkey = new PublicKey(platformWallet)
+      const transferIx = SystemProgram.transfer({
+        fromPubkey,
+        toPubkey,
+        lamports
+      })
+      
+      const { blockhash } = await connection.getLatestBlockhash('confirmed')
+      const transaction = new Transaction({
+        recentBlockhash: blockhash,
+        feePayer: fromPubkey
+      }).add(transferIx)
+      
+      // Serialize transaction
+      const serializedTx = transaction.serialize({
+        requireAllSignatures: false,
+        verifySignatures: false
+      })
+      const txBytes = Uint8Array.from(serializedTx)
+      
+      console.log('🔐 Signing with Privy...')
+      
+      // Sign and send transaction
+      const result = await signAndSendTransaction({
+        transaction: txBytes,
+        wallet: embeddedWallet
+      })
+      
+      const signature = result.signature || result
+      console.log('✅ Payment successful! Signature:', signature)
+      
+      // Close modal and reload page to rejoin
+      setShowCashOutSuccessModal(false)
+      setCashOutComplete(false)
+      setWalletBalance(null)
+      window.cashoutSignature = null
+      window.location.reload()
+      
+    } catch (error) {
+      console.error('❌ Replay payment failed:', error)
+      alert(`Payment failed: ${error.message}. Please try again.`)
+    }
+  }
+
+
   // Handle split functionality - ported from agario with improved error handling
   const handleSplit = (e) => {
     console.log('🎯 handleSplit called - checking initial conditions...')
