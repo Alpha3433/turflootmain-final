@@ -1470,9 +1470,16 @@ const MultiplayerArena = () => {
                 
                 // Step 3: Show Privy modal for user approval
                 console.log('🔐 Opening Privy modal for user approval...')
+                console.log('Serialized transaction (base64):', serializedTransaction.substring(0, 50) + '...')
+                console.log('User wallet address:', userWalletAddress)
+                console.log('privySignAndSendTransaction available:', !!privySignAndSendTransaction)
+                
+                // Convert base64 to Uint8Array for Privy
+                const txBuffer = Buffer.from(serializedTransaction, 'base64')
+                console.log('Transaction buffer length:', txBuffer.length)
                 
                 const result = await privySignAndSendTransaction({
-                  transaction: Buffer.from(serializedTransaction, 'base64'),
+                  transaction: txBuffer,
                   address: userWalletAddress
                 })
                 
