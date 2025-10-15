@@ -1791,8 +1791,15 @@ const MultiplayerArena = () => {
           const previousSessions = new Set(playerBalancesRef.current.keys())
           
           state.players.forEach((player, sessionId) => {
-            currentSessions.add(sessionId)
-            console.log(`🎮 Player: ${player.name} (${sessionId}) - isCurrentPlayer: ${sessionId === room.sessionId}`)
+            // Skip split pieces - they are not separate players
+            const isSplitPiece = player?.isSplitPiece === true
+            
+            // Only track real players (not split pieces) for elimination detection
+            if (!isSplitPiece) {
+              currentSessions.add(sessionId)
+            }
+            
+            console.log(`🎮 Player: ${player.name} (${sessionId}) - isCurrentPlayer: ${sessionId === room.sessionId}, isSplitPiece: ${isSplitPiece}`)
             const isCurrentPlayer = sessionId === room.sessionId
             if (isCurrentPlayer) {
               console.log('✅ Found current player:', sessionId, player.name)
@@ -1804,12 +1811,12 @@ const MultiplayerArena = () => {
             const PLATFORM_FEE_PERCENTAGE = 0.10
             const startingBalance = isPaidArena ? (entryFee * (1 - PLATFORM_FEE_PERCENTAGE)) : 0
             
-            // Get or initialize player balance
-            if (!playerBalancesRef.current.has(sessionId)) {
+            // Only track balance for real players, not split pieces
+            if (!isSplitPiece && !playerBalancesRef.current.has(sessionId)) {
               playerBalancesRef.current.set(sessionId, startingBalance)
             }
             
-            const currentCashOutValue = isPaidArena ? playerBalancesRef.current.get(sessionId) : 0
+            const currentCashOutValue = isPaidArena && !isSplitPiece ? (playerBalancesRef.current.get(sessionId) || 0) : 0
             
             gameState.players.push({
               ...player,
