@@ -1468,19 +1468,29 @@ const MultiplayerArena = () => {
                 const serializedTransaction = prepareData.serializedTransaction
                 console.log('✅ Transaction prepared by server')
                 
-                // Step 3: Show Privy modal for user approval
+                // Step 3: Find the wallet object for Privy (like landing page does)
+                const embeddedWalletObj = solanaWallets?.find(w => {
+                  const addr = w.address || w.publicKey?.toString() || w.publicKey?.toBase58?.()
+                  return addr === userWalletAddress
+                })
+                
                 console.log('🔐 Opening Privy modal for user approval...')
-                console.log('Serialized transaction (base64):', serializedTransaction.substring(0, 50) + '...')
                 console.log('User wallet address:', userWalletAddress)
+                console.log('Wallet object found:', !!embeddedWalletObj)
                 console.log('privySignAndSendTransaction available:', !!privySignAndSendTransaction)
+                
+                if (!embeddedWalletObj) {
+                  throw new Error('Wallet object not found for Privy signing')
+                }
                 
                 // Convert base64 to Uint8Array for Privy
                 const txBuffer = Buffer.from(serializedTransaction, 'base64')
                 console.log('Transaction buffer length:', txBuffer.length)
                 
+                // Call Privy with wallet object (not address)
                 const result = await privySignAndSendTransaction({
                   transaction: txBuffer,
-                  address: userWalletAddress
+                  wallet: embeddedWalletObj
                 })
                 
                 const signature = result.signature || result
