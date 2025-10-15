@@ -977,10 +977,22 @@ const MultiplayerArena = () => {
       
       console.log('🔐 Opening Privy transaction modal...')
       
+      // Find wallet object for Privy
+      const embeddedWalletObj = solanaWallets?.find(w => {
+        const addr = w.address || w.publicKey?.toString() || w.publicKey?.toBase58?.()
+        return addr === userWalletAddress
+      })
+      
+      if (!embeddedWalletObj) {
+        throw new Error('Wallet object not found for Privy signing')
+      }
+      
+      console.log('Wallet object found:', !!embeddedWalletObj)
+      
       // Sign and send transaction with Privy
       const result = await privySignAndSendTransaction({
         transaction: serializedTx,
-        address: userWalletAddress
+        wallet: embeddedWalletObj
       })
       
       const signature = result.signature || result
