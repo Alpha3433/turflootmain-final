@@ -4457,6 +4457,87 @@ const MultiplayerArena = () => {
           </div>
         </div>
 
+        {/* Paid Arena Stats - Desktop Only - Below Minimap */}
+        {!isMobile && isPaidArena && (
+          <div style={{
+            position: 'fixed',
+            top: '240px',
+            right: '10px',
+            zIndex: 1000,
+            width: '220px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px'
+          }}>
+            {/* Worth Display */}
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.05) 100%)',
+              border: '2px solid rgba(34, 197, 94, 0.6)',
+              borderRadius: '12px',
+              padding: '12px 16px',
+              backdropFilter: 'blur(10px)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
+            }}>
+              <div style={{
+                fontSize: '11px',
+                fontWeight: '600',
+                color: '#9ca3af',
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+                marginBottom: '6px'
+              }}>
+                Net Worth
+              </div>
+              <div style={{
+                fontSize: '28px',
+                fontWeight: '800',
+                color: '#22c55e',
+                textShadow: '0 0 20px rgba(34, 197, 94, 0.8), 0 0 40px rgba(34, 197, 94, 0.4)',
+                fontFamily: '"Rajdhani", sans-serif'
+              }}>
+                ${typeof score === 'number' ? score.toFixed(2) : '0.00'}
+              </div>
+            </div>
+
+            {/* Mass Display */}
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.05) 100%)',
+              border: '2px solid rgba(59, 130, 246, 0.6)',
+              borderRadius: '12px',
+              padding: '12px 16px',
+              backdropFilter: 'blur(10px)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
+            }}>
+              <div style={{
+                fontSize: '11px',
+                fontWeight: '600',
+                color: '#9ca3af',
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+                marginBottom: '6px'
+              }}>
+                Mass
+              </div>
+              <div style={{
+                fontSize: '28px',
+                fontWeight: '800',
+                color: '#3b82f6',
+                textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4)',
+                fontFamily: '"Rajdhani", sans-serif'
+              }}>
+                {Math.floor(mass)}
+              </div>
+            </div>
+          </div>
+        )}
+
+
         {/* Cash Out Button - centered bottom position */}
         <div 
           style={{
