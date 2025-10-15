@@ -872,6 +872,11 @@ const MultiplayerArena = () => {
     console.log('💰 Starting replay payment process...')
     
     try {
+      // Check if hooks are available
+      if (!signAndSendTransaction) {
+        throw new Error('Transaction signing not available. Please refresh the page and try again.')
+      }
+      
       // Get entry fee from URL params
       const urlParams = new URLSearchParams(window.location.search)
       const entryFee = parseFloat(urlParams.get('fee')) || 0.05
@@ -883,11 +888,12 @@ const MultiplayerArena = () => {
         account => account.type === 'wallet' && account.chainType === 'solana'
       )
       if (!embeddedWallet || !embeddedWallet.address) {
-        throw new Error('No Solana wallet found')
+        throw new Error('No Solana wallet found. Please ensure your wallet is connected.')
       }
       
       const userWalletAddress = embeddedWallet.address
       console.log('   From Wallet:', userWalletAddress)
+      console.log('   Available wallets:', solanaWallets?.length || 0)
       
       // Import Solana libraries
       const { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } = await import('@solana/web3.js')
