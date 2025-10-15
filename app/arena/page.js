@@ -2873,6 +2873,17 @@ const MultiplayerArena = () => {
           piece.vy = 0
         }
         
+        // Remove split piece if mass drops to 1 or below (from hitting spikes)
+        if (piece.mass <= 1) {
+          console.log('💥 Split piece destroyed (mass <= 1)')
+          this.playerPieces.splice(i, 1)
+          
+          // Update total mass UI
+          const totalMass = this.player.mass + this.playerPieces.reduce((sum, p) => sum + p.mass, 0)
+          setMass(Math.floor(totalMass))
+          continue // Skip to next piece
+        }
+        
         // Collision detection with main player (prevent overlap)
         const dx = piece.x - this.player.x
         const dy = piece.y - this.player.y
