@@ -1504,11 +1504,17 @@ const MultiplayerArena = () => {
                 
               } catch (error) {
                 console.error('❌ Cashout transaction failed:', error)
+                console.error('Error details:', {
+                  message: error.message,
+                  stack: error.stack,
+                  name: error.name,
+                  error: error
+                })
                 
                 if (error.message && error.message.includes('User rejected')) {
                   alert('Transaction cancelled. Reloading game...')
                 } else {
-                  alert(`Cashout failed: ${error.message}`)
+                  alert(`Cashout failed: ${error.message || 'Unknown error'}`)
                 }
                 
                 // Reload game on error
