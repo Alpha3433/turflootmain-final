@@ -27,7 +27,7 @@ const MultiplayerArena = () => {
   const inputThrottleMs = 16 // ~60fps input rate (like agario)
   
   // Privy authentication
-  const { ready, authenticated, user, login } = usePrivy()
+  const { ready, authenticated, user, login, wallets } = usePrivy()
   
   // Player name state that updates when localStorage changes
   const [playerName, setPlayerName] = useState('Anonymous Player')
