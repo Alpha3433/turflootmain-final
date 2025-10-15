@@ -1448,18 +1448,23 @@ const MultiplayerArena = () => {
                 
                 const userWalletAddress = embeddedWallet.address
                 
+                // Get the actual cashout value from playerBalancesRef (not score)
+                const actualCashOutValue = playerBalancesRef.current.get(wsRef.current.sessionId) || 0
+                
                 // DEBUG: Log all balance-related values
                 console.log('🔍 PRE-CASHOUT DEBUG:', {
                   score: score,
                   scoreType: typeof score,
+                  actualCashOutValue: actualCashOutValue,
                   coinsCollected,
                   eliminations,
                   mass,
                   isPaidArena,
+                  sessionId: wsRef.current?.sessionId,
                   playerBalancesRef: Array.from(playerBalancesRef.current.entries())
                 })
                 
-                const cashOutValueUSD = score
+                const cashOutValueUSD = actualCashOutValue
                 
                 console.log('💵 Cashout amount being sent to API:', {
                   cashOutValueUSD,
