@@ -4546,6 +4546,39 @@ const MultiplayerArena = () => {
         </div>
         )}
 
+        {/* Multiplayer Player Count - Desktop Bottom Right */}
+        {!isMobile && (
+          <div style={{
+            position: 'fixed',
+            bottom: '10px',
+            right: '10px',
+            zIndex: 1000,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            color: connectionStatus === 'connected' ? '#00ff00' : '#ff0000',
+            padding: '6px 12px',
+            borderRadius: '8px',
+            fontSize: '12px',
+            fontWeight: 'bold',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            border: `1px solid ${connectionStatus === 'connected' ? '#00ff00' : '#ff0000'}`
+          }}>
+            <span style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: connectionStatus === 'connected' ? '#00ff00' : '#ff0000'
+            }}></span>
+            <span>
+              {connectionStatus === 'connected' && `🌐 MULTIPLAYER (${playerCount} players)`}
+              {connectionStatus === 'connecting' && '🔄 CONNECTING...'}
+              {connectionStatus === 'failed' && '❌ CONNECTION ERROR'}
+              {connectionStatus === 'eliminated' && '☠️ ELIMINATED'}
+            </span>
+          </div>
+        )}
+
         {/* Virtual Joystick - Mobile Only */}
         {isMobile && (
           <div 
