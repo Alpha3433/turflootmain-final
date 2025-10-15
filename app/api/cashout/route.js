@@ -104,6 +104,20 @@ export async function POST(request) {
     // Sign transaction with platform wallet
     transaction.sign(platformKeypair)
 
+    // If prepareOnly flag is set, return the serialized transaction for Privy
+    if (prepareOnly) {
+      const serializedTransaction = transaction.serialize().toString('base64')
+      console.log('✅ Transaction prepared (not sent), returning for Privy approval')
+      
+      return NextResponse.json({
+        success: true,
+        serializedTransaction,
+        payoutUSD,
+        payoutSOL,
+        message: 'Transaction prepared, awaiting user approval via Privy'
+      })
+    }
+
     console.log('📤 Sending transaction...')
 
     // Send transaction
