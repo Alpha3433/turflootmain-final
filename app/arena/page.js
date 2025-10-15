@@ -1472,13 +1472,13 @@ const MultiplayerArena = () => {
                   wallet: userWalletAddress
                 })
                 
-                // VALIDATION: Check if score matches expected balance
-                if (Math.abs(cashOutValueUSD - 0.45) > 0.10) {
-                  console.warn('⚠️ WARNING: Cashout value seems incorrect!', {
-                    expected: '$0.45 (starting balance)',
-                    actual: `$${cashOutValueUSD.toFixed(2)}`
-                  })
-                }
+                console.log('🚨 CRITICAL CHECK - What is being sent to cashout API:', {
+                  variableName: 'cashOutValueUSD',
+                  value: cashOutValueUSD,
+                  type: typeof cashOutValueUSD,
+                  isNumber: !isNaN(cashOutValueUSD),
+                  sourceWas: 'playerBalancesRef.current.get(sessionId)'
+                })
                 
                 // Get player name
                 let playerName = 'Anonymous'
