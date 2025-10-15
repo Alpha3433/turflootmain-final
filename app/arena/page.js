@@ -941,10 +941,20 @@ const MultiplayerArena = () => {
       
       console.log('🔐 Signing with Privy...')
       
+      // Get the wallet object for signing
+      const walletForSigning = solanaWallets?.find(w => {
+        const addr = w.address || w.publicKey?.toString() || w.publicKey?.toBase58?.()
+        return addr === userWalletAddress
+      })
+      
+      if (!walletForSigning) {
+        throw new Error('Wallet not found for signing')
+      }
+      
       // Sign and send transaction
       const result = await signAndSendTransaction({
         transaction: txBytes,
-        wallet: embeddedWallet
+        wallet: walletForSigning
       })
       
       const signature = result.signature || result
