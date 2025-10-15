@@ -4544,6 +4544,7 @@ const MultiplayerArena = () => {
             </div>
           )}
         </div>
+        )}
 
         {/* Virtual Joystick - Mobile Only */}
         {isMobile && (
