@@ -2362,6 +2362,8 @@ export default function TurfLootTactical() {
 
       if (paidRoomConfig) {
         console.log('💰 Paid room detected. Applying wallet validation rules:', paidRoomConfig)
+        console.log('   Entry Fee from config:', paidRoomConfig.entryFee)
+        console.log('   Min Balance from config:', paidRoomConfig.minBalance)
 
         if (!ready || !authenticated) {
           console.log('🔐 Privy session not ready for paid room entry, opening login modal.')
