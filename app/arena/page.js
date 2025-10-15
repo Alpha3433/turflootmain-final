@@ -2138,8 +2138,8 @@ const MultiplayerArena = () => {
 
       this.cameraZoom = isMobileFlag ? 0.75 : 1
 
-      // World setup with circular zone system
-      this.world = { width: 8000, height: 8000 }
+      // World setup with circular zone system - Extended to prevent black space visibility
+      this.world = { width: 10000, height: 10000 }
       this.expectedSessionId = null // Will be set when we connect to Colyseus
       this.localCashOutState = { isCashingOut: false, cashOutProgress: 0 } // Local state for immediate feedback
       
