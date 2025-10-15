@@ -14,7 +14,7 @@ import uuid
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://turfloot-fix-1.preview.emergentagent.com"
+BASE_URL = "https://battle-rewards-13.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 PARTY_API_BASE = f"{BASE_URL}/party-api"
 
