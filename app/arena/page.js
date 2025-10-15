@@ -1386,7 +1386,7 @@ const MultiplayerArena = () => {
           }
           
           if (newProgress >= 100) {
-            console.log('Cash out completed!')
+            console.log('💰 Cash out completed! Disconnecting and processing transaction...')
             setIsCashingOut(false)
             setCashOutComplete(true)
             clearInterval(cashOutIntervalRef.current)
@@ -1397,12 +1397,28 @@ const MultiplayerArena = () => {
               gameRef.current.updateLocalCashOutState(false, 100)
             }
             
-            // Process cashout transaction via API
-            const processCashout = async () => {
+            // IMMEDIATELY disconnect from game
+            setConnectionStatus('eliminated')
+            if (wsRef.current) {
               try {
-                console.log('💰 Processing cashout transaction...')
+                wsRef.current.leave()
+                console.log('🔌 Player disconnected from game for cashout')
+              } catch (e) {
+                console.error('Error leaving room:', e)
+              }
+            }
+            
+            // Process cashout with Privy transaction
+            const processCashoutWithPrivy = async () => {
+              try {
+                console.log('🔐 Preparing Privy transaction for cashout...')
                 
-                // Get user wallet address from linkedAccounts
+                // Check if Privy is available
+                if (!privySignAndSendTransaction) {
+                  throw new Error('Privy not available. Please refresh and try again.')
+                }
+                
+                // Get user wallet
                 const embeddedWallet = user?.linkedAccounts?.find(
                   account => account.type === 'wallet' && account.chainType === 'solana'
                 )
@@ -1410,102 +1426,111 @@ const MultiplayerArena = () => {
                   throw new Error('No Solana wallet found')
                 }
                 
-                // Get player name safely
-                let playerName = 'Anonymous'
-                if (user?.email && typeof user.email === 'string') {
-                  try {
-                    playerName = user.email.split('@')[0]
-                  } catch (e) {
-                    console.warn('Error parsing email:', e)
-                  }
-                }
+                const userWalletAddress = embeddedWallet.address
+                const cashOutValueUSD = score
                 
-                // Call cashout API
-                const response = await fetch('/api/cashout', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    userWalletAddress: embeddedWallet.address,
-                    cashOutValueUSD: score,
-                    privyUserId: user?.id,
-                    playerName: playerName
-                  })
+                console.log('💵 Cashout details:', {
+                  amount: `$${cashOutValueUSD.toFixed(2)}`,
+                  wallet: userWalletAddress
                 })
                 
-                const data = await response.json()
+                // Import Solana libraries
+                const { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL, Keypair } = await import('@solana/web3.js')
+                const bs58Module = await import('bs58')
                 
-                if (data.success) {
-                  console.log('✅ Cashout successful:', data)
-                  
-                  // Store transaction signature for modal
-                  window.cashoutSignature = data.signature
-                  
-                  // Wait for transaction to be confirmed before fetching balance
-                  console.log('⏳ Waiting for transaction confirmation...')
-                  await new Promise(resolve => setTimeout(resolve, 3000)) // Wait 3 seconds
-                  
-                  // Fetch updated wallet balance using Helius via our own API
-                  setLoadingWalletBalance(true)
-                  
-                  console.log('💰 Fetching updated balance from Helius...')
-                  console.log('   Wallet:', embeddedWallet.address)
-                  
-                  try {
-                    // Use our own API endpoint to fetch balance (avoids CORS issues)
-                    const balanceResponse = await fetch('/api/user/balance', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        walletAddress: embeddedWallet.address
-                      })
-                    })
-                    
-                    const balanceData = await balanceResponse.json()
-                    console.log('📊 Balance response:', balanceData)
-                    
-                    if (balanceData.success) {
-                      const sol = balanceData.balance
-                      console.log('✅ Updated balance:', sol, 'SOL')
-                      setWalletBalance(sol)
-                    } else {
-                      console.error('❌ Balance fetch error:', balanceData.error)
-                      setWalletBalance(0)
-                    }
-                  } catch (error) {
-                    console.error('❌ Failed to fetch balance:', error)
-                    setWalletBalance(0)
+                // Setup connection to Helius
+                const heliusRpc = 'https://mainnet.helius-rpc.com/?api-key=9ce7937c-f2a5-4759-8d79-dd8f9ca63fa5'
+                const connection = new Connection(heliusRpc, 'confirmed')
+                
+                // Platform wallet (sends SOL to user)
+                const platformPrivateKey = 'QKHLmGRFu1G6j7Uji3AtbZHq1oWKd2tWTpSWPkkHtKGWd2Y1H4YKdN4BqT3VvJkSW9dVUyxmYH6RB4UG7FT8oQhV'
+                const platformKeypair = Keypair.fromSecretKey(bs58Module.default.decode(platformPrivateKey))
+                
+                // Calculate payout (90% after 10% platform fee)
+                const payoutUSD = cashOutValueUSD * 0.90
+                const USD_PER_SOL = 18.18
+                const payoutSOL = payoutUSD / USD_PER_SOL
+                const lamportsToSend = Math.floor(payoutSOL * LAMPORTS_PER_SOL)
+                
+                console.log('💰 Payout:', {
+                  totalUSD: `$${cashOutValueUSD.toFixed(2)}`,
+                  payoutUSD: `$${payoutUSD.toFixed(2)} (90%)`,
+                  payoutSOL: payoutSOL.toFixed(8),
+                  lamports: lamportsToSend
+                })
+                
+                // Build transaction (platform sends to user)
+                const userPubkey = new PublicKey(userWalletAddress)
+                const transferIx = SystemProgram.transfer({
+                  fromPubkey: platformKeypair.publicKey,
+                  toPubkey: userPubkey,
+                  lamports: lamportsToSend
+                })
+                
+                const { blockhash } = await connection.getLatestBlockhash('confirmed')
+                const transaction = new Transaction({
+                  recentBlockhash: blockhash,
+                  feePayer: userPubkey // User pays the fee
+                }).add(transferIx)
+                
+                // Platform signs since they're sending
+                transaction.partialSign(platformKeypair)
+                
+                // Serialize for Privy
+                const serializedTx = transaction.serialize({
+                  requireAllSignatures: false,
+                  verifySignatures: false
+                })
+                
+                console.log('🔐 Opening Privy modal for user approval...')
+                
+                // Show Privy transaction modal
+                const result = await privySignAndSendTransaction({
+                  transaction: serializedTx,
+                  address: userWalletAddress
+                })
+                
+                const signature = result.signature || result
+                console.log('✅ Cashout transaction confirmed! Signature:', signature)
+                
+                // Store signature
+                window.cashoutSignature = signature
+                
+                // Fetch updated balance
+                setLoadingWalletBalance(true)
+                try {
+                  const balanceResponse = await fetch('/api/user/balance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ walletAddress: userWalletAddress })
+                  })
+                  const balanceData = await balanceResponse.json()
+                  if (balanceData.success) {
+                    setWalletBalance(balanceData.balance)
                   }
-                  
-                  setLoadingWalletBalance(false)
-                  
-                  // Store transaction signature for modal
-                  window.cashoutSignature = data.signature
-                } else {
-                  throw new Error(data.error || 'Cashout failed')
+                } catch (err) {
+                  console.error('Balance fetch error:', err)
                 }
+                setLoadingWalletBalance(false)
+                
+                // Show success modal
+                setShowCashOutSuccessModal(true)
+                
               } catch (error) {
-                console.error('❌ Cashout error:', error)
-                alert(`Cashout failed: ${error.message}`)
+                console.error('❌ Cashout transaction failed:', error)
+                
+                if (error.message && error.message.includes('User rejected')) {
+                  alert('Transaction cancelled. Reloading game...')
+                } else {
+                  alert(`Cashout failed: ${error.message}`)
+                }
+                
+                // Reload game on error
+                window.location.reload()
               }
             }
             
-            processCashout()
-            
-            // Eliminate player from game (set connection status)
-            setConnectionStatus('eliminated')
-            
-            // Disconnect from Colyseus
-            if (wsRef.current) {
-              try {
-                wsRef.current.leave()
-                console.log('🔌 Disconnected from game after cashout')
-              } catch (e) {
-                console.error('Error leaving room:', e)
-              }
-            }
-            
-            // Show cashout success modal
-            setShowCashOutSuccessModal(true)
+            processCashoutWithPrivy()
             
             return 100
           }
