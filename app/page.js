@@ -2336,15 +2336,15 @@ export default function TurfLootTactical() {
         {
           idMatches: ['turfloot-au-5'],
           nameMatches: ['Turfloot $5 Room - Australia'],
-          entryFee: 0.05,
-          minBalance: 0.05,
+          entryFee: 0.50,
+          minBalance: 0.50,
           feePercentage: 10
         },
         {
           idMatches: ['turfloot-au-20'],
           nameMatches: ['Turfloot $20 Room - Australia'],
-          entryFee: 0.10,
-          minBalance: 0.10,
+          entryFee: 0.65,
+          minBalance: 0.65,
           feePercentage: 10
         }
       ]
