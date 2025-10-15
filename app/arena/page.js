@@ -1434,14 +1434,6 @@ const MultiplayerArena = () => {
                   wallet: userWalletAddress
                 })
                 
-                // Import Solana libraries
-                const { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL, Keypair } = await import('@solana/web3.js')
-                const bs58Module = await import('bs58')
-                
-                // Setup connection to Helius
-                const heliusRpc = 'https://mainnet.helius-rpc.com/?api-key=9ce7937c-f2a5-4759-8d79-dd8f9ca63fa5'
-                const connection = new Connection(heliusRpc, 'confirmed')
-                
                 // Get platform wallet private key from API
                 // We can't access env vars directly on client, so we'll use the cashout API instead
                 // Let's call the API endpoint which has access to the private key
