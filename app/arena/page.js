@@ -3389,22 +3389,6 @@ const MultiplayerArena = () => {
         this.ctx.shadowBlur = 2
         this.ctx.fillText(displayValue, drawX, textY)
         this.ctx.shadowBlur = 0
-        
-        // Draw username below player avatar in paid arenas (no box, closer to player)
-        const nameY = drawY + playerRadius + 20 // Position closer to player (was 30)
-        const playerName = player.name || 'Anonymous'
-        
-        // Style for username
-        this.ctx.font = 'bold 14px Arial'
-        this.ctx.textAlign = 'center'
-        this.ctx.textBaseline = 'middle'
-        
-        // Draw username in white with shadow (no background box)
-        this.ctx.fillStyle = '#FFFFFF'
-        this.ctx.shadowColor = '#000000'
-        this.ctx.shadowBlur = 4
-        this.ctx.fillText(playerName, drawX, nameY)
-        this.ctx.shadowBlur = 0
       }
     }
     
