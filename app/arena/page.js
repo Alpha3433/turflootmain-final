@@ -766,20 +766,41 @@ const MultiplayerArena = () => {
     selectedSkin?.pattern
   ])
 
-  // Load selected skin from localStorage
+  // Load selected skin from URL parameters (priority) or localStorage (fallback)
   useEffect(() => {
+    // First, check URL parameters for skin data
+    const skinId = searchParams.get('skinId')
+    const skinColor = searchParams.get('skinColor')
+    const skinName = searchParams.get('skinName')
+    
+    if (skinId && skinColor) {
+      // Use skin from URL parameters (passed from landing page)
+      const urlSkin = {
+        id: skinId,
+        color: decodeURIComponent(skinColor),
+        name: decodeURIComponent(skinName || 'Default Warrior'),
+        type: 'circle',
+        pattern: 'solid'
+      }
+      setSelectedSkin(urlSkin)
+      console.log('🎨 Using selected skin from URL parameters:', urlSkin)
+      setSelectedSkinLoaded(true)
+      return
+    }
+    
+    // Fallback to localStorage if no URL parameters
     const savedSkin = localStorage.getItem('selectedSkin')
     if (savedSkin) {
       try {
         const parsedSkin = JSON.parse(savedSkin)
         setSelectedSkin(parsedSkin)
-        console.log('🎨 Loaded selected skin for arena:', parsedSkin)
+        console.log('🎨 Loaded selected skin from localStorage:', parsedSkin)
       } catch (error) {
         console.log('❌ Error loading saved skin:', error)
       }
     }
     setSelectedSkinLoaded(true)
-  }, [])
+  }, [searchParams])
 
   // Authentication check - redirect to login if not authenticated with user feedback
   useEffect(() => {
