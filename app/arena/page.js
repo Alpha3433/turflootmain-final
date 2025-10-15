@@ -1400,9 +1400,21 @@ const MultiplayerArena = () => {
                 if (data.success) {
                   console.log('✅ Cashout successful:', data)
                   
-                  // Fetch updated wallet balance
+                  // Store transaction signature for modal
+                  window.cashoutSignature = data.signature
+                  
+                  // Wait for transaction to be confirmed before fetching balance
+                  console.log('⏳ Waiting for transaction confirmation...')
+                  await new Promise(resolve => setTimeout(resolve, 3000)) // Wait 3 seconds
+                  
+                  // Fetch updated wallet balance using Helius
                   setLoadingWalletBalance(true)
                   const rpcUrl = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://api.mainnet-beta.solana.com'
+                  
+                  console.log('💰 Fetching updated balance from Helius...')
+                  console.log('   RPC URL:', rpcUrl)
+                  console.log('   Wallet:', embeddedWallet.address)
+                  
                   const balanceResponse = await fetch(rpcUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1415,9 +1427,17 @@ const MultiplayerArena = () => {
                   })
                   
                   const balanceData = await balanceResponse.json()
-                  const lamports = balanceData.result?.value || 0
-                  const sol = lamports / 1_000_000_000
-                  setWalletBalance(sol)
+                  console.log('📊 Balance response:', balanceData)
+                  
+                  if (balanceData.error) {
+                    console.error('❌ Balance fetch error:', balanceData.error)
+                    setWalletBalance(0)
+                  } else {
+                    const lamports = balanceData.result?.value || 0
+                    const sol = lamports / 1_000_000_000
+                    console.log('✅ Updated balance:', sol, 'SOL (', lamports, 'lamports )')
+                    setWalletBalance(sol)
+                  }
                   setLoadingWalletBalance(false)
                   
                   // Store transaction signature for modal
