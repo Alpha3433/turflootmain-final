@@ -1766,17 +1766,6 @@ const MultiplayerArena = () => {
 
           if (prevStatus !== 'connected') {
             console.log('🔗 Setting connection status to connected (state update received)')
-            
-            // Dismiss the loading popup now that game is fully loaded
-            const loadingPopup = document.getElementById('game-loading-popup')
-            if (loadingPopup) {
-              console.log('✅ Game fully loaded - dismissing loading popup')
-              if (loadingPopup.cleanup && typeof loadingPopup.cleanup === 'function') {
-                loadingPopup.cleanup()
-              } else {
-                loadingPopup.remove()
-              }
-            }
           }
 
           return 'connected'
