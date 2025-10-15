@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server'
 export async function POST(request) {
   try {
     const body = await request.json()
-    const { userWalletAddress, cashOutValueUSD, privyUserId, playerName } = body
+    const { userWalletAddress, cashOutValueUSD, privyUserId, playerName, prepareOnly } = body
 
     // Validate required fields
     if (!userWalletAddress || !cashOutValueUSD || !privyUserId) {
