@@ -32,7 +32,36 @@ const MultiplayerArena = () => {
   
   // Solana wallet hooks for payment
   const { wallets: solanaWallets } = useSolanaWallets()
-  const { signAndSendTransaction } = useSignAndSendTransaction()
+  const signAndSendTransactionResponse = useSignAndSendTransaction()
+  const privySignAndSendTransaction = useMemo(() => {
+    if (typeof signAndSendTransactionResponse === 'function') {
+      return signAndSendTransactionResponse
+    }
+    if (
+      signAndSendTransactionResponse &&
+      typeof signAndSendTransactionResponse.signAndSendTransaction === 'function'
+    ) {
+      return signAndSendTransactionResponse.signAndSendTransaction
+    }
+    if (
+      signAndSendTransactionResponse &&
+      typeof signAndSendTransactionResponse.sendTransaction === 'function'
+    ) {
+      return signAndSendTransactionResponse.sendTransaction
+    }
+    if (
+      signAndSendTransactionResponse &&
+      typeof signAndSendTransactionResponse === 'object'
+    ) {
+      const firstFunctionKey = Object.keys(signAndSendTransactionResponse).find(
+        (key) => typeof signAndSendTransactionResponse[key] === 'function'
+      )
+      if (firstFunctionKey) {
+        return signAndSendTransactionResponse[firstFunctionKey]
+      }
+    }
+    return null
+  }, [signAndSendTransactionResponse])
   
   // Player name state that updates when localStorage changes
   const [playerName, setPlayerName] = useState('Anonymous Player')
