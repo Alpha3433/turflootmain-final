@@ -2,24 +2,26 @@ import { NextResponse } from 'next/server'
 
 /**
  * Cash-out API - Sends SOL from platform wallet to user's wallet
- * Takes 10% platform fee and sends remaining 90% to user
+ * Pays out the player's USD balance using a configurable USD⇄SOL conversion rate
  */
 export async function POST(request) {
   try {
     const body = await request.json()
     const { userWalletAddress, cashOutValueUSD, privyUserId, playerName, prepareOnly } = body
 
+    const parsedCashOutValue = Number(cashOutValueUSD)
+
     // Validate required fields
-    if (!userWalletAddress || !cashOutValueUSD || !privyUserId) {
+    if (!userWalletAddress || !privyUserId || !Number.isFinite(parsedCashOutValue) || parsedCashOutValue <= 0) {
       return NextResponse.json(
-        { success: false, error: 'Missing required fields' },
+        { success: false, error: 'Missing or invalid required fields' },
         { status: 400 }
       )
     }
 
     console.log('💰 Processing cash-out request:', {
       userWalletAddress,
-      cashOutValueUSD,
+      cashOutValueUSD: parsedCashOutValue,
       cashOutValueType: typeof cashOutValueUSD,
       privyUserId,
       playerName: playerName || privyUserId
@@ -28,17 +30,25 @@ export async function POST(request) {
     console.log('🔍 API RECEIVED - Raw body:', body)
 
     // NO platform fee on cashout - user gets 100% of their balance
-    const payoutUSD = cashOutValueUSD
+    const payoutUSD = parsedCashOutValue
+    const platformFeeUSD = 0
+
+    // Determine the USD-to-SOL conversion rate using env vars with a sensible fallback
+    const usdPerSolEnv = parseFloat(process.env.USD_PER_SOL || process.env.NEXT_PUBLIC_USD_PER_SOL || '150')
+    const USD_PER_SOL = Number.isFinite(usdPerSolEnv) && usdPerSolEnv > 0 ? usdPerSolEnv : 150
 
     console.log('💵 Cashout amount:', {
-      userBalance: `$${cashOutValueUSD.toFixed(2)}`,
+      userBalance: `$${payoutUSD.toFixed(2)}`,
       payout: `$${payoutUSD.toFixed(2)} (100% - no fee on cashout)`
     })
 
-    // Convert USD to SOL using the same rate as transactions
-    const USD_PER_SOL = 18.18
+    // Convert USD to SOL using the derived rate
     const payoutSOL = payoutUSD / USD_PER_SOL
     const lamportsToSend = Math.floor(payoutSOL * 1_000_000_000)
+
+    if (lamportsToSend <= 0) {
+      throw new Error('Calculated lamports to send is zero. Check USD to SOL conversion rate.')
+    }
 
     console.log('🔄 SOL conversion:', {
       usdAmount: `$${payoutUSD.toFixed(2)}`,
