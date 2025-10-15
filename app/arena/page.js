@@ -1710,6 +1710,10 @@ const MultiplayerArena = () => {
       GLOBAL_CONNECTION_TRACKER.isConnecting = false // Reset global flag on success
       console.log(`🔗 [${componentId}] Setting initial connection status to connected`)
       setConnectionStatus('connected')
+      
+      // Reset player balances for new game session
+      playerBalancesRef.current.clear()
+      console.log('💰 Reset player balances for new game session')
 
       initializePingMeasurement(room)
 
