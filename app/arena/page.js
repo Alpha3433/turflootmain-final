@@ -3914,8 +3914,12 @@ const MultiplayerArena = () => {
               type="button"
               onClick={handleMissionExpand}
               style={{
-                background: 'rgba(15, 15, 15, 0.92)',
-                border: '1px solid rgba(251, 191, 36, 0.6)',
+                background: missionsToDisplay[0]?.completed || completedMissions.includes(missionsToDisplay[0]?.id) 
+                  ? 'rgba(34, 197, 94, 0.15)' 
+                  : 'rgba(15, 15, 15, 0.92)',
+                border: missionsToDisplay[0]?.completed || completedMissions.includes(missionsToDisplay[0]?.id)
+                  ? '1px solid rgba(34, 197, 94, 0.6)'
+                  : '1px solid rgba(251, 191, 36, 0.6)',
                 borderRadius: '9999px',
                 padding: isMobile ? '8px 14px' : '10px 18px',
                 display: 'flex',
@@ -3932,21 +3936,34 @@ const MultiplayerArena = () => {
                 backdropFilter: 'blur(6px)'
               }}
             >
-              <span style={{ fontSize: isMobile ? '16px' : '18px' }}>🎯</span>
-              <span style={{ color: '#fbbf24', textTransform: 'uppercase' }}>Missions</span>
-              <span
-                style={{
-                  background: 'rgba(251, 191, 36, 0.2)',
-                  color: '#fbbf24',
-                  borderRadius: '9999px',
-                  padding: '2px 10px',
-                  fontSize: isMobile ? '11px' : '12px',
-                  fontWeight: 700,
-                  letterSpacing: '0.5px'
-                }}
-              >
-                {activeMissionCount}
+              <span style={{ fontSize: isMobile ? '16px' : '18px' }}>
+                {missionsToDisplay[0]?.completed || completedMissions.includes(missionsToDisplay[0]?.id) ? '✅' : '🎯'}
               </span>
+              <span style={{ 
+                color: missionsToDisplay[0]?.completed || completedMissions.includes(missionsToDisplay[0]?.id) 
+                  ? '#22c55e' 
+                  : '#fbbf24', 
+                textTransform: 'uppercase' 
+              }}>
+                {missionsToDisplay[0]?.completed || completedMissions.includes(missionsToDisplay[0]?.id) 
+                  ? 'Mission Complete' 
+                  : 'Missions'}
+              </span>
+              {!(missionsToDisplay[0]?.completed || completedMissions.includes(missionsToDisplay[0]?.id)) && (
+                <span
+                  style={{
+                    background: 'rgba(251, 191, 36, 0.2)',
+                    color: '#fbbf24',
+                    borderRadius: '9999px',
+                    padding: '2px 10px',
+                    fontSize: isMobile ? '11px' : '12px',
+                    fontWeight: 700,
+                    letterSpacing: '0.5px'
+                  }}
+                >
+                  {activeMissionCount}
+                </span>
+              )}
             </button>
           ) : (
             <div
