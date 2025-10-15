@@ -2337,8 +2337,8 @@ const MultiplayerArena = () => {
         }
         
         // Verify spawn position is within playable area (for debugging)
-        const worldCenterX = this.world.width / 4 // 2000 - left-side playable area
-        const worldCenterY = this.world.height / 4 // 2000 - top-side playable area
+        const worldCenterX = 2000 // Fixed center - left-side playable area
+        const worldCenterY = 2000 // Fixed center - top-side playable area
         const distanceFromCenter = Math.sqrt(
           Math.pow(currentPlayer.x - worldCenterX, 2) + 
           Math.pow(currentPlayer.y - worldCenterY, 2)
