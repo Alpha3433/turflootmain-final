@@ -1353,10 +1353,12 @@ const MultiplayerArena = () => {
               try {
                 console.log('💰 Processing cashout transaction...')
                 
-                // Get user wallet address
-                const embeddedWallet = wallets?.find(w => w.walletClientType === 'privy')
+                // Get user wallet address from linkedAccounts
+                const embeddedWallet = user?.linkedAccounts?.find(
+                  account => account.type === 'wallet' && account.chainType === 'solana'
+                )
                 if (!embeddedWallet || !embeddedWallet.address) {
-                  throw new Error('No wallet found')
+                  throw new Error('No Solana wallet found')
                 }
                 
                 // Call cashout API
