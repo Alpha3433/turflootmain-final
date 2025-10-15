@@ -1248,24 +1248,82 @@ const MultiplayerArena = () => {
               gameRef.current.updateLocalCashOutState(false, 100)
             }
             
-            // Add currency based on score
-            setCurrency(prevCurrency => prevCurrency + score)
-            
-            // Show cashout success modal and start countdown
-            setShowCashOutSuccessModal(true)
-            setAutoRedirectCountdown(10)
-            
-            // Start countdown timer
-            const countdownInterval = setInterval(() => {
-              setAutoRedirectCountdown(prev => {
-                if (prev <= 1) {
-                  clearInterval(countdownInterval)
-                  window.location.href = '/'
-                  return 0
+            // Process cashout transaction via API
+            const processCashout = async () => {
+              try {
+                console.log('💰 Processing cashout transaction...')
+                
+                // Get user wallet address
+                const embeddedWallet = wallets?.find(w => w.walletClientType === 'privy')
+                if (!embeddedWallet || !embeddedWallet.address) {
+                  throw new Error('No wallet found')
                 }
-                return prev - 1
-              })
-            }, 1000)
+                
+                // Call cashout API
+                const response = await fetch('/api/cashout', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    userWalletAddress: embeddedWallet.address,
+                    cashOutValueUSD: score,
+                    privyUserId: user?.id,
+                    playerName: user?.email?.split('@')[0] || 'Anonymous'
+                  })
+                })
+                
+                const data = await response.json()
+                
+                if (data.success) {
+                  console.log('✅ Cashout successful:', data)
+                  
+                  // Fetch updated wallet balance
+                  setLoadingWalletBalance(true)
+                  const rpcUrl = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://api.mainnet-beta.solana.com'
+                  const balanceResponse = await fetch(rpcUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      jsonrpc: '2.0',
+                      id: 1,
+                      method: 'getBalance',
+                      params: [embeddedWallet.address]
+                    })
+                  })
+                  
+                  const balanceData = await balanceResponse.json()
+                  const lamports = balanceData.result?.value || 0
+                  const sol = lamports / 1_000_000_000
+                  setWalletBalance(sol)
+                  setLoadingWalletBalance(false)
+                  
+                  // Store transaction signature for modal
+                  window.cashoutSignature = data.signature
+                } else {
+                  throw new Error(data.error || 'Cashout failed')
+                }
+              } catch (error) {
+                console.error('❌ Cashout error:', error)
+                alert(`Cashout failed: ${error.message}`)
+              }
+            }
+            
+            processCashout()
+            
+            // Eliminate player from game (set connection status)
+            setConnectionStatus('eliminated')
+            
+            // Disconnect from Colyseus
+            if (wsRef.current) {
+              try {
+                wsRef.current.leave()
+                console.log('🔌 Disconnected from game after cashout')
+              } catch (e) {
+                console.error('Error leaving room:', e)
+              }
+            }
+            
+            // Show cashout success modal
+            setShowCashOutSuccessModal(true)
             
             return 100
           }
