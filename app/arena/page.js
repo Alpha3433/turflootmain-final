@@ -2793,8 +2793,8 @@ const MultiplayerArena = () => {
     
     drawWorldBoundary() {
       // Circular zone system for top-left playable area
-      const centerX = this.world.width / 4  // 2000 - top left area center X
-      const centerY = this.world.height / 4 // 2000 - top left area center Y
+      const centerX = 2000  // Fixed playable area center X
+      const centerY = 2000 // Fixed playable area center Y
       const playableRadius = this.currentPlayableRadius
       
       // Draw red danger zone everywhere  
