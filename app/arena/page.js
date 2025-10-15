@@ -4171,7 +4171,8 @@ const MultiplayerArena = () => {
             }
           </div>
           
-          {/* Multiplayer Status Indicator */}
+          {/* Multiplayer Status Indicator - Mobile Only */}
+          {isMobile && (
           <div style={{
             backgroundColor: 'rgba(0, 0, 0, 0.7)',
             color: connectionStatus === 'connected'
@@ -4181,9 +4182,9 @@ const MultiplayerArena = () => {
                 : connectionStatus === 'eliminated'
                   ? '#ff4444'
                   : '#ff0000',
-            padding: isMobile ? '4px 8px' : '6px 12px',
+            padding: '4px 8px',
             borderRadius: '8px',
-            fontSize: isMobile ? '10px' : '12px',
+            fontSize: '10px',
             fontWeight: 'bold',
             marginBottom: '8px',
             display: 'flex',
@@ -4218,6 +4219,7 @@ const MultiplayerArena = () => {
               {connectionStatus === 'eliminated' && '☠️ ELIMINATED'}
             </span>
           </div>
+          )}
 
           {/* Player Rankings - Dynamic Leaderboard */}
           <div style={{ 
