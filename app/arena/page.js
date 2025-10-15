@@ -4457,7 +4457,7 @@ const MultiplayerArena = () => {
           </div>
         </div>
 
-        {/* Paid Arena Stats - Desktop Only - Below Minimap */}
+        {/* Paid Arena Stats - Desktop Only - Below Minimap - Fortnite Inspired */}
         {!isMobile && isPaidArena && (
           <div style={{
             position: 'fixed',
@@ -4465,38 +4465,46 @@ const MultiplayerArena = () => {
             right: '10px',
             zIndex: 1000,
             width: '220px',
+            background: 'rgba(0, 0, 0, 0.75)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            borderRadius: '8px',
+            padding: '8px',
+            backdropFilter: 'blur(12px)',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5)',
             display: 'flex',
-            flexDirection: 'column',
-            gap: '10px'
+            flexDirection: 'row',
+            gap: '8px'
           }}>
             {/* Worth Display */}
             <div style={{
-              background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.05) 100%)',
-              border: '2px solid rgba(34, 197, 94, 0.6)',
-              borderRadius: '12px',
-              padding: '12px 16px',
-              backdropFilter: 'blur(10px)',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+              flex: 1,
+              background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.08) 100%)',
+              border: '1.5px solid rgba(34, 197, 94, 0.5)',
+              borderRadius: '6px',
+              padding: '8px 6px',
               display: 'flex',
               flexDirection: 'column',
-              alignItems: 'center'
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '2px'
             }}>
               <div style={{
-                fontSize: '11px',
-                fontWeight: '600',
-                color: '#9ca3af',
+                fontSize: '9px',
+                fontWeight: '700',
+                color: '#a3a3a3',
                 textTransform: 'uppercase',
-                letterSpacing: '1px',
-                marginBottom: '6px'
+                letterSpacing: '0.5px',
+                fontFamily: '"Rajdhani", sans-serif'
               }}>
-                Net Worth
+                WORTH
               </div>
               <div style={{
-                fontSize: '28px',
+                fontSize: '20px',
                 fontWeight: '800',
                 color: '#22c55e',
-                textShadow: '0 0 20px rgba(34, 197, 94, 0.8), 0 0 40px rgba(34, 197, 94, 0.4)',
-                fontFamily: '"Rajdhani", sans-serif'
+                textShadow: '0 0 12px rgba(34, 197, 94, 0.6)',
+                fontFamily: '"Rajdhani", sans-serif',
+                lineHeight: '1'
               }}>
                 ${typeof score === 'number' ? score.toFixed(2) : '0.00'}
               </div>
@@ -4504,32 +4512,34 @@ const MultiplayerArena = () => {
 
             {/* Mass Display */}
             <div style={{
-              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.05) 100%)',
-              border: '2px solid rgba(59, 130, 246, 0.6)',
-              borderRadius: '12px',
-              padding: '12px 16px',
-              backdropFilter: 'blur(10px)',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+              flex: 1,
+              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.08) 100%)',
+              border: '1.5px solid rgba(59, 130, 246, 0.5)',
+              borderRadius: '6px',
+              padding: '8px 6px',
               display: 'flex',
               flexDirection: 'column',
-              alignItems: 'center'
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '2px'
             }}>
               <div style={{
-                fontSize: '11px',
-                fontWeight: '600',
-                color: '#9ca3af',
+                fontSize: '9px',
+                fontWeight: '700',
+                color: '#a3a3a3',
                 textTransform: 'uppercase',
-                letterSpacing: '1px',
-                marginBottom: '6px'
+                letterSpacing: '0.5px',
+                fontFamily: '"Rajdhani", sans-serif'
               }}>
-                Mass
+                MASS
               </div>
               <div style={{
-                fontSize: '28px',
+                fontSize: '20px',
                 fontWeight: '800',
                 color: '#3b82f6',
-                textShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4)',
-                fontFamily: '"Rajdhani", sans-serif'
+                textShadow: '0 0 12px rgba(59, 130, 246, 0.6)',
+                fontFamily: '"Rajdhani", sans-serif',
+                lineHeight: '1'
               }}>
                 {Math.floor(mass)}
               </div>
