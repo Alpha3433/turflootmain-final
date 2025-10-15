@@ -878,10 +878,12 @@ const MultiplayerArena = () => {
       
       console.log('   Entry Fee: $' + entryFee)
       
-      // Get embedded wallet
-      const embeddedWallet = wallets?.find(w => w.walletClientType === 'privy')
+      // Get embedded wallet from linkedAccounts
+      const embeddedWallet = user?.linkedAccounts?.find(
+        account => account.type === 'wallet' && account.chainType === 'solana'
+      )
       if (!embeddedWallet || !embeddedWallet.address) {
-        throw new Error('No wallet found')
+        throw new Error('No Solana wallet found')
       }
       
       const userWalletAddress = embeddedWallet.address
