@@ -2620,8 +2620,8 @@ const MultiplayerArena = () => {
         }
         
         // Keep pieces within arena boundaries (exact agario style)
-        const centerX = this.world.width / 4
-        const centerY = this.world.height / 4
+        const centerX = 2000 // Fixed playable area center
+        const centerY = 2000 // Fixed playable area center
         const playableRadius = 1800
         const maxRadius = playableRadius - piece.radius
         
