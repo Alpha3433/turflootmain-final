@@ -4986,6 +4986,48 @@ const MultiplayerArena = () => {
                   }}>Wallet Balance</div>
                 </div>
               </div>
+              
+              {/* Transaction Signature */}
+              {window.cashoutSignature && (
+                <div style={{
+                  backgroundColor: 'rgba(104, 211, 145, 0.1)',
+                  padding: isMobile ? '8px' : '12px',
+                  borderRadius: '8px',
+                  marginBottom: isMobile ? '12px' : '16px',
+                  border: '1px solid rgba(104, 211, 145, 0.3)'
+                }}>
+                  <div style={{ 
+                    color: '#68d391', 
+                    fontSize: isMobile ? '10px' : '12px',
+                    fontWeight: '600',
+                    marginBottom: '4px',
+                    textTransform: 'uppercase'
+                  }}>
+                    Transaction Signature
+                  </div>
+                  <a
+                    href={`https://solscan.io/tx/${window.cashoutSignature}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      color: '#60a5fa',
+                      fontSize: isMobile ? '10px' : '12px',
+                      wordBreak: 'break-all',
+                      textDecoration: 'underline',
+                      display: 'block'
+                    }}
+                  >
+                    {window.cashoutSignature.slice(0, 8)}...{window.cashoutSignature.slice(-8)}
+                  </a>
+                  <div style={{
+                    color: '#a0aec0',
+                    fontSize: isMobile ? '9px' : '10px',
+                    marginTop: '4px'
+                  }}>
+                    Click to view on Solscan
+                  </div>
+                </div>
+              )}
             
               {/* Action Buttons */}
               <div style={{
