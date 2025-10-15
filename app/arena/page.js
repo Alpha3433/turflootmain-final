@@ -4394,29 +4394,22 @@ const MultiplayerArena = () => {
           </div>
         </div>
 
-        {/* Player Info Panel - Bottom Right (compact) - FROM LOCAL AGARIO */}
+        {/* Player Info Panel - Mobile Only */}
+        {isMobile && (
         <div style={{
           position: 'fixed',
-          bottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 8px)' : '10px',
-          left: isMobile ? '50%' : 'auto',
-          right: isMobile ? 'auto' : '10px',
-          transform: isMobile ? 'translateX(-50%)' : 'none',
+          bottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
+          left: '50%',
+          transform: 'translateX(-50%)',
           zIndex: 1000,
-          // Minimal mobile styling
-          background: isMobile 
-            ? 'rgba(0, 0, 0, 0.6)'
-            : 'rgba(0, 0, 0, 0.85)',
-          border: isMobile 
-            ? 'none' 
-            : '2px solid #333',
-          borderRadius: isMobile ? '6px' : '4px',
-          padding: isMobile ? (statsExpanded ? '4px 6px' : '2px 4px') : '12px 14px',
-          fontSize: isMobile ? (statsExpanded ? '9px' : '8px') : '11px',
+          background: 'rgba(0, 0, 0, 0.6)',
+          borderRadius: '6px',
+          padding: statsExpanded ? '4px 6px' : '2px 4px',
+          fontSize: statsExpanded ? '9px' : '8px',
           color: '#ccc',
           fontFamily: '"Rajdhani", sans-serif',
           fontWeight: '600',
-          minWidth: isMobile ? (statsExpanded ? '100px' : '75px') : '160px',
-          maxWidth: isMobile ? 'none' : '180px',
+          minWidth: statsExpanded ? '100px' : '75px',
           transition: 'all 0.2s ease'
         }}>
           {/* Header */}
