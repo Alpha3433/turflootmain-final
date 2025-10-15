@@ -4334,6 +4334,23 @@ const MultiplayerArena = () => {
               ))
             })()}
           </div>
+          
+          {/* Divider and Player Count - Agario Style */}
+          <div style={{
+            marginTop: isMobile ? '6px' : '8px',
+            paddingTop: isMobile ? '6px' : '8px',
+            borderTop: '1px solid rgba(255, 255, 255, 0.1)'
+          }}>
+            <div style={{
+              fontSize: isMobile ? (leaderboardExpanded ? '8px' : '7px') : '10px',
+              color: '#9ca3af',
+              textAlign: 'center',
+              fontWeight: '500',
+              letterSpacing: '0.02em'
+            }}>
+              {playerCount === 1 ? '1 player in game' : `${playerCount} players in game`}
+            </div>
+          </div>
         </div>
 
         {/* Live Ping Meter - Bottom Left */}
