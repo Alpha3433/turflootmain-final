@@ -2847,18 +2847,15 @@ const MultiplayerArena = () => {
             console.log('🔄 Piece merged! New player mass:', Math.round(this.player.mass), 'Total mass:', Math.floor(totalMass))
             continue
           } else {
-            // Collision - push them apart so they don't overlap
-            const overlap = minDistance - distance
-            const pushX = (dx / distance) * overlap * 0.5
-            const pushY = (dy / distance) * overlap * 0.5
+            // Collision - push piece away but don't affect main player movement
+            // This prevents the "dragging" feeling
+            const overlap = minDistance - distance + 1 // Add 1px buffer
+            const pushX = (dx / distance) * overlap
+            const pushY = (dy / distance) * overlap
             
-            // Push the piece away from main player
+            // Only push the split piece away, main player moves freely
             piece.x += pushX
             piece.y += pushY
-            
-            // Push main player away from piece (equal and opposite)
-            this.player.x -= pushX
-            this.player.y -= pushY
           }
         }
         
