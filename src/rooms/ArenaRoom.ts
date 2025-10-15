@@ -327,8 +327,10 @@ export class ArenaRoom extends Room<GameState> {
       // Store user's wallet address for cash-outs
       player.userWalletAddress = options.userWalletAddress || "";
       
-      console.log(`💰 Player ${playerName} paid $${this.entryFee.toFixed(2)} entry fee`);
-      console.log(`💰 After 10% platform fee, starting balance: $${player.cashOutValue.toFixed(2)}`);
+      console.log(`💰 Player ${playerName} joining paid arena`);
+      console.log(`   Entry fee: $${this.entryFee.toFixed(2)}`);
+      console.log(`   Platform fee (10%): $${(this.entryFee * PLATFORM_FEE_PERCENTAGE).toFixed(2)}`);
+      console.log(`   Starting balance (90%): $${startingBalance.toFixed(2)}`);
       console.log(`👛 User wallet address: ${player.userWalletAddress || 'NOT PROVIDED'}`);
     }
     
