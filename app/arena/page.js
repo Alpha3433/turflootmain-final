@@ -286,8 +286,16 @@ const MultiplayerArena = () => {
   
   // Parse URL parameters and get authenticated user data
   const roomId = searchParams.get('roomId') || 'global-turfloot-arena'
-  const entryFee = parseFloat(searchParams.get('fee')) || 0
+  const feeParam = searchParams.get('fee')
+  const entryFee = parseFloat(feeParam) || 0
   const isPaidArena = searchParams.get('paid') === 'true' || entryFee > 0
+  
+  console.log('🔍 URL Parameters:', {
+    feeParam,
+    entryFee,
+    isPaidArena,
+    roomId
+  })
   
   const privyUserId = user?.id || null
   const walletAddress = user?.wallet?.address
