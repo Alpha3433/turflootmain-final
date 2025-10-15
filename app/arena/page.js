@@ -1408,10 +1408,10 @@ const MultiplayerArena = () => {
               }
             }
             
-            // Process cashout with Privy transaction
+            // Process cashout with Privy transaction workflow
             const processCashoutWithPrivy = async () => {
               try {
-                console.log('🔐 Preparing Privy transaction for cashout...')
+                console.log('🔐 Preparing Privy cashout transaction...')
                 
                 // Check if Privy is available
                 if (!privySignAndSendTransaction) {
@@ -1434,16 +1434,6 @@ const MultiplayerArena = () => {
                   wallet: userWalletAddress
                 })
                 
-                // Get platform wallet private key from API
-                // We can't access env vars directly on client, so we'll use the cashout API instead
-                // Let's call the API endpoint which has access to the private key
-                
-                // Actually, we should NOT handle this on the client side
-                // The platform wallet should ONLY be used on the server
-                // Let's use the existing /api/cashout endpoint which handles this securely
-                
-                console.log('📞 Calling cashout API...')
-                
                 // Get player name
                 let playerName = 'Anonymous'
                 if (user?.email && typeof user.email === 'string') {
@@ -1454,25 +1444,39 @@ const MultiplayerArena = () => {
                   }
                 }
                 
-                // Call the server-side cashout API that handles the transaction
-                const apiResponse = await fetch('/api/cashout', {
+                // Step 1: Call API to prepare the transaction (get pre-signed transaction)
+                console.log('📞 Building cashout transaction on server...')
+                const prepareResponse = await fetch('/api/cashout', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
                     userWalletAddress,
                     cashOutValueUSD,
                     privyUserId: user?.id,
-                    playerName
+                    playerName,
+                    prepareOnly: true // Flag to return serialized transaction instead of sending
                   })
                 })
                 
-                const apiData = await apiResponse.json()
+                const prepareData = await prepareResponse.json()
                 
-                if (!apiData.success) {
-                  throw new Error(apiData.error || 'Cashout API failed')
+                if (!prepareData.success) {
+                  throw new Error(prepareData.error || 'Failed to prepare cashout transaction')
                 }
                 
-                const signature = apiData.signature
+                // Step 2: Get the pre-signed transaction from server
+                const serializedTransaction = prepareData.serializedTransaction
+                console.log('✅ Transaction prepared by server')
+                
+                // Step 3: Show Privy modal for user approval
+                console.log('🔐 Opening Privy modal for user approval...')
+                
+                const result = await privySignAndSendTransaction({
+                  transaction: Buffer.from(serializedTransaction, 'base64'),
+                  address: userWalletAddress
+                })
+                
+                const signature = result.signature || result
                 console.log('✅ Cashout transaction confirmed! Signature:', signature)
                 
                 // Store signature for display
