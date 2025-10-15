@@ -1483,54 +1483,7 @@ const MultiplayerArena = () => {
                 const signature = apiData.signature
                 console.log('✅ Cashout transaction confirmed! Signature:', signature)
                 
-                // Calculate payout (90% after 10% platform fee)
-                const payoutUSD = cashOutValueUSD * 0.90
-                const USD_PER_SOL = 18.18
-                const payoutSOL = payoutUSD / USD_PER_SOL
-                const lamportsToSend = Math.floor(payoutSOL * LAMPORTS_PER_SOL)
-                
-                console.log('💰 Payout:', {
-                  totalUSD: `$${cashOutValueUSD.toFixed(2)}`,
-                  payoutUSD: `$${payoutUSD.toFixed(2)} (90%)`,
-                  payoutSOL: payoutSOL.toFixed(8),
-                  lamports: lamportsToSend
-                })
-                
-                // Build transaction (platform sends to user)
-                const userPubkey = new PublicKey(userWalletAddress)
-                const transferIx = SystemProgram.transfer({
-                  fromPubkey: platformKeypair.publicKey,
-                  toPubkey: userPubkey,
-                  lamports: lamportsToSend
-                })
-                
-                const { blockhash } = await connection.getLatestBlockhash('confirmed')
-                const transaction = new Transaction({
-                  recentBlockhash: blockhash,
-                  feePayer: userPubkey // User pays the fee
-                }).add(transferIx)
-                
-                // Platform signs since they're sending
-                transaction.partialSign(platformKeypair)
-                
-                // Serialize for Privy
-                const serializedTx = transaction.serialize({
-                  requireAllSignatures: false,
-                  verifySignatures: false
-                })
-                
-                console.log('🔐 Opening Privy modal for user approval...')
-                
-                // Show Privy transaction modal
-                const result = await privySignAndSendTransaction({
-                  transaction: serializedTx,
-                  address: userWalletAddress
-                })
-                
-                const signature = result.signature || result
-                console.log('✅ Cashout transaction confirmed! Signature:', signature)
-                
-                // Store signature
+                // Store signature for display
                 window.cashoutSignature = signature
                 
                 // Fetch updated balance
