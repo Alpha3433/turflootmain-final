@@ -897,34 +897,114 @@ const MultiplayerArena = () => {
     }
   }
 
-  // Handle replay - redirect to landing page to go through payment flow
-  const handleReplayPayment = () => {
-    console.log('🔄 Redirecting to landing page for replay...')
+  // Handle replay payment from cashout modal
+  const handleReplayPayment = async () => {
+    console.log('💰 Starting replay payment process...')
     
-    // Get room details from URL
-    const urlParams = new URLSearchParams(window.location.search)
-    const roomId = urlParams.get('room')
-    const fee = urlParams.get('fee')
-    const mode = urlParams.get('mode')
-    
-    // Close modal
-    setShowCashOutSuccessModal(false)
-    setCashOutComplete(false)
-    setWalletBalance(null)
-    window.cashoutSignature = null
-    
-    // Redirect to landing page with room info for automatic reconnection
-    if (roomId && fee && mode) {
-      // Store the room they want to rejoin
-      window.sessionStorage.setItem('rejoinRoom', JSON.stringify({
-        roomId,
-        fee: parseFloat(fee),
-        mode
-      }))
+    try {
+      // Check if Privy signing is available
+      if (!privySignAndSendTransaction) {
+        throw new Error('Privy payment system not available. Please refresh and try again.')
+      }
+      
+      // Get entry fee from URL params
+      const urlParams = new URLSearchParams(window.location.search)
+      const entryFee = parseFloat(urlParams.get('fee')) || 0.05
+      const roomId = urlParams.get('room')
+      const mode = urlParams.get('mode')
+      
+      console.log('   Entry Fee: $' + entryFee)
+      
+      // Get embedded wallet
+      const embeddedWallet = user?.linkedAccounts?.find(
+        account => account.type === 'wallet' && account.chainType === 'solana'
+      )
+      if (!embeddedWallet || !embeddedWallet.address) {
+        throw new Error('No Solana wallet found')
+      }
+      
+      const userWalletAddress = embeddedWallet.address
+      console.log('   From Wallet:', userWalletAddress)
+      
+      // Import Solana libraries
+      const { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } = await import('@solana/web3.js')
+      
+      // Setup connection
+      const heliusRpc = 'https://mainnet.helius-rpc.com/?api-key=9ce7937c-f2a5-4759-8d79-dd8f9ca63fa5'
+      const connection = new Connection(heliusRpc, 'confirmed')
+      
+      // Calculate SOL amount
+      const platformWallet = 'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
+      const USD_PER_SOL = 18.18
+      const solAmount = entryFee / USD_PER_SOL
+      const lamports = Math.floor(solAmount * LAMPORTS_PER_SOL)
+      
+      console.log('💵 Payment: $' + entryFee + ' = ' + solAmount.toFixed(6) + ' SOL')
+      
+      // Check balance
+      const fromPubkey = new PublicKey(userWalletAddress)
+      const currentBalanceLamports = await connection.getBalance(fromPubkey)
+      const RENT_EXEMPT_MINIMUM = 890880
+      const TRANSACTION_FEE_ESTIMATE = 5000
+      
+      const remainingBalance = currentBalanceLamports - lamports - TRANSACTION_FEE_ESTIMATE
+      if (remainingBalance < RENT_EXEMPT_MINIMUM) {
+        throw new Error('Insufficient balance. Please add more SOL to your wallet.')
+      }
+      
+      // Build transaction
+      const toPubkey = new PublicKey(platformWallet)
+      const transferIx = SystemProgram.transfer({
+        fromPubkey,
+        toPubkey,
+        lamports
+      })
+      
+      const { blockhash } = await connection.getLatestBlockhash('confirmed')
+      const transaction = new Transaction({
+        recentBlockhash: blockhash,
+        feePayer: fromPubkey
+      }).add(transferIx)
+      
+      // Serialize transaction
+      const serializedTx = transaction.serialize({
+        requireAllSignatures: false,
+        verifySignatures: false
+      })
+      
+      console.log('🔐 Opening Privy transaction modal...')
+      
+      // Sign and send transaction with Privy
+      const result = await privySignAndSendTransaction({
+        transaction: serializedTx,
+        address: userWalletAddress
+      })
+      
+      const signature = result.signature || result
+      console.log('✅ Payment successful! Signature:', signature)
+      
+      // Close cashout modal
+      setShowCashOutSuccessModal(false)
+      setCashOutComplete(false)
+      setWalletBalance(null)
+      window.cashoutSignature = null
+      
+      // Reload to rejoin game
+      window.location.reload()
+      
+    } catch (error) {
+      console.error('❌ Replay payment failed:', error)
+      
+      // User-friendly error messages
+      let errorMessage = error.message
+      if (error.message && error.message.includes('User rejected')) {
+        errorMessage = 'Transaction cancelled. Please try again when ready.'
+      } else if (error.message && error.message.includes('Insufficient')) {
+        errorMessage = 'Insufficient balance. Please add more SOL to your wallet.'
+      }
+      
+      alert(`Payment failed: ${errorMessage}`)
     }
-    
-    // Redirect to landing page
-    window.location.href = '/'
   }
 
 
