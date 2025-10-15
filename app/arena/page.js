@@ -2821,15 +2821,18 @@ const MultiplayerArena = () => {
           piece.vy = 0
         }
         
-        // Check for merge with main player (exact agario merge detection)
-        if (piece.canMerge) {
-          const dx = piece.x - this.player.x
-          const dy = piece.y - this.player.y
-          const distance = Math.sqrt(dx * dx + dy * dy)
-          // Exact agario merge distance
-          const minMergeDistance = (piece.radius + this.player.radius) * 0.8
+        // Collision detection with main player (prevent overlap)
+        const dx = piece.x - this.player.x
+        const dy = piece.y - this.player.y
+        const distance = Math.sqrt(dx * dx + dy * dy)
+        const minDistance = piece.radius + this.player.radius
+        
+        // Check for collision (touching but not overlapping)
+        if (distance < minDistance) {
+          // If can merge and close enough, merge them
+          const minMergeDistance = minDistance * 0.8
           
-          if (distance < minMergeDistance) {
+          if (piece.canMerge && distance < minMergeDistance) {
             // Merge piece into main player (exact agario style)
             this.player.mass += piece.mass
             this.player.radius = Math.sqrt(this.player.mass / Math.PI) * 6  // Exact agario radius
@@ -2843,6 +2846,19 @@ const MultiplayerArena = () => {
             
             console.log('🔄 Piece merged! New player mass:', Math.round(this.player.mass), 'Total mass:', Math.floor(totalMass))
             continue
+          } else {
+            // Collision - push them apart so they don't overlap
+            const overlap = minDistance - distance
+            const pushX = (dx / distance) * overlap * 0.5
+            const pushY = (dy / distance) * overlap * 0.5
+            
+            // Push the piece away from main player
+            piece.x += pushX
+            piece.y += pushY
+            
+            // Push main player away from piece (equal and opposite)
+            this.player.x -= pushX
+            this.player.y -= pushY
           }
         }
         
