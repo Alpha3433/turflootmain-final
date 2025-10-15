@@ -1442,9 +1442,46 @@ const MultiplayerArena = () => {
                 const heliusRpc = 'https://mainnet.helius-rpc.com/?api-key=9ce7937c-f2a5-4759-8d79-dd8f9ca63fa5'
                 const connection = new Connection(heliusRpc, 'confirmed')
                 
-                // Platform wallet (sends SOL to user)
-                const platformPrivateKey = 'QKHLmGRFu1G6j7Uji3AtbZHq1oWKd2tWTpSWPkkHtKGWd2Y1H4YKdN4BqT3VvJkSW9dVUyxmYH6RB4UG7FT8oQhV'
-                const platformKeypair = Keypair.fromSecretKey(bs58Module.default.decode(platformPrivateKey))
+                // Get platform wallet private key from API
+                // We can't access env vars directly on client, so we'll use the cashout API instead
+                // Let's call the API endpoint which has access to the private key
+                
+                // Actually, we should NOT handle this on the client side
+                // The platform wallet should ONLY be used on the server
+                // Let's use the existing /api/cashout endpoint which handles this securely
+                
+                console.log('📞 Calling cashout API...')
+                
+                // Get player name
+                let playerName = 'Anonymous'
+                if (user?.email && typeof user.email === 'string') {
+                  try {
+                    playerName = user.email.split('@')[0]
+                  } catch (e) {
+                    console.warn('Error parsing email:', e)
+                  }
+                }
+                
+                // Call the server-side cashout API that handles the transaction
+                const apiResponse = await fetch('/api/cashout', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    userWalletAddress,
+                    cashOutValueUSD,
+                    privyUserId: user?.id,
+                    playerName
+                  })
+                })
+                
+                const apiData = await apiResponse.json()
+                
+                if (!apiData.success) {
+                  throw new Error(apiData.error || 'Cashout API failed')
+                }
+                
+                const signature = apiData.signature
+                console.log('✅ Cashout transaction confirmed! Signature:', signature)
                 
                 // Calculate payout (90% after 10% platform fee)
                 const payoutUSD = cashOutValueUSD * 0.90
