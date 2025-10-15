@@ -975,7 +975,23 @@ const MultiplayerArena = () => {
       
     } catch (error) {
       console.error('❌ Replay payment failed:', error)
-      alert(`Payment failed: ${error.message}. Please try again.`)
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      })
+      
+      // User-friendly error messages
+      let errorMessage = error.message
+      if (error.message.includes('User rejected')) {
+        errorMessage = 'Transaction cancelled. Please try again when ready.'
+      } else if (error.message.includes('Insufficient balance')) {
+        errorMessage = 'Insufficient balance. Please add more SOL to your wallet.'
+      } else if (error.message.includes('not available')) {
+        errorMessage = 'Wallet connection issue. Please refresh the page and try again.'
+      }
+      
+      alert(`Payment failed: ${errorMessage}`)
     }
   }
 
