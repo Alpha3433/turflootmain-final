@@ -191,10 +191,11 @@ const MultiplayerArena = () => {
   ]), [])
 
   const visibleMissions = useMemo(() => {
-    return activeMissions.filter(mission => !mission.completed && !completedMissions.includes(mission.id))
-  }, [activeMissions, completedMissions])
+    // Show all missions, including completed ones
+    return activeMissions
+  }, [activeMissions])
   const missionsToDisplay = useMemo(() => visibleMissions.slice(0, 1), [visibleMissions])
-  const activeMissionCount = missionsToDisplay.length
+  const activeMissionCount = missionsToDisplay.filter(m => !m.completed && !completedMissions.includes(m.id)).length
   const hasActiveMissions = activeMissionCount > 0
   const showMissionCompletion = Boolean(missionCompletionIndicator && !hasActiveMissions)
   const shouldRenderMissionPopup = (missionPopupVisible && (hasActiveMissions || missionPopupCondensed)) || showMissionCompletion
