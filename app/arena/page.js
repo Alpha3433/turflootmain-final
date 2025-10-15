@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Client } from 'colyseus.js'
-import { usePrivy } from '@privy-io/react-auth'
+import { usePrivy, useWallets as useSolanaWallets } from '@privy-io/react-auth'
+import { useSignAndSendTransaction } from '@privy-io/react-auth/solana'
 
 // Global connection tracker to prevent duplicates across component instances
 const GLOBAL_CONNECTION_TRACKER = {
