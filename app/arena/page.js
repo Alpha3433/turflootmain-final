@@ -4195,14 +4195,6 @@ const MultiplayerArena = () => {
               gap: isMobile ? '3px' : '4px'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#9ca3af' }}>Worth:</span>
-                <span style={{ color: '#22c55e', fontWeight: '700' }}>${score}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#9ca3af' }}>Mass:</span>
-                <span style={{ color: '#ffffff', fontWeight: '700' }}>{Math.floor(mass)}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: '#9ca3af' }}>K/D:</span>
                 <span style={{ color: '#ffffff', fontWeight: '700' }}>{eliminations}/0</span>
               </div>
