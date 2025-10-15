@@ -2016,7 +2016,12 @@ const MultiplayerArena = () => {
         
         // Update loyalty stats and leaderboard after game completion (only for paid arenas)
         if (isPaidArena && user?.id && entryFee > 0) {
-          console.log('📊 Game completed - updating loyalty stats and leaderboard...')
+          console.log('📊 Game completed - updating loyalty stats and leaderboard...', {
+            isPaidArena,
+            userId: user?.id,
+            entryFee,
+            connectionStatus
+          })
           
           // Update loyalty stats
           fetch('/api/loyalty', {
